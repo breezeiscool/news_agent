@@ -3,6 +3,10 @@
 
 [GLOBAL_FILTER]
 
+!广告
+!培训
+!课程
+
 [WORD_GROUPS]
 
 # ============ 采集线A：计算产业行业动态 ============
@@ -13,9 +17,7 @@ AI
 LLM
 artificial intelligence
 GPT
-!广告
-!培训
-!课程
+
  
 算力
 computing power
@@ -41,6 +43,11 @@ foundry
 制程
 光模块
 GPO
+存储
+storage
+ssd
+dram
+ddr4
 
  
 # ============ 采集线B：公司监控名单 ============
