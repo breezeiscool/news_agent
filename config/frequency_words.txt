@@ -1,0 +1,9 @@
+# 在此粘贴你的 frequency_words.txt 内容...
+# 或拖拽文件到编辑器区域
+
+[GLOBAL_FILTER]
+
+[WORD_GROUPS]
+人工智能 AI 算力 芯片 半导体 +产业 !广告 !培训
+华为 昇腾 !手机评测
+英伟达 NVIDIA
