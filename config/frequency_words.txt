@@ -27,6 +27,8 @@ datacenter
 supercomputing
 云计算
 cloud computing
+边缘计算
+edge computing
  
 芯片
 半导体
@@ -37,6 +39,9 @@ GPU
 foundry
 光刻
 制程
+光模块
+GPO
+
  
 # ============ 采集线B：公司监控名单 ============
  
