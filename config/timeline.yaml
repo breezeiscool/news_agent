@@ -106,6 +106,52 @@
 # ───────────────────────────────────────────────────────────────
 presets:
 
+  # =====================================================
+# test_mode - 测试专用预设模板（coco新增）
+#
+# 用途：随时手动 Run workflow 都会完整执行
+#       采集 → AI 分析 → 推送 全链路，便于即时验证配置。
+#
+# 粘贴位置：你仓库 config/timeline.yaml 中 presets: 之下，
+#           与 always_on / morning_evening 等模板并列。
+#           整块粘贴，注意 test_mode: 这一行的缩进
+#           必须与 always_on: 完全对齐（前面 2 个空格）。
+#
+# 启用方式：config.yaml 中设置 schedule.preset: "test_mode"
+# ⚠️ 测试完毕务必切回正式模板（如 "custom"），
+#    否则定时任务每次唤醒都会调用 AI 并发邮件！
+# =====================================================
+ 
+  test_mode:
+    name: "测试模式"
+    description: "全天无限制：每次运行都执行采集+AI分析+推送当日汇总。仅用于调试。"
+ 
+    # 默认配置：全天所有开关全开，且不限次数
+    default:
+      collect: true              # 采集热榜 + RSS
+      analyze: true              # 每次运行都执行 AI 分析
+      ai_mode: "daily"           # AI 汇总当日全部内容
+      push: true                 # 每次运行都推送
+      report_mode: "daily"       # 报告为当日全量汇总
+      once:
+        analyze: false           # 不限制分析次数（每次 Run 都分析）
+        push: false              # 不限制推送次数（每次 Run 都推送）
+ 
+    # 不划分任何时间段，全天走 default
+    periods: {}
+    day_plans:
+      all_day:
+        periods: []
+    week_map:
+      1: "all_day"
+      2: "all_day"
+      3: "all_day"
+      4: "all_day"
+      5: "all_day"
+      6: "all_day"
+      7: "all_day"
+
+  
   # ───────────────────────────────────────────────────────────
   # 1️⃣ always_on - 全天候监控
   #
@@ -400,14 +446,14 @@ custom:
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   default:
     collect: true                  # 是否采集数据（爬取热榜 + RSS）
-    analyze: false                 # 是否执行 AI 分析
+    analyze: true                 # 是否执行 AI 分析
     ai_mode: "current"            # AI 分析模式:
                                    #   follow_report → 跟随 report_mode
                                    #   daily         → 强制全天汇总
                                    #   current       → 强制当前榜单
                                    #   incremental   → 强制增量模式
-    push: false                    # 是否发送推送通知
-    report_mode: "current"         # 报告模式:
+    push: t rue                    # 是否发送推送通知
+    report_mode: "daily"         # 报告模式:
                                    #   daily       → 当日所有新闻的汇总
                                    #   current     → 当前在榜的新闻
                                    #   incremental → 只推送新增内容
