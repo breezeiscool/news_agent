@@ -4,6 +4,124 @@
 [GLOBAL_FILTER]
 
 [WORD_GROUPS]
-人工智能 AI 算力 芯片 半导体 +产业 !广告 !培训
-华为 昇腾 !手机评测
-英伟达 NVIDIA
+
+# ============ 采集线A：计算产业行业动态 ============
+ 
+人工智能
+AI
+大模型
+LLM
+artificial intelligence
+GPT
+!广告
+!培训
+!课程
+ 
+算力
+computing power
+数据中心
+data center
+datacenter
+智算中心
+超算
+supercomputing
+云计算
+cloud computing
+ 
+芯片
+半导体
+chip
+semiconductor
+GPU
+晶圆
+foundry
+光刻
+制程
+ 
+# ============ 采集线B：公司监控名单 ============
+ 
+工商银行
+工行
+ICBC
+ 
+中国银行
+中行
+ 
+建设银行
+建行
+China Construction Bank
+ 
+农业银行
+农行
+Agricultural Bank
+ 
+邮储银行
+邮政储蓄
+Postal Savings Bank
+PSBC
+ 
+招商银行
+招行
+China Merchants Bank
+ 
+交通银行
+交行
+Bank of Communications
+ 
+中信
+CITIC
+ 
+国家税务总局
+税务总局
+State Taxation Administration
+ 
+国家电网
+国网
+State Grid
+ 
+南方电网
+南网
+Southern Power Grid
+ 
+国铁集团
+中国国家铁路
+China State Railway
+ 
+中国石油
+中石油
+PetroChina
+CNPC
+ 
+美团
+Meituan
+ 
+腾讯
+Tencent
+ 
+抖音
+Douyin
+字节跳动
+ByteDance
+TikTok
+ 
+Saudi Electricity
+沙特电力
+ 
+NEOM
+尼奥姆
+ 
+CFE
+墨西哥联邦电力
+Comision Federal de Electricidad
+ 
+DBS
+星展银行
+星展集团
+ 
+Volkswagen
+大众汽车
+VW
+ 
+埃及国防部
+Egypt Ministry of Defence
+Egyptian MOD
