@@ -1,0 +1,51 @@
+# =====================================================
+# Send Email (No AI) —— 零 token 的手动发信按钮
+#
+# 用途：手动触发时，抓取最新数据 → 关键词筛选 →
+#       生成报告 → 发送邮件，全程跳过 AI 分析（不消耗 token）。
+#
+# 安装：在你的仓库中新建文件，路径必须是：
+#       .github/workflows/send_email_no_ai.yml
+#       （在仓库首页点 Add file → Create new file，
+#         文件名一栏直接输入上面的完整路径即可自动建目录）
+#
+# 使用：Actions 页面 → 左侧选 "Send Email (No AI)"
+#       → Run workflow。这就是你的"发邮件按钮"。
+#
+# 原理：AI_ANALYSIS_ENABLED 被固定为 false（总开关优先级
+#       高于 timeline 时段开关），因此无论 timeline 怎么配，
+#       这条工作流都不会调用 AI。
+# =====================================================
+
+name: Send Email (No AI)
+
+on:
+  workflow_dispatch:   # 仅手动触发，不定时运行
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v6
+
+      - name: 安装 Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: 安装 uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: 安装依赖
+        run: uv sync --frozen --no-dev
+
+      - name: 运行 TrendRadar（跳过 AI，直接发信）
+        env:
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_SMTP_SERVER: ${{ secrets.EMAIL_SMTP_SERVER }}
+          EMAIL_SMTP_PORT: ${{ secrets.EMAIL_SMTP_PORT }}
+          AI_ANALYSIS_ENABLED: "false"   # 总开关关死 AI，零 token
+        run: uv run python -m trendradar
