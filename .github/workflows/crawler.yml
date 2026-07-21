@@ -213,3 +213,12 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy cloudflare_dist --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+
+      - name: 上传 HTML 报告（供下载预览）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report
+          path: output/html/
+          retention-days: 7
+          if-no-files-found: warn
