@@ -1,529 +1,4 @@
-# coding=utf-8
-"""
-HTML 报告渲染模块
 
-提供 HTML 格式的热点新闻报告生成功能
-"""
-
-import json
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Callable
-
-from trendradar.report.helpers import (
-    html_escape,
-    calculate_rank_trend,
-    category_icon as _category_icon,
-    order_stats_by_category as _order_stats_by_category,
-)
-from trendradar.utils.time import convert_time_for_display
-from trendradar.ai.formatter import render_ai_analysis_html_rich
-
-
-# 订阅管理面板样式（仅用于独立管理页面 output/html/manager.html）
-_CM_CSS = """
-            /* ===== 订阅管理面板 ===== */
-            .config-manager {
-                margin-top: 32px;
-            }
-            .cm-header { margin-bottom: 16px; }
-            .cm-title {
-                font-size: 18px;
-                font-weight: 700;
-                color: #1a1a1a;
-                margin-bottom: 4px;
-            }
-            .cm-sub { font-size: 13px; color: #6b7280; line-height: 1.5; }
-            .cm-grid { display: flex; flex-direction: column; gap: 20px; }
-            body.wide-mode .cm-grid { flex-direction: row; align-items: flex-start; }
-            body.wide-mode .cm-panel { flex: 1; min-width: 0; }
-            .cm-panel {
-                border: 1px solid #e5e7eb;
-                border-radius: 10px;
-                padding: 16px;
-                background: #eef3f8;
-            }
-            .cm-panel-title { font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 12px; }
-            .cm-list-label { font-size: 13px; font-weight: 600; color: #4b5563; margin: 12px 0 6px 0; }
-            .cm-hint { font-weight: 400; color: #9ca3af; font-size: 12px; font-family: 'SF Mono', Consolas, monospace; }
-            .cm-list { max-height: 300px; overflow-y: auto; }
-            .cm-group-list { max-height: 380px; }
-            .cm-cat-label {
-                font-size: 12px;
-                font-weight: 700;
-                color: #2a6f97;
-                margin: 10px 0 4px 0;
-                text-transform: none;
-            }
-            .cm-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 6px 8px;
-                border-radius: 6px;
-                font-size: 13px;
-            }
-            .cm-item:hover { background: #f3f4f6; }
-            .cm-item-name { font-weight: 600; color: #1f2937; flex-shrink: 0; }
-            .cm-item-detail {
-                color: #9ca3af;
-                font-size: 12px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                flex: 1;
-                min-width: 0;
-            }
-            .cm-del {
-                background: none;
-                border: none;
-                color: #d1d5db;
-                cursor: pointer;
-                font-size: 12px;
-                padding: 2px 6px;
-                border-radius: 4px;
-                flex-shrink: 0;
-            }
-            .cm-del:hover { color: #a3564a; background: #fee2e2; }
-            .cm-empty { color: #9ca3af; font-size: 13px; padding: 8px; }
-            .cm-add-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-            .cm-add-row input, .cm-add-row select {
-                flex: 1;
-                min-width: 90px;
-                padding: 7px 10px;
-                border: 1px solid #e5e7eb;
-                border-radius: 6px;
-                font-size: 13px;
-                outline: none;
-            }
-            .cm-add-row input:focus, .cm-add-row select:focus { border-color: #2a6f97; }
-            .cm-btn {
-                padding: 7px 12px;
-                border: 1px solid #e5e7eb;
-                border-radius: 6px;
-                background: white;
-                color: #374151;
-                font-size: 13px;
-                cursor: pointer;
-                white-space: nowrap;
-                transition: all 0.15s;
-            }
-            .cm-btn:hover { border-color: #2a6f97; color: #2a6f97; }
-            .cm-btn-primary { background: #2a6f97; border-color: #2a6f97; color: white; }
-            .cm-btn-primary:hover { background: #1b5886; color: white; }
-            .cm-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-            .cm-raw {
-                width: 100%;
-                min-height: 260px;
-                margin-top: 10px;
-                padding: 10px;
-                border: 1px solid #e5e7eb;
-                border-radius: 8px;
-                font-family: 'SF Mono', Consolas, monospace;
-                font-size: 12px;
-                line-height: 1.6;
-                box-sizing: border-box;
-                resize: vertical;
-                outline: none;
-            }
-            .cm-raw:focus { border-color: #2a6f97; }
-            .cm-note { margin-top: 14px; font-size: 12px; color: #9ca3af; line-height: 1.5; }
-
-            body.dark-mode .cm-title { color: #f1f5f9; }
-            body.dark-mode .cm-sub, body.dark-mode .cm-note { color: #94a3b8; }
-            body.dark-mode .cm-panel { background: #0f172a; border-color: #334155; }
-            body.dark-mode .cm-panel-title { color: #e2e8f0; }
-            body.dark-mode .cm-list-label { color: #cbd5e1; }
-            body.dark-mode .cm-cat-label { color: #a4c6de; }
-            body.dark-mode .cm-item:hover { background: #1e293b; }
-            body.dark-mode .cm-item-name { color: #e2e8f0; }
-            body.dark-mode .cm-add-row input, body.dark-mode .cm-add-row select,
-            body.dark-mode .cm-raw {
-                background: #1e293b;
-                border-color: #334155;
-                color: #e2e8f0;
-            }
-            body.dark-mode .cm-btn { background: #1e293b; border-color: #334155; color: #cbd5e1; }
-            body.dark-mode .cm-btn:hover { border-color: #7fb2d9; color: #a4c6de; }
-            body.dark-mode .cm-btn-primary { background: #2f6690; border-color: #2f6690; color: white; }
-            body.dark-mode .cm-del:hover { color: #fca5a5; background: #450a0a; }
-
-"""
-
-
-def _render_config_manager_section(data: Dict) -> str:
-    """渲染订阅管理面板（纯前端编辑，生成配置文件供下载/复制）
-
-    默认 display:none，由页面 JS 显示——邮件客户端不执行 JS，
-    因此该面板只在浏览器中可见，不会污染邮件推送。
-
-    Args:
-        data: {"frequency_raw": str, "platforms": [{id,name}], "rss_feeds": [{id,name,url}]}
-    """
-    # 防 </script> 注入：JSON 中的 "</" 转义
-    payload = json.dumps(
-        {
-            "frequencyRaw": data.get("frequency_raw", ""),
-            "platforms": data.get("platforms", []),
-            "rssFeeds": data.get("rss_feeds", []),
-        },
-        ensure_ascii=False,
-    ).replace("</", "<\\/")
-
-    return """
-                <div class="config-manager section-divider" id="configManager" style="display:none">
-                    <div class="cm-header">
-                        <div class="cm-title">⚙️ 订阅管理</div>
-                        <div class="cm-sub">增删信息源、监控公司与产业词组。修改后下载/复制新配置，覆盖仓库 config/ 下对应文件，下次运行生效。</div>
-                    </div>
-                    <div class="cm-grid">
-                        <div class="cm-panel">
-                            <div class="cm-panel-title">📡 信息源</div>
-                            <div class="cm-list-label">热榜平台 <span class="cm-hint">config.yaml → platforms.sources</span></div>
-                            <div id="cmPlatformList" class="cm-list"></div>
-                            <div class="cm-add-row">
-                                <input id="cmPlatId" placeholder="平台 id（如 zhihu）">
-                                <input id="cmPlatName" placeholder="显示名称（如 知乎）">
-                                <button class="cm-btn" onclick="cmAddPlatform()">＋ 添加</button>
-                            </div>
-                            <div class="cm-list-label">RSS 订阅源 <span class="cm-hint">config.yaml → rss.feeds</span></div>
-                            <div id="cmRssList" class="cm-list"></div>
-                            <div class="cm-add-row">
-                                <input id="cmRssId" placeholder="id（如 36kr）">
-                                <input id="cmRssName" placeholder="名称">
-                                <input id="cmRssUrl" placeholder="订阅地址 https://...">
-                                <button class="cm-btn" onclick="cmAddRss()">＋ 添加</button>
-                            </div>
-                            <div class="cm-actions">
-                                <button class="cm-btn cm-btn-primary" onclick="cmCopySources(this)">复制 config.yaml 片段</button>
-                                <button class="cm-btn" onclick="cmDownloadSources()">下载片段</button>
-                            </div>
-                        </div>
-                        <div class="cm-panel">
-                            <div class="cm-panel-title">🔍 监控词组（公司 / 产业）</div>
-                            <div id="cmGroupList" class="cm-list cm-group-list"></div>
-                            <div class="cm-add-row">
-                                <select id="cmGroupCat"></select>
-                                <input id="cmGroupName" placeholder="组名（如 阿里巴巴）">
-                                <input id="cmGroupWords" placeholder="关键词，逗号分隔（如 阿里巴巴,Alibaba,阿里云）">
-                                <button class="cm-btn" onclick="cmAddGroup()">＋ 添加</button>
-                            </div>
-                            <div class="cm-actions">
-                                <button class="cm-btn cm-btn-primary" onclick="cmCopyFrequency(this)">复制 frequency_words.txt</button>
-                                <button class="cm-btn" onclick="cmDownloadFrequency()">下载 frequency_words.txt</button>
-                                <button class="cm-btn" onclick="cmToggleRaw()">高级编辑</button>
-                            </div>
-                            <textarea id="cmRawText" class="cm-raw" style="display:none" spellcheck="false" oninput="cmRenderGroups()"></textarea>
-                        </div>
-                    </div>
-                    <div class="cm-note">提示：本页面的修改只是预览，不会自动写回服务器。GitHub 部署可直接在仓库网页编辑 config/frequency_words.txt 与 config.yaml 后提交。</div>
-                </div>
-                <script id="cmData" type="application/json">""" + payload + """</script>
-                <script>
-                (function() {
-                    var cmData;
-                    try { cmData = JSON.parse(document.getElementById('cmData').textContent); } catch(e) { return; }
-                    window.cmPlatforms = cmData.platforms || [];
-                    window.cmRss = cmData.rssFeeds || [];
-                    var rawEl = document.getElementById('cmRawText');
-                    rawEl.value = cmData.frequencyRaw || '';
-
-                    var CAT_RE = /^\\[(?:分类|CATEGORY)\\s*[:：]\\s*(.+?)\\]$/i;
-
-                    window.cmParseFreq = function(raw) {
-                        var paras = raw.replace(/[ \\t]+$/gm, '').split(/\\n{2,}/);
-                        var cat = null, blocks = [];
-                        paras.forEach(function(p) {
-                            if (!p.trim()) return;
-                            var lines = p.trim().split('\\n');
-                            var contentLines = lines.filter(function(l) { return l.trim() && l.trim().charAt(0) !== '#'; });
-                            var first = contentLines.length ? contentLines[0].trim() : '';
-                            var catMatch = first.match(CAT_RE);
-                            if (catMatch && contentLines.length === 1) {
-                                cat = catMatch[1].trim();
-                                blocks.push({type: 'category', text: p, category: cat});
-                                return;
-                            }
-                            var isMarker = /^\\[(GLOBAL_FILTER|WORD_GROUPS)\\]$/i.test(first);
-                            var isFilterBlock = '!+@'.indexOf(first.charAt(0)) !== -1;
-                            if (!first || isMarker || isFilterBlock) {
-                                blocks.push({type: 'raw', text: p, category: cat});
-                                return;
-                            }
-                            var name = first;
-                            var aliasMatch = first.match(/^\\[(.+)\\]$/);
-                            if (aliasMatch) name = aliasMatch[1];
-                            var words = contentLines.slice(aliasMatch ? 1 : 0).map(function(l) { return l.trim(); });
-                            blocks.push({type: 'group', text: p, category: cat, name: name, words: words});
-                        });
-                        return blocks;
-                    };
-
-                    window.cmRenderGroups = function() {
-                        var blocks = cmParseFreq(rawEl.value);
-                        var listEl = document.getElementById('cmGroupList');
-                        var catSel = document.getElementById('cmGroupCat');
-                        var html = '', cats = [], lastCat = null;
-                        blocks.forEach(function(b, idx) {
-                            if (b.type === 'category' && cats.indexOf(b.category) === -1) cats.push(b.category);
-                            if (b.type !== 'group') return;
-                            if (b.category !== lastCat) {
-                                lastCat = b.category;
-                                html += '<div class="cm-cat-label">' + cmEsc(b.category || '未分类') + '</div>';
-                            }
-                            var preview = b.words.slice(0, 4).join('、');
-                            if (b.words.length > 4) preview += ' 等' + b.words.length + '词';
-                            html += '<div class="cm-item"><span class="cm-item-name">' + cmEsc(b.name) + '</span>'
-                                + '<span class="cm-item-detail" title="' + cmEsc(b.words.join(', ')) + '">' + cmEsc(preview) + '</span>'
-                                + '<button class="cm-del" title="删除该词组" onclick="cmDelGroup(' + idx + ')">✕</button></div>';
-                        });
-                        listEl.innerHTML = html || '<div class="cm-empty">暂无词组</div>';
-                        if (catSel) {
-                            var cur = catSel.value;
-                            catSel.innerHTML = cats.map(function(c) { return '<option value="' + cmEsc(c) + '">' + cmEsc(c) + '</option>'; }).join('');
-                            if (cur) catSel.value = cur;
-                        }
-                    };
-
-                    window.cmDelGroup = function(idx) {
-                        var blocks = cmParseFreq(rawEl.value);
-                        if (!blocks[idx] || blocks[idx].type !== 'group') return;
-                        if (!confirm('删除词组「' + blocks[idx].name + '」？')) return;
-                        blocks.splice(idx, 1);
-                        rawEl.value = blocks.map(function(b) { return b.text; }).join('\\n\\n') + '\\n';
-                        cmRenderGroups();
-                    };
-
-                    window.cmAddGroup = function() {
-                        var cat = document.getElementById('cmGroupCat').value;
-                        var name = document.getElementById('cmGroupName').value.trim();
-                        var words = document.getElementById('cmGroupWords').value.split(/[,，、]/).map(function(w) { return w.trim(); }).filter(Boolean);
-                        if (!name || !words.length) { alert('请填写组名和至少一个关键词'); return; }
-                        var blocks = cmParseFreq(rawEl.value);
-                        var newText = '[' + name + ']\\n' + words.join('\\n');
-                        var insertAt = blocks.length;
-                        for (var i = blocks.length - 1; i >= 0; i--) {
-                            if (blocks[i].category === cat && (blocks[i].type === 'group' || blocks[i].type === 'category')) { insertAt = i + 1; break; }
-                        }
-                        blocks.splice(insertAt, 0, {type: 'group', text: newText, category: cat, name: name, words: words});
-                        rawEl.value = blocks.map(function(b) { return b.text; }).join('\\n\\n') + '\\n';
-                        document.getElementById('cmGroupName').value = '';
-                        document.getElementById('cmGroupWords').value = '';
-                        cmRenderGroups();
-                    };
-
-                    window.cmRenderSources = function() {
-                        var pEl = document.getElementById('cmPlatformList');
-                        pEl.innerHTML = cmPlatforms.map(function(p, i) {
-                            return '<div class="cm-item"><span class="cm-item-name">' + cmEsc(p.name) + '</span>'
-                                + '<span class="cm-item-detail">' + cmEsc(p.id) + '</span>'
-                                + '<button class="cm-del" onclick="cmDelPlatform(' + i + ')">✕</button></div>';
-                        }).join('') || '<div class="cm-empty">暂无平台</div>';
-                        var rEl = document.getElementById('cmRssList');
-                        rEl.innerHTML = cmRss.map(function(f, i) {
-                            return '<div class="cm-item"><span class="cm-item-name">' + cmEsc(f.name) + '</span>'
-                                + '<span class="cm-item-detail" title="' + cmEsc(f.url) + '">' + cmEsc(f.url) + '</span>'
-                                + '<button class="cm-del" onclick="cmDelRss(' + i + ')">✕</button></div>';
-                        }).join('') || '<div class="cm-empty">暂无 RSS 源</div>';
-                    };
-
-                    window.cmDelPlatform = function(i) { cmPlatforms.splice(i, 1); cmRenderSources(); };
-                    window.cmDelRss = function(i) { cmRss.splice(i, 1); cmRenderSources(); };
-                    window.cmAddPlatform = function() {
-                        var id = document.getElementById('cmPlatId').value.trim();
-                        var name = document.getElementById('cmPlatName').value.trim();
-                        if (!id) { alert('请填写平台 id'); return; }
-                        cmPlatforms.push({id: id, name: name || id});
-                        document.getElementById('cmPlatId').value = '';
-                        document.getElementById('cmPlatName').value = '';
-                        cmRenderSources();
-                    };
-                    window.cmAddRss = function() {
-                        var id = document.getElementById('cmRssId').value.trim();
-                        var name = document.getElementById('cmRssName').value.trim();
-                        var url = document.getElementById('cmRssUrl').value.trim();
-                        if (!id || !url) { alert('请填写 id 和订阅地址'); return; }
-                        cmRss.push({id: id, name: name || id, url: url});
-                        document.getElementById('cmRssId').value = '';
-                        document.getElementById('cmRssName').value = '';
-                        document.getElementById('cmRssUrl').value = '';
-                        cmRenderSources();
-                    };
-
-                    window.cmSourcesYaml = function() {
-                        var y = '# ===== 热榜平台：替换 config.yaml 中 platforms.sources 列表 =====\\n';
-                        y += 'platforms:\\n  enabled: true\\n  sources:\\n';
-                        cmPlatforms.forEach(function(p) { y += '    - id: "' + p.id + '"\\n      name: "' + p.name + '"\\n'; });
-                        y += '\\n# ===== RSS 源：替换 config.yaml 中 rss.feeds 列表 =====\\nrss:\\n  feeds:\\n';
-                        cmRss.forEach(function(f) { y += '    - id: "' + f.id + '"\\n      name: "' + f.name + '"\\n      url: "' + f.url + '"\\n'; });
-                        return y;
-                    };
-
-                    function cmCopy(text, btn) {
-                        function done() {
-                            if (!btn) return;
-                            var t = btn.textContent;
-                            btn.textContent = '✓ 已复制';
-                            setTimeout(function() { btn.textContent = t; }, 1500);
-                        }
-                        if (navigator.clipboard && navigator.clipboard.writeText) {
-                            navigator.clipboard.writeText(text).then(done);
-                        } else {
-                            var ta = document.createElement('textarea');
-                            ta.value = text; document.body.appendChild(ta); ta.select();
-                            try { document.execCommand('copy'); done(); } catch(e) {}
-                            document.body.removeChild(ta);
-                        }
-                    }
-                    function cmDownload(text, filename) {
-                        var blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
-                        var a = document.createElement('a');
-                        a.href = URL.createObjectURL(blob);
-                        a.download = filename;
-                        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                        URL.revokeObjectURL(a.href);
-                    }
-                    window.cmCopySources = function(btn) { cmCopy(cmSourcesYaml(), btn); };
-                    window.cmDownloadSources = function() { cmDownload(cmSourcesYaml(), 'sources-snippet.yaml'); };
-                    window.cmCopyFrequency = function(btn) { cmCopy(rawEl.value, btn); };
-                    window.cmDownloadFrequency = function() { cmDownload(rawEl.value, 'frequency_words.txt'); };
-                    window.cmToggleRaw = function() {
-                        rawEl.style.display = rawEl.style.display === 'none' ? 'block' : 'none';
-                    };
-                    window.cmEsc = function(s) {
-                        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                    };
-
-                    document.getElementById('configManager').style.display = '';
-                    cmRenderSources();
-                    cmRenderGroups();
-                })();
-                </script>"""
-
-
-
-
-def render_config_manager_page(data: Dict) -> str:
-    """渲染独立的订阅管理页面（写入 output/html/manager.html）
-
-    与推送报告解耦：报告页面不再内嵌管理面板，
-    信息源与关键词在此单独管理。
-    """
-    section = _render_config_manager_section(data)
-    return f"""<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>订阅管理 · 情报雷达</title>
-<style>
-* {{ box-sizing: border-box; }}
-body {{ margin: 0; padding: 24px 16px; background: #eef3f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; color: #333; line-height: 1.5; }}
-.mgr-wrap {{ max-width: 1100px; margin: 0 auto; }}
-.mgr-header {{ background: linear-gradient(135deg, #0c2340 0%, #14456b 55%, #2a6f97 100%); color: #fff; border-radius: 12px; padding: 22px 28px; margin-bottom: 20px; }}
-.mgr-header h1 {{ margin: 0 0 6px 0; font-size: 20px; }}
-.mgr-header p {{ margin: 0; font-size: 13px; opacity: 0.85; }}
-.mgr-body {{ background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #d3e2ef; }}
-{_CM_CSS}
-.mgr-body .cm-header {{ display: none; }} /* 页头已有标题，隐藏面板内的重复标题 */
-.mgr-body .config-manager {{ margin-top: 0; }}
-@media (min-width: 900px) {{
-    .mgr-wrap .cm-grid {{ flex-direction: row; align-items: flex-start; }}
-    .mgr-wrap .cm-panel {{ flex: 1; min-width: 0; }}
-}}
-</style>
-</head>
-<body>
-<div class="mgr-wrap">
-    <div class="mgr-header">
-        <h1>⚙️ 订阅管理</h1>
-        <p>在这里增删信息源与监控词组，生成新配置后覆盖仓库 config/ 下对应文件，下次运行生效。此页面独立于推送报告，不会出现在邮件或推送内容中。</p>
-    </div>
-    <div class="mgr-body">{section}</div>
-</div>
-</body>
-</html>"""
-
-def render_html_content(
-    report_data: Dict,
-    total_titles: int,
-    mode: str = "daily",
-    update_info: Optional[Dict] = None,
-    *,
-    region_order: Optional[List[str]] = None,
-    get_time_func: Optional[Callable[[], datetime]] = None,
-    rss_items: Optional[List[Dict]] = None,
-    rss_new_items: Optional[List[Dict]] = None,
-    display_mode: str = "keyword",
-    standalone_data: Optional[Dict] = None,
-    ai_analysis: Optional[Any] = None,
-    show_new_section: bool = True,
-    config_manager_data: Optional[Dict] = None,
-) -> str:
-    """渲染HTML内容
-
-    Args:
-        report_data: 报告数据字典，包含 stats, new_titles, failed_ids, total_new_count
-        total_titles: 新闻总数
-        mode: 报告模式 ("daily", "current", "incremental")
-        update_info: 更新信息（可选）
-        region_order: 区域显示顺序列表
-        get_time_func: 获取当前时间的函数（可选，默认使用 datetime.now）
-        rss_items: RSS 统计条目列表（可选）
-        rss_new_items: RSS 新增条目列表（可选）
-        display_mode: 显示模式 ("keyword"=按关键词分组, "platform"=按平台分组)
-        standalone_data: 独立展示区数据（可选），包含 platforms 和 rss_feeds
-        ai_analysis: AI 分析结果对象（可选），AIAnalysisResult 实例
-        show_new_section: 是否显示新增热点区域
-        config_manager_data: 订阅管理面板数据（可选），含 frequency_raw/platforms/rss_feeds，
-            提供后在页面底部渲染可交互的信息源与词组管理面板（仅浏览器可见）
-
-    Returns:
-        渲染后的 HTML 字符串
-    """
-    # 默认区域顺序
-    default_region_order = ["hotlist", "rss", "new_items", "standalone", "ai_analysis"]
-    if region_order is None:
-        region_order = default_region_order
-
-    # ── RSS 并入两大分区 ──
-    # RSS 与热榜按同一套关键词分组，分开展示会造成两块重复内容；
-    # 当 hotlist 与 rss 区域同时启用时，把 RSS 条目合并进对应词组统一展示，
-    # rss 独立区域随之不再渲染（rss_new_items 新增区不受影响）。
-    merged_rss = False
-    if rss_items and "hotlist" in region_order and "rss" in region_order:
-        stats_by_word = {s["word"]: s for s in report_data["stats"]}
-        for rs in rss_items:
-            rss_titles = []
-            for t in rs.get("titles", []):
-                t = dict(t)
-                t["is_rss"] = True
-                rss_titles.append(t)
-            if not rss_titles:
-                continue
-            target = stats_by_word.get(rs["word"])
-            if target:
-                target["titles"] = list(target["titles"]) + rss_titles
-                target["count"] = target.get("count", 0) + len(rss_titles)
-            else:
-                new_stat = {
-                    "word": rs["word"],
-                    "count": len(rss_titles),
-                    "titles": rss_titles,
-                    "category": rs.get("category"),
-                    "position": rs.get("position", 999),
-                    "percentage": 0,
-                }
-                report_data["stats"].append(new_stat)
-                stats_by_word[rs["word"]] = new_stat
-        # 合并后修正零命中列表（仅有 RSS 动态的词组不再算"无动态"）
-        nonzero_words = {s["word"] for s in report_data["stats"] if s.get("count", 0) > 0}
-        if report_data.get("empty_groups"):
-            report_data["empty_groups"] = [
-                g for g in report_data["empty_groups"] if g["word"] not in nonzero_words
-            ]
-        merged_rss = True
-
-
-    html = """
     <!DOCTYPE html>
     <html>
     <head>
@@ -2313,911 +1788,317 @@ def render_html_content(
                         </div>
                     </div>
                 </div>
-                <div class="header-title">产业情报简报</div>"""
-
-    # 使用提供的时间函数或默认 datetime.now
-    if get_time_func:
-        now = get_time_func()
-    else:
-        now = datetime.now()
-
-    # 处理报告类型显示
-    if mode == "current":
-        mode_display = "当前榜单"
-    elif mode == "incremental":
-        mode_display = "增量监控"
-    else:
-        mode_display = "全天汇总"
-
-    # ── 读者视角页头 ──
-    # 副标题：报告类型 + 生成时间
-    html += f"""
-                <div class="header-sub">{mode_display} · {now.strftime("%m-%d %H:%M")} 生成</div>"""
-
-    # 一句话总研判（取 AI 核心研判的第一行）
-    headline = ""
-    if ai_analysis is not None and getattr(ai_analysis, "success", False):
-        core_text = (getattr(ai_analysis, "core_trends", "") or "").strip()
-        if core_text:
-            headline = core_text.split("\n")[0].strip()
-            if len(headline) > 90:
-                headline = headline[:90] + "…"
-    if headline:
-        html += f"""
-                <div class="header-headline">「{html_escape(headline)}」</div>"""
-
-    # 今日概览（读者关心的数字：几个行业方向、几家客户、共几条精选）
-    def _hdr_is_company(cat):
-        return bool(cat) and any(h in cat for h in ("公司", "客户", "监控"))
-
-    active_stats_hdr = [s_ for s_ in report_data["stats"] if s_.get("count", 0) > 0]
-    company_updates = sum(1 for s_ in active_stats_hdr if _hdr_is_company(s_.get("category")))
-    industry_updates = sum(
-        1 for s_ in active_stats_hdr
-        if s_.get("category") and not _hdr_is_company(s_.get("category"))
-    )
-    total_picked = sum(s_["count"] for s_ in active_stats_hdr)
-    new_count = report_data.get("total_new_count", 0)
-
-    quick_parts = []
-    if industry_updates:
-        quick_parts.append(f'<span class="hq-item">📡 行业动态 <b>{industry_updates}</b> 组更新</span>')
-    if company_updates:
-        quick_parts.append(f'<span class="hq-item">🏢 客户动态 <b>{company_updates}</b> 家</span>')
-    quick_parts.append(f'<span class="hq-item">📰 精选 <b>{total_picked}</b> 条</span>')
-    if new_count:
-        quick_parts.append(f'<span class="hq-item">🆕 新增 <b>{new_count}</b> 条</span>')
-    html += f"""
-                <div class="header-quickstats">{"".join(quick_parts)}</div>"""
-
-    # 标注图例：来源旁数字的含义（放在页面最开头）
-    html += """
-                <div class="header-legend">标注说明：<b>#n</b>＝该平台热榜排名（颜色越深越靠前，区间为当日波动）· <b>n次</b>＝当日累计上榜次数 · <b>RSS</b>＝订阅源文章（附摘要，点击展开）</div>"""
-
-    html += """
+                <div class="header-title">产业情报简报</div>
+                <div class="header-sub">全天汇总 · 07-22 10:37 生成</div>
+                <div class="header-headline">「存储涨价与算力扩产双主线延续，客户侧出现两个明确采购信号。」</div>
+                <div class="header-quickstats"><span class="hq-item">📡 行业动态 <b>5</b> 组更新</span><span class="hq-item">🏢 客户动态 <b>4</b> 家</span><span class="hq-item">📰 精选 <b>13</b> 条</span></div>
+                <div class="header-legend">标注说明：<b>#n</b>＝该平台热榜排名（颜色越深越靠前，区间为当日波动）· <b>n次</b>＝当日累计上榜次数 · <b>RSS</b>＝订阅源文章（附摘要，点击展开）</div>
             </div>
 
-            <div class="content">"""
-
-    # ── 运维指标（挪到页面底部展示） ──
-    # 只统计热榜条目（RSS 已并入 stats，需排除，避免出现 12/9 这种口径错位）
-    hot_news_count = sum(
-        1
-        for stat in report_data["stats"]
-        for t in stat["titles"]
-        if not t.get("is_rss")
-    )
-    hotlist_total = report_data.get("hotlist_total", total_titles)
-    platform_total = report_data.get("platform_total", 0)
-    failed_count = len(report_data.get("failed_ids", []))
-    platform_success = platform_total - failed_count if platform_total else 0
-    rss_matched = report_data.get("rss_matched_count", 0)
-    rss_total = report_data.get("rss_total_count", 0)
-    rss_source_total = report_data.get("rss_source_total", 0)
-    rss_source_failed = report_data.get("rss_source_failed", 0)
-    rss_source_success = max(0, rss_source_total - rss_source_failed)
-
-    rss_value = f"{rss_matched} / {rss_total}" if rss_source_total > 0 else "未启用"
-    platform_value = f"{platform_success}/{platform_total}" if platform_total > 0 else "--"
-    rss_source_value = f"{rss_source_success}/{rss_source_total}" if rss_source_total > 0 else "--"
-
-    if ai_analysis and getattr(ai_analysis, "success", False):
-        hotlist_analyzed = getattr(ai_analysis, "hotlist_analyzed", 0)
-        rss_analyzed = getattr(ai_analysis, "rss_analyzed", 0)
-        standalone_analyzed = getattr(ai_analysis, "standalone_analyzed", 0)
-        ai_include_rss = getattr(ai_analysis, "include_rss", True)
-        ai_include_standalone = getattr(ai_analysis, "include_standalone", False)
-        ai_parts = [str(hotlist_analyzed)]
-        if ai_include_rss:
-            ai_parts.append(str(rss_analyzed))
-        if ai_include_standalone:
-            ai_parts.append(str(standalone_analyzed))
-        ai_value = " + ".join(ai_parts) if sum(int(x) for x in ai_parts) > 0 else "0"
-    elif ai_analysis:
-        ai_value = "已跳过" if getattr(ai_analysis, "skipped", False) else "待配置"
-    else:
-        ai_value = "未启用"
-
-    run_stats_items = [
-        ("报告类型", mode_display),
-        ("生成时间", now.strftime("%m-%d %H:%M")),
-        ("热榜命中", f"{hot_news_count} / {hotlist_total}"),
-        ("RSS 命中", rss_value),
-        ("热榜平台", platform_value),
-        ("RSS 源", rss_source_value),
-        ("新增热点", str(new_count) if new_count else "0"),
-        ("AI 分析", ai_value),
-    ]
-    run_stats_html = """
-                <div class="run-stats section-divider">
-                    <div class="run-stats-title">运行统计</div>
-                    <div class="run-stats-grid">"""
-    for rs_label, rs_value in run_stats_items:
-        run_stats_html += f"""
-                        <div class="run-stat"><span class="run-stat-label">{rs_label}</span><span class="run-stat-value">{rs_value}</span></div>"""
-    run_stats_html += """
-                    </div>
-                </div>"""
-
-    # 历史报告导航（每天最后一份快照；邮件等无 JS 环境中保持隐藏）
-    history_nav = report_data.get("history_nav") or []
-    if history_nav:
-        import re as _re
-
-        html += """
+            <div class="content">
                 <div class="history-nav" style="display:none">
-                    <span class="history-nav-label">历史</span>"""
-        for h_idx, h in enumerate(history_nav):
-            date_match = _re.search(r"(\d{1,4})年(\d{1,2})月(\d{1,2})日", h["date"])
-            if date_match:
-                short_date = f"{int(date_match.group(2)):02d}-{int(date_match.group(3)):02d}"
-            else:
-                short_date = h["date"]
-            active_class = " active" if h_idx == 0 else ""
-            html += f"""
-                    <a class="history-chip{active_class}" href="#" data-hist-date="{html_escape(h["date"])}" data-hist-file="{html_escape(h["file"])}">{html_escape(short_date)}</a>"""
-        html += """
+                    <span class="history-nav-label">历史</span>
+                    <a class="history-chip active" href="#" data-hist-date="2026年07月22日" data-hist-file="08-15.html">07-22</a>
+                    <a class="history-chip" href="#" data-hist-date="2026年07月21日" data-hist-file="17-33.html">07-21</a>
+                    <a class="history-chip" href="#" data-hist-date="2026年07月20日" data-hist-file="18-05.html">07-20</a>
                     <a class="history-chip" href="#" data-manager-link style="margin-left:auto">⚙ 订阅管理</a>
-                </div>"""
-
-    html += """
+                </div>
                 <div class="search-bar">
                     <input type="text" class="search-input" placeholder="搜索新闻标题..." oninput="handleSearch(this.value)">
-                </div>"""
-
-    # 处理失败ID错误信息
-    if report_data["failed_ids"]:
-        html += """
-                <div class="error-section">
-                    <div class="error-title">⚠️ 请求失败的平台</div>
-                    <ul class="error-list">"""
-        for id_value in report_data["failed_ids"]:
-            html += f'<li class="error-item">{html_escape(id_value)}</li>'
-        html += """
-                    </ul>
-                </div>"""
-
-
-    def render_news_item(j, title_data):
-        """渲染单条新闻（热榜与 RSS 条目通用；RSS 条目附摘要，可点击展开）"""
-        is_new = title_data.get("is_new", False)
-        new_class = "new" if is_new else ""
-        item_html = f"""
-                    <div class="news-item {new_class}">
-                        <div class="news-number">{j}</div>
-                        <div class="news-content">
-                            <div class="news-header">"""
-
-        if display_mode == "keyword":
-            item_html += f'<span class="source-name">{html_escape(title_data["source_name"])}</span>'
-        else:
-            matched_keyword = title_data.get("matched_keyword", "")
-            if matched_keyword:
-                item_html += f'<span class="keyword-tag">[{html_escape(matched_keyword)}]</span>'
-
-        if title_data.get("is_rss"):
-            item_html += '<span class="rss-chip">RSS</span>'
-
-        # 排名徽标（RSS 条目的排名只是时序，不展示）
-        ranks = title_data.get("ranks", [])
-        if ranks and not title_data.get("is_rss"):
-            min_rank = min(ranks)
-            max_rank = max(ranks)
-            rank_threshold = title_data.get("rank_threshold", 10)
-
-            if min_rank <= 3:
-                rank_class = "top"
-            elif min_rank <= rank_threshold:
-                rank_class = "high"
-            else:
-                rank_class = ""
-
-            rank_text = str(min_rank) if min_rank == max_rank else f"{min_rank}-{max_rank}"
-
-            rank_timeline = title_data.get("rank_timeline", [])
-            trend = calculate_rank_trend(rank_timeline, ranks)
-            trend_html = ""
-            if trend == "up":
-                trend_html = '<span class="trend-up">📈</span>'
-            elif trend == "down":
-                trend_html = '<span class="trend-down">📉</span>'
-
-            item_html += f'<span class="rank-num {rank_class}" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#{rank_text}</span>{trend_html}'
-
-        time_display = title_data.get("time_display", "")
-        if time_display:
-            simplified_time = (
-                time_display.replace(" ~ ", "~").replace("[", "").replace("]", "")
-            )
-            item_html += f'<span class="time-info" title="上榜时间（区间为首次~最近）">{html_escape(simplified_time)}</span>'
-
-        count_info = title_data.get("count", 1)
-        if count_info > 1:
-            item_html += f'<span class="count-info" title="当日累计上榜次数">{count_info}次</span>'
-
-        item_html += """
-                            </div>
-                            <div class="news-title">"""
-
-        escaped_title = html_escape(title_data["title"])
-        link_url = title_data.get("mobile_url") or title_data.get("url", "")
-        if link_url:
-            escaped_url = html_escape(link_url)
-            item_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
-        else:
-            item_html += escaped_title
-
-        item_html += """
-                            </div>"""
-
-        # RSS 摘要（默认 4 行，点击展开）
-        summary = (title_data.get("summary") or "").strip()
-        if summary and summary != title_data.get("title", ""):
-            item_html += f"""
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">{html_escape(summary)}</div>"""
-
-        item_html += """
+                </div>
+                <div class="ai-section">
+                    <div class="ai-section-header">
+                        <div class="ai-section-title">✨ AI 情报分析</div>
+                        <span class="ai-section-badge">AI</span>
+                    </div>
+                    <div class="ai-layout">
+                        <div class="ai-main">
+                    <div class="ai-block ai-block-core">
+                        <div class="ai-block-title">今日核心研判</div>
+                        <div class="ai-block-content">存储涨价与算力扩产双主线延续，客户侧出现两个明确采购信号。<br><br>1. 「英伟达新一代GPU架构发布」多平台共现，性能提升三倍、Q4出货，算力军备竞赛进入下一轮，利好上游HBM与液冷供应链。<br><br>2. 「国家电网智算中心集中采购招标」排名仅第8但业务价值极高，是电网系今年首个集中采购，弱信号。<br><br>3. 「DRAM现货价连续第五周上涨」与RSS「SSD价格季涨8%」互为印证，存储涨价开始向企业级传导。<br><br>4. 「台积电上调先进制程报价」单一信源待确认，若属实将推高AI芯片成本。</div>
+                    </div>
+                    <div class="ai-block">
+                        <div class="ai-block-title">客户与公司动态</div>
+                        <div class="ai-block-content">【重点动态】<br>1. 国家电网：启动智算中心集中采购招标，明确商机信号，建议立即跟进标书要求。<br><br>2. 工商银行：数字化转型报告显示IT投入增长12%，且RSS源确认核心系统改造大单超5亿美元，采购周期开启。<br><br>3. NEOM：新城二期数据中心招标启动，海外大单窗口。</div>
+                    </div>
                         </div>
-                    </div>"""
-        return item_html
-
-    def render_word_group(stat, extra_attr="", group_id=""):
-        """渲染一个关键词组（组头 + 条目列表）"""
-        count = stat["count"]
-        if count >= 10:
-            count_class = "hot"
-        elif count >= 5:
-            count_class = "warm"
-        else:
-            count_class = ""
-        id_attr = f' id="{group_id}"' if group_id else ""
-        group_html = f"""
-                <div class="word-group"{id_attr} {extra_attr}>
+                        <aside class="ai-side">
+                    <div class="ai-block">
+                        <div class="ai-block-title">📌 值得跟踪的线索</div>
+                        <div class="ai-block-content">1. 线索：国网智算中心招标（跟踪国网电子商务平台招标公告，两周内）<br><br>2. 线索：工行核心系统改造供应商名单（跟踪后续中标公示，一个月内）<br><br>3. 线索：存储涨价向服务器整机传导（跟踪浪潮/曙光调价函，本季度）<br><br>4. 线索：NEOM二期招标资格预审（跟踪NEOM官网采购频道，本月）</div>
+                    </div>
+                        </aside>
+                    </div>
+                </div>
+                <div class="section-divider hotlist-section">
+                <div class="zone zone-industry">
+                    <div class="zone-header">
+                        <span class="zone-icon">📡</span>
+                        <span class="zone-title">行业动态</span>
+                        <span class="zone-meta">5 组有更新 · 8 条资讯</span>
+                    </div>
+                    <div class="ind-tabbar">
+                        <button class="ind-tab active" data-ind="all">全部<span class="tab-count">8</span></button>
+                        <button class="ind-tab" data-ind="0">边缘计算与CDN<span class="tab-count">2</span></button>
+                        <button class="ind-tab" data-ind="1">算力与数据中心<span class="tab-count">2</span></button>
+                        <button class="ind-tab" data-ind="2">芯片与半导体<span class="tab-count">1</span></button>
+                        <button class="ind-tab" data-ind="3">存储<span class="tab-count">1</span></button>
+                        <button class="ind-tab" data-ind="4">AI 与大模型<span class="tab-count">2</span></button>
+                    </div>
+                    <div class="ind-groups">
+                <div class="word-group" data-ind-idx="0">
                     <div class="word-header">
                         <div class="word-info">
-                            <div class="word-name">{html_escape(stat["word"])}</div>
-                            <div class="word-count {count_class}">{count} 条</div>
+                            <div class="word-name">边缘计算与CDN</div>
+                            <div class="word-count ">2 条</div>
                         </div>
                         <div class="word-index"><span class="collapse-icon">▼</span></div>
-                    </div>"""
-        for j, title_data in enumerate(stat["titles"], 1):
-            group_html += render_news_item(j, title_data)
-        group_html += """
-                </div>"""
-        return group_html
-
-    # 生成热点分区 HTML（公司监控＝名单目录+资讯流；行业动态＝子行业页签）
-    stats_html = ""
-    if report_data["stats"]:
-        active_stats = [s for s in report_data["stats"] if s.get("count", 0) > 0]
-        stats_list, category_order = _order_stats_by_category(active_stats)
-        empty_groups_all = report_data.get("empty_groups") or []
-
-        def _is_company_cat(name):
-            return bool(name) and any(h in name for h in ("公司", "客户", "监控"))
-
-        if category_order:
-            # 展示顺序：行业动态在前、公司监控在后（关键词匹配优先级仍以词表顺序为准）
-            display_cat_order = sorted(
-                category_order,
-                key=lambda c: 1 if _is_company_cat(c if c is not None else "") else 0,
-            )
-            zone_idx = 0
-            for cat in display_cat_order:
-                cat_stats = [s for s in stats_list if s.get("category") == cat]
-                cat_empty = [
-                    g["word"] for g in empty_groups_all
-                    if (g.get("category") if g.get("category") is not None else None) == cat
-                ]
-                if not cat_stats and not cat_empty:
-                    continue
-                cat_name = cat if cat is not None else "其他"
-                total_items = sum(s["count"] for s in cat_stats)
-                is_company = _is_company_cat(cat_name)
-                zone_class = "zone-company" if is_company else "zone-industry"
-
-                stats_html += f"""
-                <div class="zone {zone_class}">
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">财联社热门</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#6</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/5" target="_blank" class="news-link">网宿科技边缘计算业务收入同比翻倍</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">2</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">虎嗅</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-22 13:30</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/r4" target="_blank" class="news-link">边缘计算进入收获期：CDN 厂商集体转型算力服务</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">过去一年，网宿、Cloudflare 等 CDN 厂商的边缘算力收入占比显著提升，边缘推理成为新的增长引擎，行业正在从带宽生意转向算力生意。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-group" data-ind-idx="1">
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">算力与数据中心</div>
+                            <div class="word-count ">2 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">华尔街见闻 / 财联社热门</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#1-2</span><span class="trend-down">📉</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/1" target="_blank" class="news-link">英伟达新一代GPU架构发布，算力性能提升三倍</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-group" data-ind-idx="2">
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">芯片与半导体</div>
+                            <div class="word-count ">1 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">财联社热门</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#5</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/8" target="_blank" class="news-link">台积电上调先进制程报价</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-group" data-ind-idx="3">
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">存储</div>
+                            <div class="word-count ">1 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#4</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/4" target="_blank" class="news-link">DRAM现货价格连续第五周上涨</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-group" data-ind-idx="4">
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">AI 与大模型</div>
+                            <div class="word-count ">2 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">TechCrunch</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-22 16:00</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/r1" target="_blank" class="news-link">Nvidia unveils next-gen GPU architecture for AI datacenters</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">Nvidia announced its next-generation GPU with 3x performance for AI workloads, shipping Q4 with HBM4 memory. Cloud providers have committed to large orders, and analysts expect supply to remain tight through 2027.</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">2</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">The Verge</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-22 14:00</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/r3" target="_blank" class="news-link">SSD prices climb as AI storage demand surges</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">Enterprise SSD prices rose 8% this quarter as AI training clusters absorb NAND supply. Vendors are prioritizing datacenter customers over consumer lines.</div>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                <div class="zone zone-company">
                     <div class="zone-header">
-                        <span class="zone-icon">{_category_icon(cat_name, zone_idx)}</span>
-                        <span class="zone-title">{html_escape(cat_name)}</span>
-                        <span class="zone-meta">{len(cat_stats)} 组有更新 · {total_items} 条资讯</span>
-                    </div>"""
-
-                if is_company:
-                    # ── 公司监控：左侧名单目录 + 右侧资讯流 ──
-                    stats_html += """
+                        <span class="zone-icon">🏢</span>
+                        <span class="zone-title">公司监控</span>
+                        <span class="zone-meta">4 组有更新 · 5 条资讯</span>
+                    </div>
                     <div class="company-layout">
                         <aside class="company-directory">
                             <div class="dir-title">监控名单</div>
-                            <div class="dir-list">"""
-                    for k, s in enumerate(cat_stats):
-                        stats_html += f"""
-                                <a class="dir-item" href="#company-grp-{zone_idx}-{k}">{html_escape(s["word"])}<span class="dir-count">{s["count"]}</span></a>"""
-                    for w in cat_empty:
-                        stats_html += f"""
-                                <span class="dir-item dir-muted">{html_escape(w)}</span>"""
-                    stats_html += """
+                            <div class="dir-list">
+                                <a class="dir-item" href="#company-grp-1-0">工商银行<span class="dir-count">2</span></a>
+                                <a class="dir-item" href="#company-grp-1-1">国家电网<span class="dir-count">1</span></a>
+                                <a class="dir-item" href="#company-grp-1-2">腾讯<span class="dir-count">1</span></a>
+                                <a class="dir-item" href="#company-grp-1-3">NEOM<span class="dir-count">1</span></a>
+                                <span class="dir-item dir-muted">中国银行</span>
+                                <span class="dir-item dir-muted">建设银行</span>
+                                <span class="dir-item dir-muted">农业银行</span>
+                                <span class="dir-item dir-muted">邮储银行</span>
+                                <span class="dir-item dir-muted">招商银行</span>
+                                <span class="dir-item dir-muted">交通银行</span>
+                                <span class="dir-item dir-muted">中信</span>
+                                <span class="dir-item dir-muted">税务总局</span>
+                                <span class="dir-item dir-muted">南方电网</span>
+                                <span class="dir-item dir-muted">国铁集团</span>
+                                <span class="dir-item dir-muted">中国石油</span>
+                                <span class="dir-item dir-muted">美团</span>
+                                <span class="dir-item dir-muted">字节跳动</span>
+                                <span class="dir-item dir-muted">沙特电力</span>
+                                <span class="dir-item dir-muted">墨西哥联邦电力</span>
+                                <span class="dir-item dir-muted">星展银行</span>
+                                <span class="dir-item dir-muted">大众汽车</span>
+                                <span class="dir-item dir-muted">埃及国防部</span>
                             </div>
                             <div class="dir-note">灰色名称＝今日无相关资讯。点击有更新的公司可跳转到对应资讯；名单可在页面底部「订阅管理」中增删。</div>
                         </aside>
-                        <div class="company-feed">"""
-                    if cat_stats:
-                        for k, s in enumerate(cat_stats):
-                            stats_html += render_word_group(s, group_id=f"company-grp-{zone_idx}-{k}")
-                    else:
-                        stats_html += """
-                            <div class="zone-empty-feed">监控名单今日暂无资讯更新</div>"""
-                    stats_html += """
+                        <div class="company-feed">
+                <div class="word-group" id="company-grp-1-0" >
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">工商银行</div>
+                            <div class="word-count ">2 条</div>
                         </div>
-                    </div>"""
-                else:
-                    # ── 行业动态：子行业页签 + 词组 ──
-                    if cat_stats:
-                        stats_html += f"""
-                    <div class="ind-tabbar">
-                        <button class="ind-tab active" data-ind="all">全部<span class="tab-count">{total_items}</span></button>"""
-                        for k, s in enumerate(cat_stats):
-                            stats_html += f"""
-                        <button class="ind-tab" data-ind="{k}">{html_escape(s["word"])}<span class="tab-count">{s["count"]}</span></button>"""
-                        stats_html += """
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
                     </div>
-                    <div class="ind-groups">"""
-                        for k, s in enumerate(cat_stats):
-                            stats_html += render_word_group(s, extra_attr=f'data-ind-idx="{k}"')
-                        stats_html += """
-                    </div>"""
-                    if cat_empty:
-                        stats_html += f"""
-                    <div class="zone-empty">📭 今日无动态：{html_escape("、".join(cat_empty))}</div>"""
-
-                stats_html += """
-                </div>"""
-                zone_idx += 1
-        else:
-            # 无分类配置：平铺渲染
-            for stat in stats_list:
-                stats_html += render_word_group(stat)
-
-    # 给热点分区添加外层包装
-    if stats_html:
-        stats_html = f"""
-                <div class="hotlist-section">{stats_html}
-                </div>"""
-
-    # 生成新增新闻区域的HTML
-    new_titles_html = ""
-    if show_new_section and report_data["new_titles"]:
-        new_titles_html += f"""
-                <div class="new-section">
-                    <div class="new-section-title">本次新增热点 (共 {report_data['total_new_count']} 条)</div>
-                    <div class="new-sources-grid">"""
-
-        for source_data in report_data["new_titles"]:
-            escaped_source = html_escape(source_data["source_name"])
-            titles_count = len(source_data["titles"])
-
-            new_titles_html += f"""
-                    <div class="new-source-group">
-                        <div class="new-source-title">{escaped_source} · {titles_count}条</div>"""
-
-            # 为新增新闻也添加序号
-            for idx, title_data in enumerate(source_data["titles"], 1):
-                ranks = title_data.get("ranks", [])
-
-                # 处理新增新闻的排名显示
-                rank_class = ""
-                if ranks:
-                    min_rank = min(ranks)
-                    if min_rank <= 3:
-                        rank_class = "top"
-                    elif min_rank <= title_data.get("rank_threshold", 10):
-                        rank_class = "high"
-
-                    if len(ranks) == 1:
-                        rank_text = str(ranks[0])
-                    else:
-                        rank_text = f"{min(ranks)}-{max(ranks)}"
-                else:
-                    rank_text = "?"
-
-                new_titles_html += f"""
-                        <div class="new-item">
-                            <div class="new-item-number">{idx}</div>
-                            <div class="new-item-rank {rank_class}">{rank_text}</div>
-                            <div class="new-item-content">
-                                <div class="new-item-title">"""
-
-                # 处理新增新闻的链接
-                escaped_title = html_escape(title_data["title"])
-                link_url = title_data.get("mobile_url") or title_data.get("url", "")
-
-                if link_url:
-                    escaped_url = html_escape(link_url)
-                    new_titles_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
-                else:
-                    new_titles_html += escaped_title
-
-                new_titles_html += """
-                                </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#12</span>
                             </div>
-                        </div>"""
-
-            new_titles_html += """
-                    </div>"""
-
-        new_titles_html += """
-                    </div>
-                </div>"""
-
-    # 生成 RSS 统计内容
-    def render_rss_stats_html(stats: List[Dict], title: str = "RSS 订阅更新") -> str:
-        """渲染 RSS 统计区块 HTML
-
-        Args:
-            stats: RSS 分组统计列表，格式与热榜一致：
-                [
-                    {
-                        "word": "关键词",
-                        "count": 5,
-                        "titles": [
-                            {
-                                "title": "标题",
-                                "source_name": "Feed 名称",
-                                "time_display": "12-29 08:20",
-                                "url": "...",
-                                "is_new": True/False
-                            }
-                        ]
-                    }
-                ]
-            title: 区块标题
-
-        Returns:
-            渲染后的 HTML 字符串
-        """
-        if not stats:
-            return ""
-
-        # 计算总条目数
-        total_count = sum(stat.get("count", 0) for stat in stats)
-        if total_count == 0:
-            return ""
-
-        rss_html = f"""
-                <div class="rss-section">
-                    <div class="rss-section-header">
-                        <div class="rss-section-title">{title}</div>
-                        <div class="rss-section-count">{total_count} 条</div>
-                    </div>
-                    <div class="rss-feeds-grid">"""
-
-        # 按分类归拢关键词组（如 行业动态 / 公司监控）
-        ordered_stats, category_order = _order_stats_by_category(stats)
-        category_counts = {}
-        for stat in ordered_stats:
-            cat = stat.get("category")
-            category_counts[cat] = category_counts.get(cat, 0) + len(stat.get("titles", []))
-
-        rendered_category = object()
-        # 按关键词分组渲染（与热榜格式一致）
-        for stat in ordered_stats:
-            keyword = stat.get("word", "")
-            titles = stat.get("titles", [])
-            if not titles:
-                continue
-
-            # 分类切换时插入分类标签
-            current_cat = stat.get("category")
-            if category_order and current_cat != rendered_category:
-                rendered_category = current_cat
-                cat_idx = category_order.index(current_cat)
-                cat_name = current_cat if current_cat is not None else "其他"
-                rss_html += f"""
-                    <div class="rss-category-label category-style-{cat_idx % 3}">
-                        <span class="category-icon">{_category_icon(current_cat, cat_idx)}</span>
-                        <span>{html_escape(cat_name)}</span>
-                        <span class="rss-category-count">{category_counts.get(current_cat, 0)} 条</span>
-                    </div>"""
-
-            keyword_count = len(titles)
-
-            rss_html += f"""
-                    <div class="feed-group">
-                        <div class="feed-header">
-                            <div class="feed-name">{html_escape(keyword)}</div>
-                            <div class="feed-count">{keyword_count} 条</div>
-                        </div>"""
-
-            for title_data in titles:
-                item_title = title_data.get("title", "")
-                url = title_data.get("url", "")
-                time_display = title_data.get("time_display", "")
-                source_name = title_data.get("source_name", "")
-                is_new = title_data.get("is_new", False)
-                summary = (title_data.get("summary") or "").strip()
-                author = (title_data.get("author") or "").strip()
-
-                rss_html += """
-                        <div class="rss-item">
-                            <div class="rss-meta">"""
-
-                if time_display:
-                    rss_html += f'<span class="rss-time">{html_escape(time_display)}</span>'
-
-                if source_name:
-                    rss_html += f'<span class="rss-author">{html_escape(source_name)}</span>'
-
-                if author and author != source_name:
-                    rss_html += f'<span class="rss-time">{html_escape(author)}</span>'
-
-                if is_new:
-                    rss_html += '<span class="rss-author" style="color: #16548f;">NEW</span>'
-
-                rss_html += """
+                            <div class="news-title"><a href="https://example.com/3" target="_blank" class="news-link">工商银行发布年度数字化转型报告，IT投入增长12%</a>
                             </div>
-                            <div class="rss-title">"""
-
-                escaped_title = html_escape(item_title)
-                if url:
-                    escaped_url = html_escape(url)
-                    rss_html += f'<a href="{escaped_url}" target="_blank" class="rss-link">{escaped_title}</a>'
-                else:
-                    rss_html += escaped_title
-
-                rss_html += """
-                            </div>"""
-
-                # 摘要（默认显示 4 行，点击展开全文，帮助判断是否值得点开原文）
-                if summary and summary != item_title:
-                    rss_html += f"""
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">{html_escape(summary)}</div>"""
-
-                rss_html += """
-                        </div>"""
-
-            rss_html += """
-                    </div>"""
-
-        rss_html += """
+                        </div>
                     </div>
-                </div>"""
-        return rss_html
-
-    # 生成独立展示区内容
-    def render_standalone_html(data: Optional[Dict]) -> str:
-        """渲染独立展示区 HTML（复用热点词汇统计区样式）
-
-        Args:
-            data: 独立展示数据，格式：
-                {
-                    "platforms": [
-                        {
-                            "id": "zhihu",
-                            "name": "知乎热榜",
-                            "items": [
-                                {
-                                    "title": "标题",
-                                    "url": "链接",
-                                    "rank": 1,
-                                    "ranks": [1, 2, 1],
-                                    "first_time": "08:00",
-                                    "last_time": "12:30",
-                                    "count": 3,
-                                }
-                            ]
-                        }
-                    ],
-                    "rss_feeds": [
-                        {
-                            "id": "hacker-news",
-                            "name": "Hacker News",
-                            "items": [
-                                {
-                                    "title": "标题",
-                                    "url": "链接",
-                                    "published_at": "2025-01-07T08:00:00",
-                                    "author": "作者",
-                                }
-                            ]
-                        }
-                    ]
-                }
-
-        Returns:
-            渲染后的 HTML 字符串
-        """
-        if not data:
-            return ""
-
-        platforms = data.get("platforms", [])
-        rss_feeds = data.get("rss_feeds", [])
-
-        if not platforms and not rss_feeds:
-            return ""
-
-        # 计算总条目数
-        total_platform_items = sum(len(p.get("items", [])) for p in platforms)
-        total_rss_items = sum(len(f.get("items", [])) for f in rss_feeds)
-        total_count = total_platform_items + total_rss_items
-
-        if total_count == 0:
-            return ""
-
-        # 收集所有分组信息用于生成 tab
-        all_groups = []
-        for p in platforms:
-            items = p.get("items", [])
-            if items:
-                all_groups.append({"name": p.get("name", p.get("id", "")), "count": len(items)})
-        for f in rss_feeds:
-            items = f.get("items", [])
-            if items:
-                all_groups.append({"name": f.get("name", f.get("id", "")), "count": len(items)})
-
-        standalone_html = f"""
-                <div class="standalone-section">
-                    <div class="standalone-section-header">
-                        <div class="standalone-section-title">独立展示区</div>
-                        <div class="standalone-section-count">{total_count} 条</div>
-                    </div>"""
-
-        # 生成 tab 栏（2+ 分组时）
-        if len(all_groups) >= 2:
-            standalone_html += """
-                    <div class="tab-bar standalone-tab-bar">"""
-            for idx, g in enumerate(all_groups):
-                active = ' active' if idx == 0 else ''
-                standalone_html += f"""
-                        <button class="tab-btn{active}" data-standalone-tab="{idx}">{html_escape(g["name"])}<span class="tab-count">{g["count"]}</span></button>"""
-            standalone_html += f"""
-                        <button class="tab-btn" data-standalone-tab="all">全部<span class="tab-count">{total_count}</span></button>
-                    </div>"""
-
-        standalone_html += """
-                    <div class="standalone-groups-grid">"""
-
-        group_idx = 0
-        # 渲染热榜平台（复用 word-group 结构）
-        for platform in platforms:
-            platform_name = platform.get("name", platform.get("id", ""))
-            items = platform.get("items", [])
-            if not items:
-                continue
-
-            standalone_html += f"""
-                    <div class="standalone-group" data-standalone-tab="{group_idx}">
-                        <div class="standalone-header">
-                            <div class="standalone-name">{html_escape(platform_name)}</div>
-                            <div class="standalone-count">{len(items)} 条</div>
-                        </div>"""
-
-            # 渲染每个条目（复用 news-item 结构）
-            for j, item in enumerate(items, 1):
-                title = item.get("title", "")
-                url = item.get("url", "") or item.get("mobileUrl", "")
-                rank = item.get("rank", 0)
-                ranks = item.get("ranks", [])
-                first_time = item.get("first_time", "")
-                last_time = item.get("last_time", "")
-                count = item.get("count", 1)
-
-                standalone_html += f"""
-                        <div class="news-item">
-                            <div class="news-number">{j}</div>
-                            <div class="news-content">
-                                <div class="news-header">"""
-
-                # 排名显示（复用 rank-num 样式，无 # 前缀）
-                if ranks:
-                    min_rank = min(ranks)
-                    max_rank = max(ranks)
-
-                    # 确定排名等级
-                    if min_rank <= 3:
-                        rank_class = "top"
-                    elif min_rank <= 10:
-                        rank_class = "high"
-                    else:
-                        rank_class = ""
-
-                    if min_rank == max_rank:
-                        rank_text = str(min_rank)
-                    else:
-                        rank_text = f"{min_rank}-{max_rank}"
-
-                    standalone_html += f'<span class="rank-num {rank_class}">{rank_text}</span>'
-                elif rank > 0:
-                    if rank <= 3:
-                        rank_class = "top"
-                    elif rank <= 10:
-                        rank_class = "high"
-                    else:
-                        rank_class = ""
-                    standalone_html += f'<span class="rank-num {rank_class}">{rank}</span>'
-
-                # 时间显示（复用 time-info 样式，将 HH-MM 转换为 HH:MM）
-                if first_time and last_time and first_time != last_time:
-                    first_time_display = convert_time_for_display(first_time)
-                    last_time_display = convert_time_for_display(last_time)
-                    standalone_html += f'<span class="time-info">{html_escape(first_time_display)}~{html_escape(last_time_display)}</span>'
-                elif first_time:
-                    first_time_display = convert_time_for_display(first_time)
-                    standalone_html += f'<span class="time-info">{html_escape(first_time_display)}</span>'
-
-                # 出现次数（复用 count-info 样式）
-                if count > 1:
-                    standalone_html += f'<span class="count-info">{count}次</span>'
-
-                standalone_html += """
-                                </div>
-                                <div class="news-title">"""
-
-                # 标题和链接（复用 news-link 样式）
-                escaped_title = html_escape(title)
-                if url:
-                    escaped_url = html_escape(url)
-                    standalone_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
-                else:
-                    standalone_html += escaped_title
-
-                standalone_html += """
-                                </div>
+                    <div class="news-item ">
+                        <div class="news-number">2</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-22 15:10</span>
                             </div>
-                        </div>"""
-
-            standalone_html += """
-                    </div>"""
-            group_idx += 1
-
-        # 渲染 RSS 源（复用相同结构）
-        for feed in rss_feeds:
-            feed_name = feed.get("name", feed.get("id", ""))
-            items = feed.get("items", [])
-            if not items:
-                continue
-
-            standalone_html += f"""
-                    <div class="standalone-group" data-standalone-tab="{group_idx}">
-                        <div class="standalone-header">
-                            <div class="standalone-name">{html_escape(feed_name)}</div>
-                            <div class="standalone-count">{len(items)} 条</div>
-                        </div>"""
-
-            for j, item in enumerate(items, 1):
-                title = item.get("title", "")
-                url = item.get("url", "")
-                published_at = item.get("published_at", "")
-                author = item.get("author", "")
-
-                standalone_html += f"""
-                        <div class="news-item">
-                            <div class="news-number">{j}</div>
-                            <div class="news-content">
-                                <div class="news-header">"""
-
-                # 时间显示（格式化 ISO 时间）
-                if published_at:
-                    try:
-                        from datetime import datetime as dt
-                        if "T" in published_at:
-                            dt_obj = dt.fromisoformat(published_at.replace("Z", "+00:00"))
-                            time_display = dt_obj.strftime("%m-%d %H:%M")
-                        else:
-                            time_display = published_at
-                    except:
-                        time_display = published_at
-
-                    standalone_html += f'<span class="time-info">{html_escape(time_display)}</span>'
-
-                # 作者显示
-                if author:
-                    standalone_html += f'<span class="source-name">{html_escape(author)}</span>'
-
-                standalone_html += """
-                                </div>
-                                <div class="news-title">"""
-
-                escaped_title = html_escape(title)
-                if url:
-                    escaped_url = html_escape(url)
-                    standalone_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
-                else:
-                    standalone_html += escaped_title
-
-                standalone_html += """
-                                </div>
+                            <div class="news-title"><a href="https://example.com/r2" target="_blank" class="news-link">工商银行核心系统改造大单落地，规模超5亿美元</a>
                             </div>
-                        </div>"""
-
-            standalone_html += """
-                    </div>"""
-            group_idx += 1
-
-        standalone_html += """
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">工商银行与多家国产厂商签署多年期核心银行系统重建协议，分析师估算规模超过5亿美元，是今年银行业最大的数字化订单之一。</div>
+                        </div>
                     </div>
-                </div>"""
-        return standalone_html
-
-    # 生成 RSS 统计和新增 HTML
-    # RSS 已并入热点分区时不再单独渲染，避免同一批信息出现两遍
-    rss_stats_html = (
-        render_rss_stats_html(rss_items, "RSS 订阅更新")
-        if rss_items and not merged_rss
-        else ""
-    )
-    rss_new_html = render_rss_stats_html(rss_new_items, "RSS 新增更新") if rss_new_items else ""
-
-    # 生成独立展示区 HTML
-    standalone_html = render_standalone_html(standalone_data)
-
-    # 生成 AI 分析 HTML
-    ai_html = render_ai_analysis_html_rich(ai_analysis) if ai_analysis else ""
-
-    # 准备各区域内容映射
-    region_contents = {
-        "hotlist": stats_html,
-        "rss": rss_stats_html,
-        "new_items": (new_titles_html, rss_new_html),  # 元组，分别处理
-        "standalone": standalone_html,
-        "ai_analysis": ai_html,
-    }
-
-    def add_section_divider(content: str) -> str:
-        """为内容的外层 div 添加 section-divider 类"""
-        if not content or 'class="' not in content:
-            return content
-        first_class_pos = content.find('class="')
-        if first_class_pos != -1:
-            insert_pos = first_class_pos + len('class="')
-            return content[:insert_pos] + "section-divider " + content[insert_pos:]
-        return content
-
-    # 按 region_order 顺序组装内容，动态添加分割线
-    has_previous_content = False
-    for region in region_order:
-        content = region_contents.get(region, "")
-        if region == "new_items":
-            # 特殊处理 new_items 区域（包含热榜新增和 RSS 新增两部分）
-            new_html, rss_new = content
-            if new_html:
-                if has_previous_content:
-                    new_html = add_section_divider(new_html)
-                html += new_html
-                has_previous_content = True
-            if rss_new:
-                if has_previous_content:
-                    rss_new = add_section_divider(rss_new)
-                html += rss_new
-                has_previous_content = True
-        elif content:
-            if has_previous_content:
-                content = add_section_divider(content)
-            html += content
-            has_previous_content = True
-
-    # 运行统计（运维指标，放页面底部，不占用阅读主区）
-    html += run_stats_html
-
-    # 订阅管理面板（固定在所有内容区之后、页脚之前；仅浏览器可见）
-    if config_manager_data:
-        html += _render_config_manager_section(config_manager_data)
-
-    html += """
+                </div>
+                <div class="word-group" id="company-grp-1-1" >
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">国家电网</div>
+                            <div class="word-count ">1 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#8</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/2" target="_blank" class="news-link">国家电网启动智算中心集中采购招标</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-group" id="company-grp-1-2" >
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">腾讯</div>
+                            <div class="word-count ">1 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">财联社热门</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#9</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/6" target="_blank" class="news-link">腾讯云发布新一代边缘容器产品</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-group" id="company-grp-1-3" >
+                    <div class="word-header">
+                        <div class="word-info">
+                            <div class="word-name">NEOM</div>
+                            <div class="word-count ">1 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">财联社热门</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#15</span>
+                            </div>
+                            <div class="news-title"><a href="https://example.com/7" target="_blank" class="news-link">沙特NEOM新城启动二期数据中心招标</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="run-stats section-divider">
+                    <div class="run-stats-title">运行统计</div>
+                    <div class="run-stats-grid">
+                        <div class="run-stat"><span class="run-stat-label">报告类型</span><span class="run-stat-value">全天汇总</span></div>
+                        <div class="run-stat"><span class="run-stat-label">生成时间</span><span class="run-stat-value">07-22 10:37</span></div>
+                        <div class="run-stat"><span class="run-stat-label">热榜命中</span><span class="run-stat-value">8 / 9</span></div>
+                        <div class="run-stat"><span class="run-stat-label">RSS 命中</span><span class="run-stat-value">4 / 4</span></div>
+                        <div class="run-stat"><span class="run-stat-label">热榜平台</span><span class="run-stat-value">2/2</span></div>
+                        <div class="run-stat"><span class="run-stat-label">RSS 源</span><span class="run-stat-value">11/11</span></div>
+                        <div class="run-stat"><span class="run-stat-label">新增热点</span><span class="run-stat-value">0</span></div>
+                        <div class="run-stat"><span class="run-stat-label">AI 分析</span><span class="run-stat-value">8 + 4</span></div>
+                    </div>
+                </div>
             </div>
 
             <div class="footer">
                 <div class="footer-content">
-                    由 <span class="project-name">Coco Wang</span> 制作"""
-
-    if update_info:
-        html += f"""
-                    <br>
-                    <span style="color: #4d8ec4; font-weight: 500;">
-                        发现新版本 {update_info['remote_version']}，当前版本 {update_info['current_version']}
-                    </span>"""
-
-    html += """
+                    由 <span class="project-name">Coco Wang</span> 制作
                 </div>
             </div>
         </div>
@@ -3930,7 +2811,7 @@ def render_html_content(
 
                     var line = idx + '. ';
                     if (url) {
-                        line += '[' + titleText.replace(/[[\\]]/g, '') + '](' + url + ')';
+                        line += '[' + titleText.replace(/[[\]]/g, '') + '](' + url + ')';
                     } else {
                         line += titleText;
                     }
@@ -4007,7 +2888,7 @@ def render_html_content(
                             var author = item.querySelector('.rss-author');
                             if (author) meta.push(author.textContent.trim());
                             var line = (i + 1) + '. ';
-                            if (url) { line += '[' + titleText.replace(/[\\[\\]]/g, '') + '](' + url + ')'; }
+                            if (url) { line += '[' + titleText.replace(/[\[\]]/g, '') + '](' + url + ')'; }
                             else { line += titleText; }
                             if (meta.length) line += '  `' + meta.join(' | ') + '`';
                             lines.push(line);
@@ -4090,7 +2971,7 @@ def render_html_content(
                 lines.push('*Generated by TrendRadar*');
 
                 // 下载
-                var md = lines.join('\\n');
+                var md = lines.join('\n');
                 var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
                 var link = document.createElement('a');
                 var filename = 'TrendRadar_' + dateStr + '_' + timeStr.replace(':', '') + '.md';
@@ -4146,9 +3027,9 @@ def render_html_content(
                 if (histNav) {
                     var p = location.pathname;
                     var prefix;
-                    if (/\\/html\\/[^/]+\\/[^/]+\\.html$/.test(p)) {
+                    if (/\/html\/[^/]+\/[^/]+\.html$/.test(p)) {
                         prefix = '../';            // 位于 output/html/<日期>/ 或 html/latest/ 内
-                    } else if (/\\/output\\/(index\\.html)?$/.test(p)) {
+                    } else if (/\/output\/(index\.html)?$/.test(p)) {
                         prefix = 'html/';          // 位于 output/index.html
                     } else {
                         prefix = 'output/html/';   // 位于仓库根 index.html（GitHub Pages 入口）
@@ -4280,6 +3161,4 @@ def render_html_content(
         </script>
     </body>
     </html>
-    """
-
-    return html
+    

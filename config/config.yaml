@@ -45,7 +45,8 @@ app:
 # ===============================================================
 schedule:
   enabled: true                         # 是否启用调度系统
-  preset: "office_hours"             # 预设模板名称（见上方说明）
+  preset: "workday_us"               # 工作日节奏+美股时段（见 timeline.yaml 中 workday_us 定义）
+                                      # 晨间隔夜美股简报→午间速览→收工汇总→美股开盘增量
 
 
 # ===============================================================
@@ -59,12 +60,27 @@ schedule:
 platforms:
   enabled: true                         # 是否启用热榜平台抓取
   sources:
+    # ---- 财经 / 宏观 ----
     - id: "wallstreetcn-hot"
       name: "华尔街见闻"
-    - id: "thepaper"
-      name: "澎湃新闻"
     - id: "cls-hot"
       name: "财联社热门"
+    - id: "jin10"
+      name: "金十数据"               # 宏观/大宗/美股快讯，时效强
+    - id: "gelonghui"
+      name: "格隆汇"                 # 港美股视角
+    - id: "xueqiu-hotstock"
+      name: "雪球热股"               # 投资者视角的公司讨论热度
+    # ---- 科技 / 产业 ----
+    - id: "ithome"
+      name: "IT之家"                 # 硬件/芯片/消费电子
+    - id: "36kr-quick"
+      name: "36氪快讯"               # 科技商业快讯
+    - id: "solidot"
+      name: "Solidot"                # 技术圈资讯
+    # ---- 综合 ----
+    - id: "thepaper"
+      name: "澎湃新闻"
     - id: "ifeng"
       name: "凤凰网"
 
@@ -103,13 +119,27 @@ rss:
   # - 正整数：覆盖全局设置，只推送此天数内的文章
   # - 0：禁用此频道的新鲜度过滤，推送所有文章
   feeds:
-    - id: "hacker-news"
-      name: "Hacker News"
-      url: "https://hnrss.org/frontpage"
+    # ---- 中文产业源（与英文源保持对等覆盖）----
+    - id: "36kr"
+      name: "36氪"
+      url: "https://36kr.com/feed"
+
+    - id: "ithome"
+      name: "IT之家"
+      url: "https://www.ithome.com/rss/"
+
+    - id: "huxiu"
+      name: "虎嗅"
+      url: "https://www.huxiu.com/rss/0.xml"
 
     - id: "ruanyifeng"
       name: "阮一峰的网络日志"
       url: "http://www.ruanyifeng.com/blog/atom.xml"
+
+    # ---- 英文源 ----
+    - id: "hacker-news"
+      name: "Hacker News"
+      url: "https://hnrss.org/frontpage"
 
     - id: "yahoo-finance"
       name: "雅虎财经"
@@ -127,10 +157,6 @@ rss:
       name: "VentureBeat"
       url: "http://venturebeat.com/feed/"
 
-    - id: "hacker-news"
-      name: "Hacker News"
-      url: "http://news.ycombinator.com/rss"
-
     - id: "infoq"
       name: "InfoQ"
       url: "https://feed.infoq.com"
@@ -138,6 +164,16 @@ rss:
     - id: "mit-news"
       name: "MIT News"
       url: "https://news.mit.edu/rss/topic/science-technology-and-society"
+
+    - id: "theregister"
+      name: "The Register"
+      url: "https://www.theregister.com/headlines.atom"
+      # 企业 IT/数据中心/芯片，英文硬核源
+
+    - id: "arstechnica"
+      name: "Ars Technica"
+      url: "https://feeds.arstechnica.com/arstechnica/index"
+      # 深度科技报道，覆盖芯片/AI/政策
 
 
 
@@ -207,20 +243,20 @@ display:
   #   1. 在此列表中
   #   2. 下方 regions 中对应开关为 true
   region_order:
-    - rss                       # 3️⃣ RSS 订阅区域
-    - ai_analysis                       # 5️⃣ AI 分析区域
-    - hotlist                       # 2️⃣ 热榜区域（关键词匹配）
-    - new_items                       # 1️⃣ 新增热点区域
-    - standalone                       # 4️⃣ 独立展示区
+    - ai_analysis                       # 1️⃣ AI 情报简报（要闻速览，放最顶部）
+    - hotlist                       # 2️⃣ 热榜区域（按 行业动态/公司监控 分区展示）
+    - rss                       # 3️⃣ RSS 订阅区域（同样按分类分区）
+    - new_items                       # 4️⃣ 新增热点区域
+    - standalone                       # 5️⃣ 独立展示区
   regions:
     rss: true # RSS 订阅区域
     ai_analysis: true # AI 分析区域
-    hotlist: false # 热榜区域（关键词匹配的热点新闻）
+    hotlist: true # 热榜区域（关键词匹配的热点新闻，按分类分区）
     new_items: false # 新增热点区域（含热榜新增 + RSS 新增）
     standalone: false # 独立展示区（完整热榜/RSS，不受关键词过滤）
   standalone:
-    platforms: ["zhihu","wallstreetcn-hot","cls-hot","thepaper","ifeng"] # 热榜平台 ID 列表（如 ["zhihu", "weibo"]）
-    rss_feeds: ["yahoo-finance","ICBC","DBS","ruanyifeng","hacker-news","the-verge","venturebeat","techcrunch","infoq","mit-news"] # RSS 源 ID 列表（如 ["hacker-news"]）
+    platforms: ["wallstreetcn-hot","cls-hot","thepaper","ifeng"] # 热榜平台 ID 列表（需与上方 platforms.sources 的 id 一致）
+    rss_feeds: ["36kr","ithome","huxiu","ruanyifeng","yahoo-finance","hacker-news","the-verge","venturebeat","techcrunch","infoq","mit-news"] # RSS 源 ID 列表（需与上方 rss.feeds 的 id 一致）
     max_items: 20                     # 每个源最多展示条数（0=不限制）
 
 
@@ -375,7 +411,7 @@ ai:
   temperature: 1.0                  # 采样温度 (0.0-2.0)
                                     # 注意：部分模型(如 gpt-5)可能要求必须为 1.0，否则会报错
   
-  max_tokens: 5000                  # 最大生成 token 数
+  max_tokens: 8000                  # 最大生成 token 数（AI 分析板块信息量加大后需要更多输出空间）
                                     # 注意：如果 API 不支持此参数(报 HTTP 400)，请设为 0 以禁用发送
   # 高级选项
   num_retries: 1                    # 失败重试次数
@@ -444,7 +480,8 @@ ai_analysis:
                                       # GitHub Action 部署默认推送约 20 次（每小时推送一次）， 约 0.1 元/天
                                       # Docker 部署默认推送 48 次(每半小时推送一次)， 约 0.2 元/天
 
-  include_rss: false                # 是否包含 RSS 内容进行分析
+  include_rss: true                 # 是否包含 RSS 内容进行分析
+                                    # ⚠️ RSS 是本项目主力信息源，必须纳入 AI 分析
   
   include_standalone: true          # 是否将独立展示区数据纳入 AI 分析（只需上方 display 区的 standalone 配置了平台/RSS 即可）
 

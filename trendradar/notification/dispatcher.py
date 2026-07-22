@@ -818,8 +818,19 @@ class NotificationDispatcher:
         """发送邮件（保持原有逻辑，已支持多收件人）
 
         Note:
-            AI 分析内容已在 HTML 生成时嵌入，无需在此传递
+            AI 分析内容已在 HTML 生成时嵌入，无需在此传递。
+            优先使用同目录的 .email.html 轻量版（避免 Gmail 102KB 裁剪），
+            不存在时回退完整版。
         """
+        if html_file_path:
+            from pathlib import Path
+
+            snapshot = Path(html_file_path)
+            email_candidate = snapshot.with_name(snapshot.stem + ".email.html")
+            if email_candidate.exists():
+                print(f"邮件使用轻量版: {email_candidate}")
+                html_file_path = str(email_candidate)
+
         return send_to_email(
             from_email=self.config["EMAIL_FROM"],
             password=self.config["EMAIL_PASSWORD"],

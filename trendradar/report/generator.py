@@ -99,8 +99,13 @@ def prepare_report_data(
                 )
 
     processed_stats = []
+    # 零命中词组单独收集（用于报告中"今日无动态"提示，区分"无新闻"与"关键词失效"）
+    empty_groups = []
     for stat in stats:
         if stat["count"] <= 0:
+            empty_groups.append(
+                {"word": stat["word"], "category": stat.get("category")}
+            )
             continue
 
         processed_titles = []
@@ -125,17 +130,28 @@ def prepare_report_data(
                 "count": stat["count"],
                 "percentage": stat.get("percentage", 0),
                 "titles": processed_titles,
+                "category": stat.get("category"),
             }
         )
 
     # total_new_count 始终从过滤结果计算（用于头部统计），不受 hide_new_section 影响
     total_new_count = sum(len(titles) for titles in filtered_new_titles.values())
 
+    # 失败平台显示名称而非内部 ID（如 "财联社热门（cls-hot）"）
+    display_failed_ids = []
+    for failed_id in failed_ids or []:
+        name = (id_to_name or {}).get(failed_id)
+        if name and name != failed_id:
+            display_failed_ids.append(f"{name}（{failed_id}）")
+        else:
+            display_failed_ids.append(str(failed_id))
+
     return {
         "stats": processed_stats,
         "new_titles": processed_new_titles,
-        "failed_ids": failed_ids or [],
+        "failed_ids": display_failed_ids,
         "total_new_count": total_new_count,
+        "empty_groups": empty_groups,
     }
 
 
@@ -154,6 +170,8 @@ def generate_html_report(
     render_html_func: Optional[Callable] = None,
     report_metadata: Optional[Dict] = None,
     translate_report_func: Optional[Callable] = None,
+    render_email_func: Optional[Callable] = None,
+    config_manager_data: Optional[Dict] = None,
 ) -> str:
     """
     生成 HTML 报告
@@ -212,6 +230,28 @@ def generate_html_report(
             if key in report_metadata:
                 report_data[key] = report_metadata[key]
 
+    # 收集历史报告导航数据（每天取最后一份快照，最近 14 天）
+    history_nav = []
+    html_root = Path(output_dir) / "html"
+    if html_root.exists():
+        date_dirs = sorted(
+            (d for d in html_root.iterdir() if d.is_dir() and d.name != "latest"),
+            key=lambda d: d.name,
+            reverse=True,
+        )[:14]
+        for d in date_dirs:
+            files = sorted(
+                (f.name for f in d.glob("*.html") if not f.name.endswith(".email.html")),
+                reverse=True,
+            )
+            if files:
+                history_nav.append({"date": d.name, "file": files[0]})
+    # 当天条目指向本次即将写入的快照
+    history_nav = [h for h in history_nav if h["date"] != date_folder]
+    history_nav.insert(0, {"date": date_folder, "file": snapshot_filename})
+    history_nav.sort(key=lambda h: h["date"], reverse=True)
+    report_data["history_nav"] = history_nav
+
     # 渲染 HTML 内容
     if render_html_func:
         html_content = render_html_func(
@@ -224,6 +264,30 @@ def generate_html_report(
     # 1. 保存时间戳快照（历史记录）
     with open(snapshot_file, "w", encoding="utf-8") as f:
         f.write(html_content)
+
+    # 1.4 生成独立订阅管理页面（信息源/关键词单独管理，不进入推送报告）
+    if config_manager_data:
+        try:
+            from trendradar.report.html import render_config_manager_page
+
+            manager_file = html_root / "manager.html"
+            manager_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(manager_file, "w", encoding="utf-8") as f:
+                f.write(render_config_manager_page(config_manager_data))
+        except Exception as e:
+            print(f"订阅管理页面生成失败: {e}")
+
+    # 1.5 生成邮件专用轻量版（避免 Gmail 102KB 裁剪），与快照同目录同名 .email.html
+    if render_email_func:
+        try:
+            email_content = render_email_func(
+                report_data, total_titles, mode, update_info
+            )
+            email_file = snapshot_path / f"{time_filename}.email.html"
+            with open(email_file, "w", encoding="utf-8") as f:
+                f.write(email_content)
+        except Exception as e:
+            print(f"邮件轻量版生成失败（邮件将回退为完整版）: {e}")
 
     # 2. 复制到 html/latest/{mode}.html（最新报告）
     latest_dir = Path(output_dir) / "html" / "latest"

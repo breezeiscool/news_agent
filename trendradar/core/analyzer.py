@@ -432,6 +432,9 @@ def count_word_frequency(
     group_key_to_display_name = {
         group["group_key"]: group.get("display_name") for group in word_groups
     }
+    group_key_to_category = {
+        group["group_key"]: group.get("category") for group in word_groups
+    }
 
     for group_key, data in word_stats.items():
         all_titles = []
@@ -447,6 +450,22 @@ def count_word_frequency(
                 -x["count"],
             ),
         )
+
+        # 跨平台同题合并：同一词组内相同标题只保留权重最高的一条，来源合并显示
+        seen_titles = {}
+        merged_titles = []
+        for title_data in sorted_titles:
+            title_key = " ".join(str(title_data["title"]).lower().split())
+            if title_key in seen_titles:
+                kept = seen_titles[title_key]
+                extra_source = title_data.get("source_name", "")
+                if extra_source and extra_source not in kept["source_name"]:
+                    kept["source_name"] = f"{kept['source_name']} / {extra_source}"
+                continue
+            title_data = dict(title_data)
+            seen_titles[title_key] = title_data
+            merged_titles.append(title_data)
+        sorted_titles = merged_titles
 
         # 应用最大显示数量限制（优先级：单独配置 > 全局配置）
         group_max_count = group_key_to_max_count.get(group_key, 0)
@@ -466,6 +485,7 @@ def count_word_frequency(
                 "count": data["count"],
                 "position": group_key_to_position.get(group_key, 999),
                 "titles": sorted_titles,
+                "category": group_key_to_category.get(group_key),
                 "percentage": (
                     round(data["count"] / total_titles * 100, 2)
                     if total_titles > 0
@@ -652,6 +672,8 @@ def count_rss_frequency(
                     "url": url,
                     "mobile_url": "",
                     "is_new": is_new,
+                    "summary": item.get("summary", ""),
+                    "author": item.get("author", ""),
                 }
                 word_stats[group_key]["titles"].append(title_data)
                 break  # 一个条目只匹配第一个词组
@@ -666,6 +688,9 @@ def count_rss_frequency(
     }
     group_key_to_display_name = {
         group["group_key"]: group.get("display_name") for group in word_groups
+    }
+    group_key_to_category = {
+        group["group_key"]: group.get("category") for group in word_groups
     }
 
     for group_key, data in word_stats.items():
@@ -693,6 +718,7 @@ def count_rss_frequency(
             "count": data["count"],
             "position": group_key_to_position.get(group_key, 999),
             "titles": sorted_titles,
+            "category": group_key_to_category.get(group_key),
             "percentage": round(data["count"] / total_items * 100, 2) if total_items > 0 else 0,
         })
 

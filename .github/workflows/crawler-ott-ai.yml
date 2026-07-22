@@ -1,0 +1,101 @@
+name: OTT & AI Watchlist Push
+
+# ═══════════════════════════════════════════════════════════════
+# 第二推送线：OTT & AI 公司监控（发送对象与主线不同）
+#
+# 与主线 (crawler.yml) 的区别：
+#   1. 关键词名单：config/custom/keyword/frequency_words_ott_ai.txt
+#      （中西方大型 OTT、AI 公司 + 新兴热门公司；行业动态段与主线一致）
+#   2. 邮件收件人：使用 Secret `EMAIL_TO_OTT_AI`（逗号分隔多个收件人）
+#   3. 触发方式：仅手动按钮（Actions 页面 → 本 workflow → Run workflow）
+#      点击即完整执行 采集 → AI 分析 → 推送（SCHEDULE_PRESET=test_mode
+#      强制每次运行都推送，不受 workday_us 时段静默限制）
+#
+# 若想定时自动运行，取消下方 schedule 注释并按需改 cron
+# ═══════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+
+  # schedule:
+  #   - cron: "45 0,10 * * 1-5"   # 例：工作日北京时间 8:45 / 18:45 各推一次
+
+concurrency:
+  group: crawler-ott-ai-${{ github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          clean: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-dev
+
+      - name: Verify required files
+        run: |
+          if [ ! -f config/config.yaml ]; then
+            echo "Error: Config missing"
+            exit 1
+          fi
+          if [ ! -f config/custom/keyword/frequency_words_ott_ai.txt ]; then
+            echo "Error: OTT & AI watchlist missing"
+            exit 1
+          fi
+
+      - name: Run crawler (OTT & AI watchlist)
+        env:
+          # ── 本推送线的两个关键差异 ──
+          FREQUENCY_WORDS_PATH: "config/custom/keyword/frequency_words_ott_ai.txt"
+          EMAIL_TO: ${{ secrets.EMAIL_TO_OTT_AI }}
+          # 手动触发即推送：使用 test_mode 预设（每次运行都执行 采集+AI+推送当日汇总）
+          SCHEDULE_PRESET: "test_mode"
+
+          # ── 以下与主线共用同一套 Secrets ──
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL_OTT_AI }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID_OTT_AI }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_SMTP_SERVER: ${{ secrets.EMAIL_SMTP_SERVER }}
+          EMAIL_SMTP_PORT: ${{ secrets.EMAIL_SMTP_PORT }}
+          # AI 配置（与主线共用）
+          AI_ANALYSIS_ENABLED: ${{ secrets.AI_ANALYSIS_ENABLED }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          AI_API_BASE: ${{ secrets.AI_API_BASE }}
+          # 远程存储（可选，与主线共用）
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
+          S3_REGION: ${{ secrets.S3_REGION }}
+          GITHUB_ACTIONS: true
+        run: uv run python -m trendradar
+
+      - name: 上传 HTML 报告（供下载预览）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-ott-ai
+          path: output/html/
+          retention-days: 7
+          if-no-files-found: warn

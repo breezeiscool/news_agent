@@ -338,6 +338,69 @@ class AppContext:
             render_html_func=lambda *args, **kwargs: self.render_html(*args, rss_items=rss_items, rss_new_items=rss_new_items, ai_analysis=ai_analysis, standalone_data=standalone_data, **kwargs),
             report_metadata=report_metadata,
             translate_report_func=translate_report_func,
+            render_email_func=lambda *args, **kwargs: self.render_email(*args, rss_items=rss_items, ai_analysis=ai_analysis, **kwargs),
+            config_manager_data=self.build_config_manager_data(),
+        )
+
+    def build_config_manager_data(self) -> Optional[Dict]:
+        """构建订阅管理面板数据（当前信息源 + 频率词原文）
+
+        供 HTML 报告底部的订阅管理面板使用；构建失败时返回 None（面板不渲染）。
+        """
+        try:
+            import os
+
+            freq_file = os.environ.get(
+                "FREQUENCY_WORDS_PATH", "config/frequency_words.txt"
+            )
+            freq_path = Path(freq_file)
+            if not freq_path.exists():
+                custom_path = Path("config/custom/keyword") / freq_file
+                if custom_path.exists():
+                    freq_path = custom_path
+            frequency_raw = (
+                freq_path.read_text(encoding="utf-8") if freq_path.exists() else ""
+            )
+
+            return {
+                "frequency_raw": frequency_raw,
+                "platforms": [
+                    {"id": p.get("id", ""), "name": p.get("name", p.get("id", ""))}
+                    for p in self.platforms
+                ],
+                "rss_feeds": [
+                    {
+                        "id": f.get("id", ""),
+                        "name": f.get("name", f.get("id", "")),
+                        "url": f.get("url", ""),
+                    }
+                    for f in self.rss_feeds
+                ],
+            }
+        except Exception as e:
+            print(f"订阅管理面板数据构建失败: {e}")
+            return None
+
+    def render_email(
+        self,
+        report_data: Dict,
+        total_titles: int,
+        mode: str = "daily",
+        update_info: Optional[Dict] = None,
+        rss_items: Optional[List[Dict]] = None,
+        ai_analysis: Optional[Any] = None,
+    ) -> str:
+        """渲染邮件专用轻量 HTML（避免 Gmail 102KB 裁剪）"""
+        from trendradar.report.email_html import render_email_html
+
+        return render_email_html(
+            report_data=report_data,
+            total_titles=total_titles,
+            mode=mode,
+            update_info=update_info,
+            rss_items=rss_items,
+            ai_analysis=ai_analysis,
+            get_time_func=self.get_time,
         )
 
     def render_html(

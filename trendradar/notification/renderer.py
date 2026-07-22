@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Callable
 
 from trendradar.report.formatter import format_title_for_platform
+from trendradar.report.helpers import category_icon, order_stats_by_category
 
 
 # 默认区域顺序
@@ -48,11 +49,22 @@ def render_feishu_content(
     if report_data["stats"]:
         stats_content += "📊 **热点词汇统计**\n\n"
 
-        total_count = len(report_data["stats"])
+        # 按分类归拢词组（如 行业动态 / 公司监控）
+        stats_list, category_order = order_stats_by_category(report_data["stats"])
+        total_count = len(stats_list)
 
-        for i, stat in enumerate(report_data["stats"]):
+        rendered_category = object()
+        for i, stat in enumerate(stats_list):
             word = stat["word"]
             count = stat["count"]
+
+            # 分类切换时插入分类标题
+            current_cat = stat.get("category")
+            if category_order and current_cat != rendered_category:
+                rendered_category = current_cat
+                cat_idx = category_order.index(current_cat)
+                cat_name = current_cat if current_cat is not None else "其他"
+                stats_content += f"{category_icon(current_cat, cat_idx)} **【{cat_name}】**\n\n"
 
             sequence_display = f"<font color='grey'>[{i + 1}/{total_count}]</font>"
 
@@ -72,7 +84,7 @@ def render_feishu_content(
                 if j < len(stat["titles"]):
                     stats_content += "\n"
 
-            if i < len(report_data["stats"]) - 1:
+            if i < len(stats_list) - 1:
                 stats_content += f"\n{separator}\n\n"
 
     # 生成新增新闻部分
@@ -186,11 +198,22 @@ def render_dingtalk_content(
     if report_data["stats"]:
         stats_content += "📊 **热点词汇统计**\n\n"
 
-        total_count = len(report_data["stats"])
+        # 按分类归拢词组（如 行业动态 / 公司监控）
+        stats_list, category_order = order_stats_by_category(report_data["stats"])
+        total_count = len(stats_list)
 
-        for i, stat in enumerate(report_data["stats"]):
+        rendered_category = object()
+        for i, stat in enumerate(stats_list):
             word = stat["word"]
             count = stat["count"]
+
+            # 分类切换时插入分类标题
+            current_cat = stat.get("category")
+            if category_order and current_cat != rendered_category:
+                rendered_category = current_cat
+                cat_idx = category_order.index(current_cat)
+                cat_name = current_cat if current_cat is not None else "其他"
+                stats_content += f"{category_icon(current_cat, cat_idx)} **【{cat_name}】**\n\n"
 
             sequence_display = f"[{i + 1}/{total_count}]"
 
@@ -210,7 +233,7 @@ def render_dingtalk_content(
                 if j < len(stat["titles"]):
                     stats_content += "\n"
 
-            if i < len(report_data["stats"]) - 1:
+            if i < len(stats_list) - 1:
                 stats_content += "\n---\n\n"
 
     # 生成新增新闻部分

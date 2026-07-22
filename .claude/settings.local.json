@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/private/tmp/claude-501/-Users-cocowang2000-coding-news-agent-master/d5b1db00-8ae6-4e62-9712-10874e227264/scratchpad/venv/bin/python /private/tmp/claude-501/-Users-cocowang2000-coding-news-agent-master/d5b1db00-8ae6-4e62-9712-10874e227264/scratchpad/test_report.py)",
+      "Bash(python3 -)"
+    ]
+  }
+}

@@ -11,12 +11,16 @@
 - 正则表达式（/pattern/ 语法）
 - 显示名称（=> 别名 语法）
 - 组别名（[组别名] 语法，作为词组第一行）
+- 分类标记（[分类:分类名] 语法，其后所有词组归入该分类，用于报告分区展示）
 """
 
 import os
 import re
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Union
+
+# 分类标记语法：[分类:行业动态] / [分类：行业动态] / [CATEGORY: Industry]
+CATEGORY_MARKER_RE = re.compile(r"^\[(?:分类|CATEGORY)\s*[:：]\s*(.+?)\]$", re.IGNORECASE)
 
 
 def _parse_word(word: str) -> Dict:
@@ -136,6 +140,9 @@ def load_frequency_words(
     with open(frequency_path, "r", encoding="utf-8") as f:
         content = f.read()
 
+    # 规范化：仅含空白字符的行（如单个空格）视为空行，避免分组分隔失效
+    content = "\n".join(line.rstrip() for line in content.splitlines())
+
     word_groups = [group.strip() for group in content.split("\n\n") if group.strip()]
 
     processed_groups = []
@@ -144,6 +151,8 @@ def load_frequency_words(
 
     # 默认区域（向后兼容）
     current_section = "WORD_GROUPS"
+    # 当前分类（[分类:xxx] 标记之后的词组都归入该分类）
+    current_category = None
 
     for group in word_groups:
         # 过滤空行和注释行（# 开头）
@@ -158,6 +167,16 @@ def load_frequency_words(
             if section_name in ("GLOBAL_FILTER", "WORD_GROUPS"):
                 current_section = section_name
                 lines = lines[1:]  # 移除标记行
+
+        # 检查是否为分类标记（[分类:xxx]），设置后续词组的分类
+        if lines:
+            category_match = CATEGORY_MARKER_RE.match(lines[0])
+            if category_match:
+                current_category = category_match.group(1).strip()
+                lines = lines[1:]
+
+        if not lines:
+            continue
 
         # 处理全局过滤区域
         if current_section == "GLOBAL_FILTER":
@@ -237,6 +256,7 @@ def load_frequency_words(
                     "group_key": group_key,
                     "display_name": display_name,  # 可能为 None
                     "max_count": group_max_count,
+                    "category": current_category,  # 可能为 None
                 }
             )
 

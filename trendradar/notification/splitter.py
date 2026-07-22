@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Callable
 
 from trendradar.report.formatter import format_title_for_platform
-from trendradar.report.helpers import format_rank_display
+from trendradar.report.helpers import format_rank_display, category_icon, order_stats_by_category
 from trendradar.utils.time import DEFAULT_TIMEZONE, format_iso_time_friendly, convert_time_for_display
 from trendradar.notification.batch import truncate_at_line_boundary
 
@@ -413,10 +413,21 @@ def split_content_into_batches(
             current_batch_has_content = True
 
         # 逐个处理词组（确保词组标题+第一条新闻的原子性）
-        for i, stat in enumerate(report_data["stats"]):
+        # 按分类归拢词组（如 行业动态 / 公司监控），分类切换时插入分类标题行
+        ordered_stats, stats_cat_order = order_stats_by_category(report_data["stats"])
+        last_category = object()
+        for i, stat in enumerate(ordered_stats):
             word = stat["word"]
             count = stat["count"]
             sequence_display = f"[{i + 1}/{total_count}]"
+
+            category_prefix = ""
+            current_category = stat.get("category")
+            if stats_cat_order and current_category != last_category:
+                last_category = current_category
+                cat_idx = stats_cat_order.index(current_category)
+                cat_name = current_category if current_category is not None else "其他"
+                category_prefix = f"{category_icon(current_category, cat_idx)}【{cat_name}】\n\n"
 
             # 构建词组标题
             word_header = ""
@@ -478,6 +489,8 @@ def split_content_into_batches(
                     )
                 else:
                     word_header = f"📌 {sequence_display} *{word}* : {count} 条\n\n"
+
+            word_header = category_prefix + word_header
 
             # 构建第一条新闻
             # display_mode: keyword=显示来源, platform=显示关键词
@@ -589,7 +602,7 @@ def split_content_into_batches(
                     current_batch_has_content = True
 
             # 词组间分隔符
-            if i < len(report_data["stats"]) - 1:
+            if i < len(ordered_stats) - 1:
                 separator = ""
                 if format_type in ("wework", "bark"):
                     separator = f"\n\n\n\n"
@@ -1074,10 +1087,21 @@ def _process_rss_stats_section(
         current_batch_has_content = True
 
     # 逐个处理关键词组（与热榜一致）
-    for i, stat in enumerate(rss_stats):
+    # 按分类归拢词组（如 行业动态 / 公司监控），分类切换时插入分类标题行
+    ordered_rss_stats, rss_cat_order = order_stats_by_category(rss_stats)
+    last_rss_category = object()
+    for i, stat in enumerate(ordered_rss_stats):
         word = stat["word"]
         count = stat["count"]
         sequence_display = f"[{i + 1}/{total_keywords}]"
+
+        rss_category_prefix = ""
+        current_rss_category = stat.get("category")
+        if rss_cat_order and current_rss_category != last_rss_category:
+            last_rss_category = current_rss_category
+            cat_idx = rss_cat_order.index(current_rss_category)
+            cat_name = current_rss_category if current_rss_category is not None else "其他"
+            rss_category_prefix = f"{category_icon(current_rss_category, cat_idx)}【{cat_name}】\n\n"
 
         # 构建关键词标题（与热榜格式一致）
         word_header = ""
@@ -1123,6 +1147,8 @@ def _process_rss_stats_section(
                 word_header = f"📈 {sequence_display} *{word}* : *{count}* 条\n\n"
             else:
                 word_header = f"📌 {sequence_display} *{word}* : {count} 条\n\n"
+
+        word_header = rss_category_prefix + word_header
 
         # 构建第一条新闻（使用 format_title_for_platform）
         first_news_line = ""
@@ -1201,7 +1227,7 @@ def _process_rss_stats_section(
                 current_batch_has_content = True
 
         # 关键词间分隔符
-        if i < len(rss_stats) - 1:
+        if i < len(ordered_rss_stats) - 1:
             separator = ""
             if format_type in ("wework", "bark"):
                 separator = "\n\n\n\n"

@@ -1,0 +1,357 @@
+[GLOBAL_FILTER]
+
+!广告
+!培训
+!课程
+!招聘
+!抽奖
+!优惠券
+!秒杀
+
+[WORD_GROUPS]
+
+# ═══════════════════════════════════════════════════════════
+# OTT & AI 公司监控名单（第二推送线专用）
+#
+# 覆盖三类公司：
+#   1. 中西方大型 OTT / 流媒体平台
+#   2. 中西方头部人工智能公司
+#   3. 新兴但市场热度高的公司（MiniMax、长鑫、Palantir 等）
+#
+# 规则与主名单一致：
+#   - 公司组放在行业词之前，公司新闻优先归入公司组
+#   - 英文缩写用 /(?<![a-z0-9])xx(?![a-z0-9])/ ASCII 边界防误报
+# ═══════════════════════════════════════════════════════════
+
+[分类:公司监控]
+
+# ---------- 中国 OTT / 流媒体 ----------
+
+[腾讯]
+腾讯
+Tencent
+腾讯视频
+
+[爱奇艺]
+爱奇艺
+iQIYI
+
+[优酷]
+优酷
+Youku
+
+[芒果超媒]
+芒果超媒
+芒果TV
+
+[哔哩哔哩]
+哔哩哔哩
+/(?<![a-z0-9])b站/ => B站
+Bilibili
+
+[字节跳动]
+字节跳动
+抖音
+Douyin
+ByteDance
+TikTok
+
+[快手]
+快手
+Kuaishou
+
+# ---------- 西方 OTT / 流媒体 ----------
+
+[Netflix]
+Netflix
+奈飞
+网飞
+
+[YouTube]
+YouTube
+油管
+
+[迪士尼]
+迪士尼
+Disney
+
+[华纳]
+华纳
+Warner Bros
+/(?<![a-z0-9])hbo(?![a-z0-9])/ => HBO
+
+[亚马逊]
+亚马逊
+Amazon
+Prime Video
+
+[Spotify]
+Spotify
+
+[Hulu]
+/(?<![a-z0-9])hulu(?![a-z0-9])/ => Hulu
+
+[Roku]
+/(?<![a-z0-9])roku(?![a-z0-9])/ => Roku
+
+[派拉蒙]
+派拉蒙
+Paramount
+
+[Apple TV]
+Apple TV
+
+# ---------- 西方 AI 公司 ----------
+
+[OpenAI]
+OpenAI
+ChatGPT
+
+[Anthropic]
+Anthropic
+Claude
+
+[谷歌]
+谷歌
+Google
+DeepMind
+Gemini
+
+[Meta]
+/(?<![a-z0-9])meta(?![a-z0-9])/ => Meta
+Facebook
+Instagram
+
+[xAI]
+/(?<![a-z0-9])xai(?![a-z0-9])/ => xAI
+/(?<![a-z0-9])grok(?![a-z0-9])/ => Grok
+
+[Mistral]
+Mistral
+
+[Perplexity]
+Perplexity
+
+[Midjourney]
+Midjourney
+
+[Scale AI]
+Scale AI
+
+# ---------- 中国 AI 公司 ----------
+
+[DeepSeek]
+DeepSeek
+深度求索
+
+[月之暗面]
+月之暗面
+Kimi
+Moonshot
+
+[MiniMax]
+/(?<![a-z0-9])minimax(?![a-z0-9])/ => MiniMax
+稀宇科技
+
+[智谱]
+智谱
+/(?<![a-z0-9])glm(?![a-z0-9])/ => GLM
+
+[百川智能]
+百川智能
+
+[阶跃星辰]
+阶跃星辰
+StepFun
+
+[零一万物]
+零一万物
+
+[商汤]
+商汤
+SenseTime
+
+[科大讯飞]
+科大讯飞
+讯飞
+iFLYTEK
+
+[百度]
+百度
+Baidu
+文心一言
+
+[阿里巴巴]
+阿里巴巴
+阿里云
+Alibaba
+通义千问
+/(?<![a-z0-9])qwen(?![a-z0-9])/ => Qwen
+
+# ---------- 新兴热门公司 ----------
+
+[长鑫科技]
+长鑫科技
+长鑫存储
+/(?<![a-z0-9])cxmt(?![a-z0-9])/ => CXMT
+
+[Palantir]
+Palantir
+
+[宇树科技]
+宇树
+Unitree
+
+[智元机器人]
+智元机器人
+
+[Figure AI]
+Figure AI
+
+[Anduril]
+Anduril
+
+[CoreWeave]
+CoreWeave
+
+[Cerebras]
+Cerebras
+
+[Groq]
+/(?<![a-z0-9])groq(?![a-z0-9])/ => Groq
+
+[壁仞科技]
+壁仞科技
+
+[摩尔线程]
+摩尔线程
+
+# ============ 采集线A：计算产业行业动态 ============
+# 每组 @15：行业大词全天汇总易刷屏，只保留权重最高的 15 条
+
+[分类:行业动态]
+
+[边缘计算与CDN]
+@15
+边缘计算
+edge computing
+边缘云
+边缘节点
+算力网络
+/(?<![a-z0-9])mec(?![a-z0-9])/ => MEC
+/(?<![a-z0-9])cdn(?![a-z0-9])/ => CDN
+网宿科技
+网宿
+Cloudflare
+Fastly
+Akamai
+优刻得
+UCloud
+首都在线
+数据港
+中科曙光
+浪潮信息
+浪潮集团
+Inspur
+紫光股份
+紫光集团
+
+[AI 与大模型]
+@15
+人工智能
+/(?<![a-z0-9])ai(?![a-z0-9])/ => AI
+大模型
+/(?<![a-z0-9])llm(?![a-z0-9])/ => LLM
+artificial intelligence
+GPT
+OpenAI
+Anthropic
+Claude
+Gemini
+DeepSeek
+深度求索
+智谱
+月之暗面
+Kimi
+通义千问
+文心一言
+Llama
+Grok
+/(?<![a-z0-9])agi(?![a-z0-9])/ => AGI
+具身智能
+智能体
+
+[算力与数据中心]
+@15
+算力
+computing power
+数据中心
+data center
+datacenter
+智算中心
+超算
+supercomputing
+云计算
+cloud computing
+液冷
+东数西算
+算力租赁
+/(?<![a-z0-9])idc(?![a-z0-9])/ => IDC
+服务器
+hyperscale
+
+[芯片与半导体]
+@15
+芯片
+半导体
+/(?<![a-z0-9])chip(?!otle)/ => chip
+semiconductor
+GPU
+英伟达
+NVIDIA
+/(?<![a-z0-9])amd(?![a-z0-9])/ => AMD
+英特尔
+/(?<![a-z0-9])intel(?![a-z0-9])/ => Intel
+台积电
+TSMC
+中芯国际
+/(?<![a-z0-9])smic(?![a-z0-9])/ => SMIC
+阿斯麦
+ASML
+高通
+Qualcomm
+昇腾
+寒武纪
+海光
+摩尔线程
+晶圆
+foundry
+光刻
+/(?<![a-z0-9])euv(?![a-z0-9])/ => EUV
+制程
+先进封装
+CoWoS
+光模块
+GPO
+
+[存储]
+@15
+存储
+storage
+/(?<![a-z0-9])ssd(?![a-z0-9])/ => SSD
+/(?<![a-z0-9])dram(?![a-z0-9])/ => DRAM
+/(?<![a-z0-9])hbm/ => HBM
+/(?<![a-z0-9])nand(?![a-z0-9])/ => NAND
+闪存
+海力士
+SK Hynix
+美光
+Micron
+铠侠
+Kioxia
+长江存储
+长鑫
+西部数据
+Western Digital
+ddr4
+ddr5

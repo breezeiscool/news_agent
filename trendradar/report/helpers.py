@@ -9,6 +9,41 @@ import re
 from typing import Dict, List, Optional
 
 
+def category_icon(name: Optional[str], idx: int) -> str:
+    """根据分类名称/顺序选择展示图标"""
+    if name:
+        if any(hint in name for hint in ("公司", "客户", "企业", "监控")):
+            return "🏢"
+        if any(hint in name for hint in ("行业", "产业", "市场")):
+            return "📡"
+    icons = ["📡", "🏢", "📌"]
+    return icons[idx % len(icons)]
+
+
+def order_stats_by_category(stats: List[Dict]) -> tuple:
+    """按分类归拢统计数据（保持分类首次出现的顺序，未分类的排在末尾）
+
+    Args:
+        stats: 统计结果列表，每项可含 category 字段
+
+    Returns:
+        (排序后的统计列表, 分类顺序列表)；无任何分类时原样返回 (stats, [])
+    """
+    if not any(s.get("category") for s in stats):
+        return stats, []
+
+    cat_order: List[Optional[str]] = []
+    for s in stats:
+        c = s.get("category")
+        if c not in cat_order:
+            cat_order.append(c)
+    if None in cat_order:
+        cat_order = [c for c in cat_order if c is not None] + [None]
+
+    ordered = sorted(stats, key=lambda s: cat_order.index(s.get("category")))
+    return ordered, cat_order
+
+
 def clean_title(title: str) -> str:
     """清理标题中的特殊字符
 
