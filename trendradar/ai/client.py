@@ -9,7 +9,13 @@ AI 客户端模块
 import os
 from typing import Any, Dict, List
 
-from litellm import completion
+# litellm 体积巨大且仅 AI 调用需要，改为在调用时按需导入（见 _lazy_completion）
+
+
+def _lazy_completion(*args, **kwargs):
+    from litellm import completion
+
+    return completion(*args, **kwargs)
 
 
 class AIClient:
@@ -89,7 +95,7 @@ class AIClient:
                 params[key] = value
 
         # 调用 LiteLLM
-        response = completion(**params)
+        response = _lazy_completion(**params)
 
         # 提取响应内容
         # 某些模型/提供商返回 list（内容块）而非 str，统一转为 str

@@ -92,7 +92,12 @@ def _load_notification_config(config_data: Dict) -> Dict:
     max_accounts_env = _get_env_int_or_none("MAX_ACCOUNTS_PER_CHANNEL")
 
     return {
-        "ENABLE_NOTIFICATION": notification.get("enabled", True),
+        # 支持环境变量覆盖（本地预览脚本用 ENABLE_NOTIFICATION=false 禁止误发通知）
+        "ENABLE_NOTIFICATION": (
+            _get_env_bool("ENABLE_NOTIFICATION")
+            if _get_env_bool("ENABLE_NOTIFICATION") is not None
+            else notification.get("enabled", True)
+        ),
         "MESSAGE_BATCH_SIZE": batch_size.get("default", 4000),
         "DINGTALK_BATCH_SIZE": batch_size.get("dingtalk", 20000),
         "FEISHU_BATCH_SIZE": batch_size.get("feishu", 29000),
