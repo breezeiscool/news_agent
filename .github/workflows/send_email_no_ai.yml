@@ -52,7 +52,7 @@ jobs:
 
       - name: 上传 HTML 报告（供下载预览）
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: html-report
           path: output/html/
