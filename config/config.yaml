@@ -74,8 +74,7 @@ platforms:
     # ---- 科技 / 产业 ----
     - id: "ithome"
       name: "IT之家"                 # 硬件/芯片/消费电子
-    - id: "36kr-quick"
-      name: "36氪快讯"               # 科技商业快讯
+    # 36kr-quick 该 API 返回 500（源不可用），36氪内容已由 RSS 源覆盖
     - id: "solidot"
       name: "Solidot"                # 技术圈资讯
     # ---- 综合 ----
@@ -165,10 +164,7 @@ rss:
       name: "MIT News"
       url: "https://news.mit.edu/rss/topic/science-technology-and-society"
 
-    - id: "theregister"
-      name: "The Register"
-      url: "https://www.theregister.com/headlines.atom"
-      # 企业 IT/数据中心/芯片，英文硬核源
+    # The Register 的 atom 源存在非法字符导致解析失败，已移除
 
     - id: "arstechnica"
       name: "Ars Technica"

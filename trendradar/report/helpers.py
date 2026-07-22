@@ -200,3 +200,33 @@ def format_rank_display(
     trend_arrow = {"up": "📈", "down": "📉"}.get(trend, "")
 
     return f"{rank_str} {trend_arrow}" if trend_arrow else rank_str
+
+def titles_similar(a: str, b: str, threshold: float = 0.6) -> bool:
+    """判断两条新闻标题是否为同一事件（字符二元组 Jaccard 相似度）
+
+    用于跨平台同题合并：不同平台对同一事件的标题措辞略有差异，
+    精确匹配无法覆盖，用字符 bigram 重叠度近似判断。
+
+    Args:
+        a, b: 标题
+        threshold: 相似度阈值（0-1），默认 0.6
+    """
+    def norm(t: str) -> str:
+        return re.sub(r"[\s\W_]+", "", str(t).lower())
+
+    na, nb = norm(a), norm(b)
+    if not na or not nb:
+        return False
+    if na == nb:
+        return True
+    # 长度悬殊的标题（如快讯聚合 vs 单条）不视为同一事件
+    if min(len(na), len(nb)) / max(len(na), len(nb)) < 0.4:
+        return False
+
+    def bigrams(t: str) -> set:
+        return {t[i:i + 2] for i in range(len(t) - 1)} if len(t) > 1 else {t}
+
+    ba, bb = bigrams(na), bigrams(nb)
+    inter = len(ba & bb)
+    union = len(ba | bb)
+    return union > 0 and inter / union >= threshold

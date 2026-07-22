@@ -11,7 +11,12 @@
 from typing import Dict, List, Tuple, Optional, Callable
 
 from trendradar.core.frequency import matches_word_groups, _word_matches
+from trendradar.report.helpers import titles_similar
 from trendradar.utils.time import DEFAULT_TIMEZONE
+
+# 最短有效标题长度：短于该值的标题（如雪球热股的"腾讯控股"这类纯股票名）
+# 没有资讯内容，直接跳过不进入报告
+MIN_TITLE_LENGTH = 8
 
 
 def calculate_news_weight(
@@ -234,6 +239,10 @@ def count_word_frequency(
             if title in processed_titles.get(source_id, {}):
                 continue
 
+            # 过滤无内容的超短标题（如股票榜单的纯公司名"腾讯控股"）
+            if len(str(title).strip()) < MIN_TITLE_LENGTH:
+                continue
+
             # 使用统一的匹配逻辑
             matches_frequency_words = matches_word_groups(
                 title, word_groups, filter_words, global_filters
@@ -329,6 +338,17 @@ def count_word_frequency(
                 if not ranks:
                     ranks = [99]
 
+                # 记录命中的具体关键词（用于行业区按公司/主题二级聚类）
+                matched_word = None
+                for w in group["normal"] + group["required"]:
+                    if _word_matches(w, title_lower):
+                        matched_word = (
+                            w.get("display_name") or w.get("word")
+                            if isinstance(w, dict)
+                            else str(w)
+                        )
+                        break
+
                 time_display = format_time_display(first_time, last_time, convert_time_func)
 
                 source_name = id_to_name.get(source_id, source_id)
@@ -357,6 +377,7 @@ def count_word_frequency(
                         "mobileUrl": mobile_url,
                         "is_new": is_new,
                         "rank_timeline": rank_timeline,
+                        "matched_word": matched_word,
                     }
                 )
 
@@ -451,13 +472,19 @@ def count_word_frequency(
             ),
         )
 
-        # 跨平台同题合并：同一词组内相同标题只保留权重最高的一条，来源合并显示
+        # 跨平台同题合并：同一词组内相同/相似标题只保留权重最高的一条，来源合并显示
+        # （不同平台对同一事件措辞常有差异，用模糊相似度而非精确匹配）
         seen_titles = {}
         merged_titles = []
         for title_data in sorted_titles:
             title_key = " ".join(str(title_data["title"]).lower().split())
-            if title_key in seen_titles:
-                kept = seen_titles[title_key]
+            kept = seen_titles.get(title_key)
+            if kept is None:
+                for candidate in merged_titles:
+                    if titles_similar(candidate["title"], title_data["title"]):
+                        kept = candidate
+                        break
+            if kept is not None:
                 extra_source = title_data.get("source_name", "")
                 if extra_source and extra_source not in kept["source_name"]:
                     kept["source_name"] = f"{kept['source_name']} / {extra_source}"
@@ -608,6 +635,10 @@ def count_rss_frequency(
         title = item.get("title", "")
         url = item.get("url", "")
 
+        # 过滤无内容的超短标题
+        if len(str(title).strip()) < MIN_TITLE_LENGTH:
+            continue
+
         # 去重
         if url and url in processed_urls:
             continue
@@ -662,6 +693,17 @@ def count_rss_frequency(
                 # 获取排名（基于发布时间顺序）
                 rank = url_to_rank.get(url, 99) if url else 99
 
+                # 记录命中的具体关键词
+                rss_matched_word = None
+                for w in group["normal"] + group["required"]:
+                    if _word_matches(w, title_lower):
+                        rss_matched_word = (
+                            w.get("display_name") or w.get("word")
+                            if isinstance(w, dict)
+                            else str(w)
+                        )
+                        break
+
                 title_data = {
                     "title": title,
                     "source_name": item.get("feed_name", item.get("feed_id", "RSS")),
@@ -674,6 +716,7 @@ def count_rss_frequency(
                     "is_new": is_new,
                     "summary": item.get("summary", ""),
                     "author": item.get("author", ""),
+                    "matched_word": rss_matched_word,
                 }
                 word_stats[group_key]["titles"].append(title_data)
                 break  # 一个条目只匹配第一个词组

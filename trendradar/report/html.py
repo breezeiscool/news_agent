@@ -14,6 +14,7 @@ from trendradar.report.helpers import (
     calculate_rank_trend,
     category_icon as _category_icon,
     order_stats_by_category as _order_stats_by_category,
+    titles_similar as _titles_similar,
 )
 from trendradar.utils.time import convert_time_for_display
 from trendradar.ai.formatter import render_ai_analysis_html_rich
@@ -501,8 +502,24 @@ def render_html_content(
                 continue
             target = stats_by_word.get(rs["word"])
             if target:
-                target["titles"] = list(target["titles"]) + rss_titles
-                target["count"] = target.get("count", 0) + len(rss_titles)
+                # 与已有条目相似的 RSS 视为同一事件：合并信源、补充摘要，不重复展示
+                existing = list(target["titles"])
+                appended = []
+                for t in rss_titles:
+                    dup = next(
+                        (e for e in existing if _titles_similar(e.get("title", ""), t.get("title", ""))),
+                        None,
+                    )
+                    if dup is not None:
+                        src = t.get("source_name", "")
+                        if src and src not in dup.get("source_name", ""):
+                            dup["source_name"] = f"{dup['source_name']} / {src}"
+                        if not dup.get("summary") and t.get("summary"):
+                            dup["summary"] = t["summary"]
+                        continue
+                    appended.append(t)
+                target["titles"] = existing + appended
+                target["count"] = target.get("count", 0) + len(appended)
             else:
                 new_stat = {
                     "word": rs["word"],
@@ -1716,6 +1733,44 @@ def render_html_content(
             body.dark-mode .ind-tab { background: rgba(15,31,46,0.6); border-color: #1e4552; color: #8cc0d8; }
             body.dark-mode .ind-tab.active { background: #1e7f9e; color: #fff; }
 
+            /* 行业区公司聚类（AI 总结 + 引用角标） */
+            .cluster {
+                padding: 8px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            .cluster:last-child { border-bottom: none; }
+            .cluster-hd {
+                font-size: 13.5px;
+                font-weight: 700;
+                color: #174e7c;
+                margin-bottom: 3px;
+            }
+            .cluster-cnt {
+                font-weight: 400;
+                font-size: 11px;
+                color: #93a8ba;
+                margin-left: 6px;
+            }
+            .cluster-sum {
+                font-size: 13px;
+                line-height: 1.6;
+                color: #3c4650;
+            }
+            .cites { margin-left: 4px; white-space: nowrap; }
+            .cite {
+                font-size: 11px;
+                font-weight: 600;
+                color: #1f6cab;
+                text-decoration: none;
+                margin-right: 2px;
+                cursor: pointer;
+            }
+            .cite:hover { color: #16548f; text-decoration: underline; }
+            body.dark-mode .cluster { border-bottom-color: #24405a; }
+            body.dark-mode .cluster-hd { color: #a4c6de; }
+            body.dark-mode .cluster-sum { color: #cbd5e1; }
+            body.dark-mode .cite { color: #8fbcdb; }
+
             /* RSS 来源徽标（RSS 条目并入分区后的标识） */
             .rss-chip {
                 font-size: 10px;
@@ -2586,6 +2641,64 @@ def render_html_content(
                 </div>"""
         return group_html
 
+
+    def render_industry_group(stat, extra_attr=""):
+        """渲染行业词组：按命中的公司/主题二级聚类
+
+        有 AI 聚类总结时：公司标题 + 一段话总结 + 引用角标（悬停显示标题与信源）；
+        无总结（单条或 AI 未运行）时：按普通条目展示。
+        """
+        industry_summaries = (
+            getattr(ai_analysis, "industry_summaries", None) or {}
+            if ai_analysis is not None
+            else {}
+        )
+        count = stat["count"]
+        count_class = "hot" if count >= 10 else ("warm" if count >= 5 else "")
+        group_html = (
+            f'\n                <div class="word-group" {extra_attr}>'
+            '<div class="word-header"><div class="word-info">'
+            f'<div class="word-name">{html_escape(stat["word"])}</div>'
+            f'<div class="word-count {count_class}">{count} 条</div>'
+            '</div><div class="word-index"><span class="collapse-icon">▼</span></div></div>'
+        )
+
+        # 按命中词聚类（保持条目顺序）
+        clusters = {}
+        for t in stat["titles"]:
+            sub = t.get("matched_word") or stat["word"]
+            clusters.setdefault(sub, []).append(t)
+
+        item_no = 0
+        for sub, items in clusters.items():
+            summary = industry_summaries.get(f"{stat['word']}/{sub}")
+            if summary and len(items) >= 2:
+                # 聚类块：公司/主题标题 + AI 总结 + 引用角标
+                cites = ""
+                for ci, t in enumerate(items, 1):
+                    link = t.get("mobile_url") or t.get("url", "")
+                    tip = f"{t.get('title', '')} ｜ {t.get('source_name', '')}"
+                    time_disp = (t.get("time_display") or "").replace("[", "").replace("]", "")
+                    if time_disp:
+                        tip += f" · {time_disp}"
+                    if link:
+                        cites += f'<a class="cite" href="{html_escape(link)}" target="_blank" title="{html_escape(tip)}">[{ci}]</a>'
+                    else:
+                        cites += f'<span class="cite" title="{html_escape(tip)}">[{ci}]</span>'
+                group_html += (
+                    '<div class="cluster">'
+                    f'<div class="cluster-hd">{html_escape(sub)}<span class="cluster-cnt">{len(items)} 条</span></div>'
+                    f'<div class="cluster-sum">{html_escape(summary)}<span class="cites">{cites}</span></div>'
+                    '</div>'
+                )
+            else:
+                for t in items:
+                    item_no += 1
+                    group_html += render_news_item(item_no, t)
+
+        group_html += "\n                </div>"
+        return group_html
+
     # 生成热点分区 HTML（公司监控＝名单目录+资讯流；行业动态＝子行业页签）
     stats_html = ""
     if report_data["stats"]:
@@ -2664,7 +2777,7 @@ def render_html_content(
                     </div>
                     <div class="ind-groups">"""
                         for k, s in enumerate(cat_stats):
-                            stats_html += render_word_group(s, extra_attr=f'data-ind-idx="{k}"')
+                            stats_html += render_industry_group(s, extra_attr=f'data-ind-idx="{k}"')
                         stats_html += """
                     </div>"""
                     if cat_empty:

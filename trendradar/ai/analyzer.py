@@ -24,6 +24,7 @@ class AIAnalysisResult:
     rss_insights: str = ""               # RSS 深度洞察
     outlook_strategy: str = ""           # 研判与策略建议
     standalone_summaries: Dict[str, str] = field(default_factory=dict)  # 独立展示区概括 {源ID: 概括}
+    industry_summaries: Dict[str, str] = field(default_factory=dict)   # 行业区公司/主题聚类总结 {"组名/子词": 一段话}
 
     # 基础元数据
     raw_response: str = ""               # 原始响应
@@ -183,6 +184,9 @@ class AIAnalyzer:
         user_prompt = user_prompt.replace("{news_content}", prepared.news_content)
         user_prompt = user_prompt.replace("{rss_content}", prepared.rss_content)
         user_prompt = user_prompt.replace("{language}", self.language)
+        user_prompt = user_prompt.replace(
+            "{industry_clusters}", self._prepare_industry_clusters(stats, rss_stats)
+        )
 
         # 构建独立展示区内容
         standalone_content = ""
@@ -251,6 +255,44 @@ class AIAnalyzer:
                 success=False,
                 error=friendly_msg
             )
+
+    def _prepare_industry_clusters(
+        self,
+        stats: List[Dict],
+        rss_stats: Optional[List[Dict]] = None,
+    ) -> str:
+        """构建行业区"公司/主题聚类"清单（供 AI 逐簇生成一段话总结）
+
+        聚类键为 "组名/命中词"（与前端渲染的聚类键一致），
+        AI 需以该键为 key 返回 industry_summaries。
+        """
+        def _is_company_cat(name):
+            return bool(name) and any(h in name for h in ("公司", "客户", "监控"))
+
+        clusters = {}
+        for stat_list in (stats or [], rss_stats or []):
+            for stat in stat_list:
+                cat = stat.get("category")
+                if not cat or _is_company_cat(cat):
+                    continue
+                word = stat.get("word", "")
+                for t in stat.get("titles", []):
+                    if not isinstance(t, dict):
+                        continue
+                    sub = t.get("matched_word") or word
+                    key = f"{word}/{sub}"
+                    clusters.setdefault(key, []).append(t)
+
+        # 单条新闻的簇不需要总结（直接展示原标题即可）
+        lines = []
+        for key, items in clusters.items():
+            if len(items) < 2:
+                continue
+            lines.append(f"\n[{key}] ({len(items)}条)")
+            for t in items:
+                source = t.get("source_name", "")
+                lines.append(f"- [{source}] {t.get('title', '')}")
+        return "\n".join(lines) if lines else "（无多条聚类，industry_summaries 返回空对象即可）"
 
     def _prepare_news_content(
         self,
@@ -623,6 +665,12 @@ class AIAnalyzer:
         # 解析成功，提取字段
         try:
             result.core_trends = data.get("core_trends", "")
+            industry_summaries = data.get("industry_summaries")
+            result.industry_summaries = (
+                {str(k): str(v) for k, v in industry_summaries.items() if v}
+                if isinstance(industry_summaries, dict)
+                else {}
+            )
             result.sentiment_controversy = data.get("sentiment_controversy", "")
             result.signals = data.get("signals", "")
             result.rss_insights = data.get("rss_insights", "")
