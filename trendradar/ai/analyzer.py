@@ -169,9 +169,14 @@ class AIAnalyzer:
         # 构建提示词
         current_time = self.get_time_func().strftime("%Y-%m-%d %H:%M:%S")
 
-        # 提取关键词
+        # 提取关键词（只取有命中新闻的词组；零命中公司不进入 AI 视野，
+        # 否则 AI 会在摘要里逐个"交代"无动态公司，与页面灰色名单重复）
         if not keywords:
-            keywords = [s.get("word", "") for s in stats if s.get("word")] if stats else []
+            keywords = (
+                [s.get("word", "") for s in stats if s.get("word") and s.get("titles")]
+                if stats
+                else []
+            )
 
         # 使用安全的字符串替换，避免模板中其他花括号（如 JSON 示例）被误解析
         user_prompt = self.user_prompt_template
