@@ -754,6 +754,9 @@ class NewsAnalyzer:
                 )
                 return translated_rd
 
+        # 英文 RSS 摘要翻译为中文（标题保持原文；HTML 与推送共用同一份数据）
+        rss_items = self._translate_rss_summaries(rss_items)
+
         # 计算 RSS 匹配条数（供 HTML 和推送共用）
         self._rss_matched_count = sum(stat.get("count", 0) for stat in rss_items) if rss_items else 0
 
@@ -1259,6 +1262,66 @@ class NewsAnalyzer:
 
         self._rss_total_count = total
         return rss_stats, rss_new_stats, raw_rss_items, rss_new_urls
+
+    def _translate_rss_summaries(self, rss_items):
+        """将英文 RSS 摘要批量翻译为简体中文（标题保持英文原文）
+
+        仅在配置了 AI Key 时执行；单次最多 30 条；任何失败都静默回退原文，
+        不影响报告生成与推送。
+        """
+        if not rss_items:
+            return rss_items
+
+        ai_config = self.ctx.config.get("AI", {})
+        import os as _os
+        if not (ai_config.get("API_KEY") or _os.environ.get("AI_API_KEY", "")):
+            return rss_items
+
+        def _is_english(text):
+            letters = sum(1 for c in text if c.isascii() and c.isalpha())
+            return letters / max(len(text), 1) > 0.5
+
+        targets = []
+        for stat in rss_items:
+            for t in stat.get("titles", []):
+                summary = (t.get("summary") or "").strip()
+                if summary and _is_english(summary):
+                    targets.append(t)
+        if not targets:
+            return rss_items
+        targets = targets[:30]  # 控制单次调用成本
+
+        try:
+            import json as _json
+            from trendradar.ai.client import AIClient
+
+            payload = [(t.get("summary") or "")[:400] for t in targets]
+            prompt = (
+                "把下面 JSON 数组中的英文新闻摘要逐条翻译成简体中文。要求：\n"
+                "1. 保留公司名、产品名、型号等专有名词的英文原文\n"
+                "2. 数字与百分比保持不变\n"
+                "3. 只返回一个与输入等长的 JSON 字符串数组，不要任何其他文字\n\n"
+                + _json.dumps(payload, ensure_ascii=False)
+            )
+            client = AIClient(ai_config)
+            response = client.chat(
+                [{"role": "user", "content": prompt}], max_tokens=4000, temperature=0.2
+            )
+            text = response.strip()
+            if "```" in text:
+                text = text.split("```")[1].lstrip("json").strip()
+            translated = _json.loads(text)
+            if isinstance(translated, list) and len(translated) == len(targets):
+                for t, zh in zip(targets, translated):
+                    if isinstance(zh, str) and zh.strip():
+                        t["summary"] = zh.strip()
+                print(f"[翻译] {len(targets)} 条英文 RSS 摘要已译为中文")
+            else:
+                print("[翻译] 返回格式不符，保留英文摘要")
+        except Exception as e:
+            print(f"[翻译] 摘要翻译失败（保留原文）: {e}")
+
+        return rss_items
 
     def _convert_rss_items_to_list(self, items_dict: Dict, id_to_name: Dict) -> List[Dict]:
         """将 RSS 条目字典转换为列表格式，并应用新鲜度过滤（用于推送）"""

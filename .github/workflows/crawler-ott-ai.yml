@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write     # 提交报告回仓库（供 GitHub Pages 访问）
 
 jobs:
   crawl:
@@ -90,6 +90,21 @@ jobs:
           S3_REGION: ${{ secrets.S3_REGION }}
           GITHUB_ACTIONS: true
         run: uv run python -m trendradar
+
+
+      - name: Commit reports back to repo
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html output/ || true
+          if git diff --cached --quiet; then
+            echo "no report changes"
+          else
+            git commit -m "chore: update reports $(date -u +%Y-%m-%dT%H:%M) [skip ci]"
+            git pull --rebase origin master || true
+            git push origin master
+          fi
 
       - name: 上传 HTML 报告（供下载预览）
         if: always()

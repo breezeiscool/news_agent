@@ -393,6 +393,16 @@ class AppContext:
         """渲染邮件专用轻量 HTML（避免 Gmail 102KB 裁剪）"""
         from trendradar.report.email_html import render_email_html
 
+        # 完整报告链接：显式配置 > GitHub Pages 自动推导（Actions 环境）
+        import os as _os
+
+        report_url = self.config.get("EMAIL_REPORT_URL", "")
+        if not report_url:
+            repo = _os.environ.get("GITHUB_REPOSITORY", "")
+            if repo and "/" in repo:
+                owner, name = repo.split("/", 1)
+                report_url = f"https://{owner}.github.io/{name}/"
+
         return render_email_html(
             report_data=report_data,
             total_titles=total_titles,
@@ -401,6 +411,7 @@ class AppContext:
             rss_items=rss_items,
             ai_analysis=ai_analysis,
             get_time_func=self.get_time,
+            report_url=report_url,
         )
 
     def render_html(

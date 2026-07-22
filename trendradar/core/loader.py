@@ -425,6 +425,8 @@ def _load_webhook_config(config_data: Dict) -> Dict:
         "EMAIL_TO": _get_env_str("EMAIL_TO") or email.get("to", ""),
         "EMAIL_SMTP_SERVER": _get_env_str("EMAIL_SMTP_SERVER") or email.get("smtp_server", ""),
         "EMAIL_SMTP_PORT": _get_env_str("EMAIL_SMTP_PORT") or email.get("smtp_port", ""),
+        # 完整网页报告地址（邮件中的跳转链接；留空时自动尝试 GitHub Pages 地址）
+        "EMAIL_REPORT_URL": _get_env_str("EMAIL_REPORT_URL") or email.get("report_url", ""),
         # 邮件是否发送完整网页版报告（默认 false＝发送紧凑版，避免 Gmail 102KB 裁剪）
         "EMAIL_USE_FULL": (
             _get_env_bool("EMAIL_USE_FULL")
