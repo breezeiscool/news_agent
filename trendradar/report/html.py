@@ -1756,6 +1756,13 @@ def render_html_content(
                 line-height: 1.6;
                 color: #3c4650;
             }
+            .cluster-rest-label {
+                margin-top: 10px;
+                font-size: 11px;
+                font-weight: 700;
+                color: #93a8ba;
+                letter-spacing: 0.05em;
+            }
             .cites { margin-left: 4px; white-space: nowrap; }
             .cite {
                 font-size: 11px;
@@ -2643,16 +2650,22 @@ def render_html_content(
 
 
     def render_industry_group(stat, extra_attr=""):
-        """渲染行业词组：按命中的公司/主题二级聚类
+        """渲染行业词组：按 AI 判定的公司主体聚合资讯（而非按信息源）
 
-        有 AI 聚类总结时：公司标题 + 一段话总结 + 引用角标（悬停显示标题与信源）；
-        无总结（单条或 AI 未运行）时：按普通条目展示。
+        AI 在 industry_clusters 中为每条行业新闻判定"最值得关注的公司主体"，
+        同一公司的多条新闻合为一簇：公司名 + 1-2 句整合总结 + 引用角标
+        （悬停显示标题与信源，点击打开原文）。
+        AI 未运行或未覆盖的条目回退为普通列表。
         """
-        industry_summaries = (
-            getattr(ai_analysis, "industry_summaries", None) or {}
+        ai_clusters_all = (
+            getattr(ai_analysis, "industry_clusters", None) or []
             if ai_analysis is not None
-            else {}
+            else []
         )
+        group_clusters = [
+            c for c in ai_clusters_all if c.get("group") in ("", stat["word"])
+        ]
+
         count = stat["count"]
         count_class = "hot" if count >= 10 else ("warm" if count >= 5 else "")
         group_html = (
@@ -2663,38 +2676,49 @@ def render_html_content(
             '</div><div class="word-index"><span class="collapse-icon">▼</span></div></div>'
         )
 
-        # 按命中词聚类（保持条目顺序）
-        clusters = {}
-        for t in stat["titles"]:
-            sub = t.get("matched_word") or stat["word"]
-            clusters.setdefault(sub, []).append(t)
+        # 用 AI 返回的标题（逐字复制）匹配本组条目；精确优先、模糊兜底
+        remaining = list(stat["titles"])
+        clusters_html = ""
+        for c in group_clusters:
+            items = []
+            for ct in c.get("titles", []):
+                match = next((t for t in remaining if t.get("title") == ct), None)
+                if match is None:
+                    match = next(
+                        (t for t in remaining if _titles_similar(t.get("title", ""), ct)),
+                        None,
+                    )
+                if match is not None:
+                    remaining.remove(match)
+                    items.append(match)
+            if not items:
+                continue
+            cites = ""
+            for ci, t in enumerate(items, 1):
+                link = t.get("mobile_url") or t.get("url", "")
+                tip = f"{t.get('title', '')} ｜ {t.get('source_name', '')}"
+                time_disp = (t.get("time_display") or "").replace("[", "").replace("]", "")
+                if time_disp:
+                    tip += f" · {time_disp}"
+                if link:
+                    cites += f'<a class="cite" href="{html_escape(link)}" target="_blank" title="{html_escape(tip)}">[{ci}]</a>'
+                else:
+                    cites += f'<span class="cite" title="{html_escape(tip)}">[{ci}]</span>'
+            clusters_html += (
+                '<div class="cluster">'
+                f'<div class="cluster-hd">{html_escape(c["company"])}<span class="cluster-cnt">{len(items)} 条</span></div>'
+                f'<div class="cluster-sum">{html_escape(c["summary"])}<span class="cites">{cites}</span></div>'
+                '</div>'
+            )
 
-        item_no = 0
-        for sub, items in clusters.items():
-            summary = industry_summaries.get(f"{stat['word']}/{sub}")
-            if summary and len(items) >= 2:
-                # 聚类块：公司/主题标题 + AI 总结 + 引用角标
-                cites = ""
-                for ci, t in enumerate(items, 1):
-                    link = t.get("mobile_url") or t.get("url", "")
-                    tip = f"{t.get('title', '')} ｜ {t.get('source_name', '')}"
-                    time_disp = (t.get("time_display") or "").replace("[", "").replace("]", "")
-                    if time_disp:
-                        tip += f" · {time_disp}"
-                    if link:
-                        cites += f'<a class="cite" href="{html_escape(link)}" target="_blank" title="{html_escape(tip)}">[{ci}]</a>'
-                    else:
-                        cites += f'<span class="cite" title="{html_escape(tip)}">[{ci}]</span>'
-                group_html += (
-                    '<div class="cluster">'
-                    f'<div class="cluster-hd">{html_escape(sub)}<span class="cluster-cnt">{len(items)} 条</span></div>'
-                    f'<div class="cluster-sum">{html_escape(summary)}<span class="cites">{cites}</span></div>'
-                    '</div>'
-                )
-            else:
-                for t in items:
-                    item_no += 1
-                    group_html += render_news_item(item_no, t)
+        group_html += clusters_html
+
+        # AI 未覆盖的条目：普通列表兜底
+        if remaining:
+            if clusters_html:
+                group_html += '<div class="cluster-rest-label">其他条目</div>'
+            for j, t in enumerate(remaining, 1):
+                group_html += render_news_item(j, t)
 
         group_html += "\n                </div>"
         return group_html

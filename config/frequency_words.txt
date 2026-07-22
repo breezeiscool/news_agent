@@ -133,80 +133,14 @@ Egypt Ministry of Defence
 Egyptian MOD
 
 # ============ 采集线A：计算产业行业动态 ============
+# 四层级分组（AI芯片及硬件 → 云基础设施 → 大模型厂商 → AI应用）
 # 每组 @15：行业大词全天汇总易刷屏，只保留权重最高的 15 条
+# 注意：新闻按"第一个匹配的词组"归类，层级顺序即匹配优先级，
+#       宽泛词（人工智能/AI）放在最后的 AI应用 层兜底
 
 [分类:行业动态]
 
-[边缘计算与CDN]
-@15
-边缘计算
-edge computing
-边缘云
-边缘节点
-算力网络
-/(?<![a-z0-9])mec(?![a-z0-9])/ => MEC
-/(?<![a-z0-9])cdn(?![a-z0-9])/ => CDN
-网宿科技
-网宿
-Cloudflare
-Fastly
-Akamai
-优刻得
-UCloud
-首都在线
-数据港
-中科曙光
-浪潮信息
-浪潮集团
-Inspur
-紫光股份
-紫光集团
-
-[AI 与大模型]
-@15
-人工智能
-/(?<![a-z0-9])ai(?![a-z0-9])/ => AI
-大模型
-/(?<![a-z0-9])llm(?![a-z0-9])/ => LLM
-artificial intelligence
-GPT
-OpenAI
-Anthropic
-Claude
-Gemini
-DeepSeek
-深度求索
-智谱
-月之暗面
-Kimi
-通义千问
-文心一言
-Llama
-Grok
-/(?<![a-z0-9])agi(?![a-z0-9])/ => AGI
-具身智能
-智能体
-
-[算力与数据中心]
-@15
-算力
-computing power
-数据中心
-data center
-datacenter
-智算中心
-超算
-supercomputing
-云计算
-cloud computing
-液冷
-东数西算
-算力租赁
-/(?<![a-z0-9])idc(?![a-z0-9])/ => IDC
-服务器
-hyperscale
-
-[芯片与半导体]
+[AI 芯片及硬件]
 @15
 芯片
 半导体
@@ -239,9 +173,6 @@ foundry
 CoWoS
 光模块
 GPO
-
-[存储]
-@15
 存储
 storage
 /(?<![a-z0-9])ssd(?![a-z0-9])/ => SSD
@@ -261,3 +192,93 @@ Kioxia
 Western Digital
 ddr4
 ddr5
+服务器
+液冷
+
+[云基础设施]
+@15
+数据中心
+data center
+datacenter
+算力
+computing power
+智算中心
+超算
+supercomputing
+云计算
+cloud computing
+东数西算
+算力租赁
+/(?<![a-z0-9])idc(?![a-z0-9])/ => IDC
+hyperscale
+边缘计算
+edge computing
+边缘云
+边缘节点
+算力网络
+/(?<![a-z0-9])mec(?![a-z0-9])/ => MEC
+/(?<![a-z0-9])cdn(?![a-z0-9])/ => CDN
+网宿科技
+网宿
+Cloudflare
+Fastly
+Akamai
+优刻得
+UCloud
+首都在线
+数据港
+中科曙光
+浪潮信息
+浪潮集团
+Inspur
+紫光股份
+紫光集团
+/(?<![a-z0-9])aws(?![a-z0-9])/ => AWS
+Azure
+阿里云
+腾讯云
+谷歌云
+CoreWeave
+万国数据
+世纪互联
+
+[大模型厂商]
+@15
+大模型
+/(?<![a-z0-9])llm(?![a-z0-9])/ => LLM
+OpenAI
+GPT
+ChatGPT
+Anthropic
+Claude
+Gemini
+DeepSeek
+深度求索
+智谱
+月之暗面
+Kimi
+通义千问
+文心一言
+Llama
+Grok
+/(?<![a-z0-9])minimax(?![a-z0-9])/ => MiniMax
+阶跃星辰
+百川智能
+零一万物
+Mistral
+
+[AI 应用]
+@15
+人工智能
+/(?<![a-z0-9])ai(?![a-z0-9])/ => AI
+artificial intelligence
+/(?<![a-z0-9])agi(?![a-z0-9])/ => AGI
+智能体
+具身智能
+人形机器人
+Copilot
+Midjourney
+/(?<![a-z0-9])sora(?![a-z0-9])/ => Sora
+Perplexity
+自动驾驶
+AI眼镜

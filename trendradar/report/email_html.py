@@ -101,13 +101,6 @@ def render_email_html(
     company_sum = (
         (getattr(ai_analysis, "sentiment_controversy", "") or "").strip() if ai_ok else ""
     )
-    headline = ""
-    if core:
-        headline = core.split("\n")[0].strip()
-        core_rest = "\n".join(core.split("\n")[1:]).strip() or core
-    else:
-        core_rest = ""
-
     rows = ""
 
     # 页头（纯色，Outlook 不支持渐变）
@@ -120,22 +113,12 @@ def render_email_html(
         "</td></tr>"
     )
 
-    # 一句话研判
-    if headline:
-        rows += (
-            '<tr><td style="' + _TD_BASE
-            + 'font-size:15px;font-weight:bold;color:#1a2b3c;line-height:1.6;'
-            'padding:18px 24px 6px 24px;">'
-            + html_escape(headline)
-            + "</td></tr>"
-        )
-
-    if ai_ok and (core_rest or company_sum):
-        # 两段分区总结
-        if core_rest:
+    if ai_ok and (core or company_sum):
+        # 两段分区总结（各段第一行即本信息域的一句话研判，两域不混杂）
+        if core:
             rows += (
                 f'<tr><td style="{_BLOCK_TITLE}">一、行业动态速览</td></tr>'
-                f'<tr><td style="{_BLOCK_TEXT}">{_fmt_ai(core_rest)}</td></tr>'
+                f'<tr><td style="{_BLOCK_TEXT}">{_fmt_ai(core)}</td></tr>'
             )
         if company_sum:
             rows += (
