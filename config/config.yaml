@@ -308,6 +308,10 @@ notification:
       to: ""                          # 收件人邮箱，多个用逗号分隔
       smtp_server: ""                 # SMTP 服务器（可选，留空自动识别）
       smtp_port: ""                   # SMTP 端口（可选，留空自动识别）
+      use_full_report: false          # 邮件是否发送完整网页版报告
+                                      #   false（默认）：发送紧凑版（demo 同款视觉，体积小，Gmail 不裁剪）
+                                      #   true：发送完整网页版（内容最全，但 Gmail 超 102KB 会折叠"查看整封邮件"）
+                                      #   也可用环境变量 EMAIL_USE_FULL=true 覆盖
 
     ntfy:
       server_url: "https://ntfy.sh"   # ntfy 服务器地址（可改为自托管）

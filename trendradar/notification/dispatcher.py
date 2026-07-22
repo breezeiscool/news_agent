@@ -822,13 +822,13 @@ class NotificationDispatcher:
             优先使用同目录的 .email.html 轻量版（避免 Gmail 102KB 裁剪），
             不存在时回退完整版。
         """
-        if html_file_path:
+        if html_file_path and not self.config.get("EMAIL_USE_FULL"):
             from pathlib import Path
 
             snapshot = Path(html_file_path)
             email_candidate = snapshot.with_name(snapshot.stem + ".email.html")
             if email_candidate.exists():
-                print(f"邮件使用轻量版: {email_candidate}")
+                print(f"邮件使用紧凑版: {email_candidate}（完整版可设 EMAIL_USE_FULL=true）")
                 html_file_path = str(email_candidate)
 
         return send_to_email(

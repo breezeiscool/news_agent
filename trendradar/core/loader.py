@@ -425,6 +425,12 @@ def _load_webhook_config(config_data: Dict) -> Dict:
         "EMAIL_TO": _get_env_str("EMAIL_TO") or email.get("to", ""),
         "EMAIL_SMTP_SERVER": _get_env_str("EMAIL_SMTP_SERVER") or email.get("smtp_server", ""),
         "EMAIL_SMTP_PORT": _get_env_str("EMAIL_SMTP_PORT") or email.get("smtp_port", ""),
+        # 邮件是否发送完整网页版报告（默认 false＝发送紧凑版，避免 Gmail 102KB 裁剪）
+        "EMAIL_USE_FULL": (
+            _get_env_bool("EMAIL_USE_FULL")
+            if _get_env_bool("EMAIL_USE_FULL") is not None
+            else email.get("use_full_report", False)
+        ),
         # ntfy
         "NTFY_SERVER_URL": _get_env_str("NTFY_SERVER_URL") or ntfy.get("server_url") or "https://ntfy.sh",
         "NTFY_TOPIC": _get_env_str("NTFY_TOPIC") or ntfy.get("topic", ""),
