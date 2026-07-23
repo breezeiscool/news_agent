@@ -26,6 +26,7 @@ class AIAnalysisResult:
     standalone_summaries: Dict[str, str] = field(default_factory=dict)  # 独立展示区概括 {源ID: 概括}
     industry_summaries: Dict[str, str] = field(default_factory=dict)   # （旧版兼容）行业区关键词聚类总结
     industry_clusters: List[Dict] = field(default_factory=list)         # 行业区按公司主体聚合 [{group, company, summary, titles}]
+    industry_level_summaries: Dict[str, str] = field(default_factory=dict)  # 产业层级总结 {"层级名": 2-3句}
 
     # 基础元数据
     raw_response: str = ""               # 原始响应
@@ -698,6 +699,12 @@ class AIAnalyzer:
                         "section": section,
                     })
             result.industry_clusters = parsed_clusters
+            level_summaries = data.get("industry_level_summaries")
+            result.industry_level_summaries = (
+                {str(k): str(v) for k, v in level_summaries.items() if v}
+                if isinstance(level_summaries, dict)
+                else {}
+            )
             result.sentiment_controversy = data.get("sentiment_controversy", "")
             result.signals = data.get("signals", "")
             result.rss_insights = data.get("rss_insights", "")

@@ -1801,6 +1801,55 @@ def render_html_content(
             details.more-items summary:hover { color: #174e7c; }
             body.dark-mode details.more-items summary { color: #64798c; }
 
+            /* 层级 AI 总结（置于每个产业层级最开头） */
+            .level-sum {
+                margin: 4px 0 10px 0;
+                padding: 10px 14px;
+                background: #eef4f9;
+                border-left: 3px solid #1e7f9e;
+                border-radius: 0 8px 8px 0;
+                font-size: 13px;
+                line-height: 1.65;
+                color: #1f4e79;
+            }
+            body.dark-mode .level-sum {
+                background: #14273a;
+                border-left-color: #4d8ec4;
+                color: #a4c6de;
+            }
+
+            /* 行业板块整体折叠句柄 */
+            details.zone-collapse > summary.zone-collapse-summary {
+                cursor: pointer;
+                user-select: none;
+                font-size: 13px;
+                font-weight: 600;
+                color: #1e7f9e;
+                padding: 10px 14px;
+                background: #f0f7f9;
+                border: 1px dashed #cfe6ed;
+                border-radius: 10px;
+                list-style: none;
+            }
+            details.zone-collapse > summary.zone-collapse-summary::-webkit-details-marker { display: none; }
+            details.zone-collapse > summary.zone-collapse-summary::before {
+                content: "▸ ";
+                font-size: 12px;
+            }
+            details.zone-collapse[open] > summary.zone-collapse-summary::before {
+                content: "▾ ";
+            }
+            details.zone-collapse > summary.zone-collapse-summary:hover {
+                border-color: #1e7f9e;
+                background: #e6f3f6;
+            }
+            details.zone-collapse[open] > summary.zone-collapse-summary { margin-bottom: 12px; }
+            body.dark-mode details.zone-collapse > summary.zone-collapse-summary {
+                background: #0f2530;
+                border-color: #1e4552;
+                color: #8cc0d8;
+            }
+
             .cluster-rest-label {
                 margin-top: 10px;
                 font-size: 11px;
@@ -3011,6 +3060,18 @@ def render_html_content(
             '</div><div class="word-index"><span class="collapse-icon">▼</span></div></div>'
         )
 
+        # 层级 AI 总结（面视角：当日主线/主要玩家/最值得注意的点），置于层级最开头
+        level_summaries = (
+            getattr(ai_analysis, "industry_level_summaries", None) or {}
+            if ai_analysis is not None
+            else {}
+        )
+        level_sum = level_summaries.get(stat["word"], "")
+        if level_sum:
+            group_html += (
+                f'<div class="level-sum">{html_escape(level_sum)}</div>'
+            )
+
         # 用 AI 返回的标题（逐字复制）匹配本组条目；精确优先、模糊兜底
         remaining = [t for t in stat["titles"] if id(t) not in claimed_ids]
         clusters_html = ""
@@ -3191,7 +3252,11 @@ def render_html_content(
                             market_blocks.append((c, m_items))
 
                     if cat_stats:
+                        # 行业动态整个板块默认折叠（用户要求）：
+                        # 分区标题栏保持可见，明细收在 <details> 里，点击展开
                         stats_html += f"""
+                    <details class="zone-collapse">
+                        <summary class="zone-collapse-summary">展开层级明细（{len(cat_stats)} 个层级 · {total_items} 条资讯）</summary>
                     <div class="ind-tabbar">
                         <button class="ind-tab active" data-ind="all">全部<span class="tab-count">{total_items}</span></button>"""
                         for k, s in enumerate(cat_stats):
@@ -3207,7 +3272,7 @@ def render_html_content(
                         stats_html += """
                     </div>"""
 
-                    # 投资市场动向：涨跌/资金类资讯统一收纳，与产业实质资讯分离
+                    # 投资市场动向：涨跌/资金类资讯统一收纳，与产业实质资讯分离（随板块一起折叠）
                     if market_blocks:
                         market_total = sum(len(items) for _, items in market_blocks)
                         stats_html += f"""
@@ -3225,6 +3290,9 @@ def render_html_content(
                     if cat_empty:
                         stats_html += f"""
                     <div class="zone-empty">📭 今日无动态：{html_escape("、".join(cat_empty))}</div>"""
+                    if cat_stats:
+                        stats_html += """
+                    </details>"""
 
                 stats_html += """
                 </div>"""

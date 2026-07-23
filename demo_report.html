@@ -1259,6 +1259,55 @@
             details.more-items summary:hover { color: #174e7c; }
             body.dark-mode details.more-items summary { color: #64798c; }
 
+            /* 层级 AI 总结（置于每个产业层级最开头） */
+            .level-sum {
+                margin: 4px 0 10px 0;
+                padding: 10px 14px;
+                background: #eef4f9;
+                border-left: 3px solid #1e7f9e;
+                border-radius: 0 8px 8px 0;
+                font-size: 13px;
+                line-height: 1.65;
+                color: #1f4e79;
+            }
+            body.dark-mode .level-sum {
+                background: #14273a;
+                border-left-color: #4d8ec4;
+                color: #a4c6de;
+            }
+
+            /* 行业板块整体折叠句柄 */
+            details.zone-collapse > summary.zone-collapse-summary {
+                cursor: pointer;
+                user-select: none;
+                font-size: 13px;
+                font-weight: 600;
+                color: #1e7f9e;
+                padding: 10px 14px;
+                background: #f0f7f9;
+                border: 1px dashed #cfe6ed;
+                border-radius: 10px;
+                list-style: none;
+            }
+            details.zone-collapse > summary.zone-collapse-summary::-webkit-details-marker { display: none; }
+            details.zone-collapse > summary.zone-collapse-summary::before {
+                content: "▸ ";
+                font-size: 12px;
+            }
+            details.zone-collapse[open] > summary.zone-collapse-summary::before {
+                content: "▾ ";
+            }
+            details.zone-collapse > summary.zone-collapse-summary:hover {
+                border-color: #1e7f9e;
+                background: #e6f3f6;
+            }
+            details.zone-collapse[open] > summary.zone-collapse-summary { margin-bottom: 12px; }
+            body.dark-mode details.zone-collapse > summary.zone-collapse-summary {
+                background: #0f2530;
+                border-color: #1e4552;
+                color: #8cc0d8;
+            }
+
             .cluster-rest-label {
                 margin-top: 10px;
                 font-size: 11px;
@@ -2133,7 +2182,7 @@
                     </div>
                 </div>
                 <div class="header-title">产业情报简报</div>
-                <div class="header-sub">全天汇总 · 07-23 18:23 生成</div>
+                <div class="header-sub">全天汇总 · 07-23 19:26 生成</div>
             </div>
 
             <div class="content">
@@ -2195,6 +2244,8 @@
                         <span class="zone-title">行业动态</span>
                         <span class="zone-meta">3 组有更新 · 11 条资讯</span>
                     </div>
+                    <details class="zone-collapse">
+                        <summary class="zone-collapse-summary">展开层级明细（3 个层级 · 11 条资讯）</summary>
                     <div class="ind-tabbar">
                         <button class="ind-tab active" data-ind="all">全部<span class="tab-count">11</span></button>
                         <button class="ind-tab" data-ind="0">AI 芯片及硬件<span class="tab-count">8</span></button>
@@ -2202,7 +2253,7 @@
                         <button class="ind-tab" data-ind="2">AI 应用<span class="tab-count">1</span></button>
                     </div>
                     <div class="ind-groups">
-                <div class="word-group" data-ind-idx="0"><div class="word-header"><div class="word-info"><div class="word-name">AI 芯片及硬件</div><div class="word-count warm">8 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div><div class="cluster"><div class="cluster-hd">英伟达<span class="cluster-region">美国头部</span><span class="cluster-cnt">1 条</span></div><div class="cluster-sum">英伟达发布新一代GPU架构，算力性能提升三倍，多平台共现。<span class="cites"><a class="cite" href="https://example.com/1" target="_blank" title="英伟达新一代GPU架构发布，算力性能提升三倍 ｜ 华尔街见闻 / 财联社热门">[1]</a></span></div></div><div class="cluster"><div class="cluster-hd">台积电<span class="cluster-cnt">2 条</span></div><div class="cluster-sum">台积电上调先进制程报价并加速美国厂扩产，AI芯片成本与产能压力同步上移。<span class="cites"><a class="cite" href="https://example.com/8" target="_blank" title="台积电上调先进制程报价 ｜ 财联社热门">[1]</a><a class="cite" href="https://example.com/9" target="_blank" title="台积电宣布美国厂扩产计划提速 ｜ 财联社热门">[2]</a></span></div></div><div class="cluster-rest-label">其他条目</div>
+                <div class="word-group" data-ind-idx="0"><div class="word-header"><div class="word-info"><div class="word-name">AI 芯片及硬件</div><div class="word-count warm">8 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div><div class="level-sum">芯片层主线是算力供给扩张：英伟达新架构落地、台积电产能与报价双升，存储涨价向企业级传导。</div><div class="cluster"><div class="cluster-hd">英伟达<span class="cluster-region">美国头部</span><span class="cluster-cnt">1 条</span></div><div class="cluster-sum">英伟达发布新一代GPU架构，算力性能提升三倍，多平台共现。<span class="cites"><a class="cite" href="https://example.com/1" target="_blank" title="英伟达新一代GPU架构发布，算力性能提升三倍 ｜ 华尔街见闻 / 财联社热门">[1]</a></span></div></div><div class="cluster"><div class="cluster-hd">台积电<span class="cluster-cnt">2 条</span></div><div class="cluster-sum">台积电上调先进制程报价并加速美国厂扩产，AI芯片成本与产能压力同步上移。<span class="cites"><a class="cite" href="https://example.com/8" target="_blank" title="台积电上调先进制程报价 ｜ 财联社热门">[1]</a><a class="cite" href="https://example.com/9" target="_blank" title="台积电宣布美国厂扩产计划提速 ｜ 财联社热门">[2]</a></span></div></div><div class="cluster-rest-label">其他条目</div>
                     <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
@@ -2233,7 +2284,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="word-group" data-ind-idx="1"><div class="word-header"><div class="word-info"><div class="word-name">云基础设施</div><div class="word-count ">2 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
+                <div class="word-group" data-ind-idx="1"><div class="word-header"><div class="word-info"><div class="word-name">云基础设施</div><div class="word-count ">2 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div><div class="level-sum">云层以边缘转型为主线，CDN 厂商算力收入占比提升。</div>
                     <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
@@ -2261,6 +2312,7 @@
                         <div class="market-hd">投资市场动向<span class="market-cnt">1 条</span></div><div class="cluster"><div class="cluster-hd">存储板块<span class="cluster-cnt">1 条</span></div><div class="cluster-sum">存储概念股午后集体拉升，海力士大涨5%，AI交易情绪回暖。<span class="cites"><a class="cite" href="https://example.com/m1" target="_blank" title="存储芯片概念股午后集体拉升，海力士大涨5% ｜ 财联社热门">[1]</a></span></div></div>
                     </div>
                     <div class="zone-empty">📭 今日无动态：大模型厂商</div>
+                    </details>
                 </div>
                 <div class="zone zone-company">
                     <div class="zone-header">
@@ -2388,7 +2440,7 @@
                     <div class="run-stats-title">运行统计</div>
                     <div class="run-stats-grid">
                         <div class="run-stat"><span class="run-stat-label">报告类型</span><span class="run-stat-value">全天汇总</span></div>
-                        <div class="run-stat"><span class="run-stat-label">生成时间</span><span class="run-stat-value">07-23 18:23</span></div>
+                        <div class="run-stat"><span class="run-stat-label">生成时间</span><span class="run-stat-value">07-23 19:26</span></div>
                         <div class="run-stat"><span class="run-stat-label">热榜命中</span><span class="run-stat-value">11 / 13</span></div>
                         <div class="run-stat"><span class="run-stat-label">RSS 命中</span><span class="run-stat-value">4 / 4</span></div>
                         <div class="run-stat"><span class="run-stat-label">热榜平台</span><span class="run-stat-value">2/2</span></div>
