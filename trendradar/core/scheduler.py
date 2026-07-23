@@ -30,6 +30,7 @@ class ResolvedSchedule:
     frequency_file: Optional[str] = None  # 频率词文件路径，None=使用默认
     filter_method: Optional[str] = None   # 筛选策略: "keyword"|"ai"，None=使用全局配置
     interests_file: Optional[str] = None  # AI 筛选兴趣文件，None=使用默认
+    lookback_days: int = 0                # daily 模式额外回看天数（1=合并昨日数据成 24h 窗口）
 
 
 class Scheduler:
@@ -166,6 +167,7 @@ class Scheduler:
             push=merged.get("push", False),
             report_mode=merged.get("report_mode", "current"),
             ai_mode=self._resolve_ai_mode(merged),
+            lookback_days=int(merged.get("lookback_days", 0) or 0),
             once_analyze=merged.get("once", {}).get("analyze", False),
             once_push=merged.get("once", {}).get("push", False),
             frequency_file=merged.get("frequency_file"),

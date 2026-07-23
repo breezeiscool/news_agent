@@ -80,6 +80,82 @@ def read_all_today_titles_from_storage(
         return {}, {}, {}
 
 
+def merge_lookback_titles(
+    storage_manager,
+    all_results: Dict,
+    id_to_name: Dict,
+    title_info: Dict,
+    platform_ids: Optional[List[str]] = None,
+    lookback_date: Optional[str] = None,
+    cutoff_hhmm: str = "00-00",
+    quiet: bool = False,
+) -> int:
+    """将昨日数据中仍在 24h 窗口内的条目并入今日数据（晨报 24h 汇总用）
+
+    取昨日 last_time >= cutoff_hhmm（即昨日此刻之后仍活跃）的条目；
+    与今日同题（精确或模糊相似）的条目跳过（今日数据优先），
+    昨日独有条目原地并入 all_results / id_to_name / title_info。
+
+    Args:
+        lookback_date: 昨日日期（如 "2026-07-22"）
+        cutoff_hhmm: 窗口起点时刻（"HH-MM"，通常为当前时刻）
+
+    Returns:
+        并入的条目数
+    """
+    from trendradar.report.helpers import titles_similar
+
+    try:
+        y_data = storage_manager.get_today_all_data(date=lookback_date)
+    except Exception as e:
+        print(f"[24h窗口] 读取昨日数据失败: {e}")
+        return 0
+
+    if not y_data or not y_data.items:
+        if not quiet:
+            print("[24h窗口] 昨日无数据")
+        return 0
+
+    added = 0
+    for source_id, news_list in y_data.items.items():
+        if platform_ids is not None and source_id not in platform_ids:
+            continue
+        today_titles = all_results.get(source_id, {})
+        for item in news_list:
+            last_time = item.last_time or item.crawl_time or ""
+            # 字符串 "HH-MM" 可直接比较；早于窗口起点（已出 24h 窗口）的跳过
+            if last_time < cutoff_hhmm:
+                continue
+            title = item.title
+            if title in today_titles:
+                continue
+            if any(titles_similar(title, t) for t in today_titles):
+                continue
+
+            ranks = item.ranks or [item.rank]
+            all_results.setdefault(source_id, {})[title] = {
+                "ranks": ranks,
+                "url": item.url or "",
+                "mobileUrl": item.mobile_url or "",
+            }
+            title_info.setdefault(source_id, {})[title] = {
+                "first_time": item.first_time or item.crawl_time,
+                "last_time": item.last_time or item.crawl_time,
+                "count": item.count,
+                "ranks": ranks,
+                "url": item.url or "",
+                "mobileUrl": item.mobile_url or "",
+                "rank_timeline": item.rank_timeline,
+            }
+            if source_id not in id_to_name:
+                id_to_name[source_id] = y_data.id_to_name.get(source_id, source_id)
+            added += 1
+
+    if not quiet:
+        print(f"[24h窗口] 已并入昨日 {cutoff_hhmm.replace('-', ':')} 后仍活跃的 {added} 条")
+    return added
+
+
 def read_all_today_titles(
     storage_manager,
     current_platform_ids: Optional[List[str]] = None,

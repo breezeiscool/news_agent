@@ -688,7 +688,7 @@ class AIAnalyzer:
                     if not (c.get("company") and c.get("summary") and isinstance(titles, list)):
                         continue
                     section = str(c.get("section", "other")).lower()
-                    if section not in ("us", "cn", "other", "market"):
+                    if section not in ("us", "cn", "other", "market", "vertical", "emerging"):
                         section = "other"
                     parsed_clusters.append({
                         "group": str(c.get("group", "")),

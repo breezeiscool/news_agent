@@ -60,8 +60,18 @@ China Merchants Bank
 Bank of Communications
 
 [中信]
-/中信(?=银行|集团|证券|建投|信托|泰富|国安|重工|股份|保诚|金属|资源|出版)/ => 中信系
+中信集团
+中信股份
+中信泰富
+中信银行
+中信证券
+中信建投
+中信信托
 CITIC
+# 过滤券商研报播报体（"中信证券：看好XX"），全局生效
+!/中信(证券|建投)[:：]/
+!中信证券研报
+!中信建投研报
 
 [税务总局]
 国家税务总局
@@ -133,15 +143,18 @@ Egypt Ministry of Defence
 Egyptian MOD
 
 # ============ 采集线A：计算产业行业动态 ============
+# ⚠️ 本行业段与以下两个文件需保持同步（修改后同步复制）：
+#    config/custom/keyword/frequency_words_ott_ai.txt（行业段）
+#    config/custom/keyword/frequency_words_industry.txt（晚间行业专用表）
 # 四层级分组（AI芯片及硬件 → 云基础设施 → 大模型厂商 → AI应用）
-# 每组 @15：行业大词全天汇总易刷屏，只保留权重最高的 15 条
+# 每组 @10：行业大词全天汇总易刷屏，只保留权重最高的 15 条
 # 注意：新闻按"第一个匹配的词组"归类，层级顺序即匹配优先级，
 #       宽泛词（人工智能/AI）放在最后的 AI应用 层兜底
 
 [分类:行业动态]
 
 [AI 芯片及硬件]
-@15
+@10
 芯片
 半导体
 /(?<![a-z0-9])chip(?!otle)/ => chip
@@ -194,9 +207,24 @@ ddr4
 ddr5
 服务器
 液冷
+博通
+Broadcom
+地平线
+Cerebras
+/(?<![a-z0-9])groq(?![a-z0-9])/ => Groq
+SambaNova
+Marvell
+Lightmatter
+沐曦
+壁仞科技
+天数智芯
+云天励飞
+芯原股份
+燧原科技
+黑芝麻智能
 
 [云基础设施]
-@15
+@10
 数据中心
 data center
 datacenter
@@ -241,9 +269,24 @@ Azure
 CoreWeave
 万国数据
 世纪互联
+微软
+Microsoft
+甲骨文
+Oracle
+华为云
+百度智能云
+火山引擎
+天翼云
+移动云
+联通云
+京东云
+金山云
+浪潮云
+青云科技
+Lambda Labs
 
 [大模型厂商]
-@15
+@10
 大模型
 /(?<![a-z0-9])llm(?![a-z0-9])/ => LLM
 OpenAI
@@ -266,9 +309,19 @@ Grok
 百川智能
 零一万物
 Mistral
+/(?<![a-z0-9])meta(?![a-z0-9])/ => Meta
+/(?<![a-z0-9])xai(?![a-z0-9])/ => xAI
+豆包
+Doubao
+混元
+盘古大模型
+Cohere
+Databricks
+昆仑万维
+讯飞星火
 
 [AI 应用]
-@15
+@10
 人工智能
 /(?<![a-z0-9])ai(?![a-z0-9])/ => AI
 artificial intelligence
@@ -282,3 +335,36 @@ Midjourney
 Perplexity
 自动驾驶
 AI眼镜
+Palantir
+Scale AI
+Figure AI
+Anduril
+特斯拉
+Tesla
+SpaceX
+苹果
+Apple
+Salesforce
+Adobe
+Firefly
+ServiceNow
+Grammarly
+/(?<![a-z0-9])runway(?![a-z0-9])/ => Runway
+ElevenLabs
+/(?<![a-z0-9])suno(?![a-z0-9])/ => Suno
+/(?<![a-z0-9])cursor(?![a-z0-9])/ => Cursor
+/(?<![a-z0-9])windsurf(?![a-z0-9])/ => Windsurf
+/(?<![a-z0-9])devin(?![a-z0-9])/ => Devin
+腾讯元宝
+可灵
+Kling
+即梦
+海螺AI
+秘塔
+第四范式
+金山办公
+/(?<![a-z0-9])wps(?![a-z0-9])/ => WPS
+用友
+金蝶
+/(?<![a-z0-9])trae(?![a-z0-9])/ => Trae
+通义灵码

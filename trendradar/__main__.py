@@ -67,6 +67,7 @@ class NewsAnalyzer:
         self.request_interval = self.ctx.config["REQUEST_INTERVAL"]
         self.report_mode = self.ctx.config["REPORT_MODE"]
         self.frequency_file = None
+        self.lookback_days = 0
         self.filter_method = None  # None=使用全局配置 ctx.filter_method
         self.interests_file = None  # None=使用全局配置 ai_filter.interests_file
         self.rank_threshold = self.ctx.rank_threshold
@@ -454,6 +455,21 @@ class NewsAnalyzer:
             all_results, id_to_name, title_info = self.ctx.read_today_titles(
                 current_platform_ids, quiet=quiet
             )
+
+            # 24h 窗口：晨报时段并入昨日仍活跃的条目（跨天汇总）
+            if self.lookback_days >= 1 and self.report_mode == "daily":
+                from datetime import timedelta
+                from trendradar.core.data import merge_lookback_titles
+
+                now = self.ctx.get_time()
+                merge_lookback_titles(
+                    self.ctx.get_storage_manager(),
+                    all_results, id_to_name, title_info,
+                    platform_ids=current_platform_ids,
+                    lookback_date=(now - timedelta(days=1)).strftime("%Y-%m-%d"),
+                    cutoff_hhmm=now.strftime("%H-%M"),
+                    quiet=quiet,
+                )
 
             if not all_results:
                 print("没有找到当天的数据")
@@ -1141,6 +1157,32 @@ class NewsAnalyzer:
                 raw_rss_items = self._convert_rss_items_to_list(latest_data.items, latest_data.id_to_name)
         else:  # daily
             all_data = self.storage_manager.get_rss_data(rss_data.date)
+            # 24h 窗口：并入昨日 RSS（url 去重；新鲜度过滤会把窗口裁到 max_age_days）
+            if self.lookback_days >= 1:
+                from datetime import timedelta
+
+                y_date = (self.ctx.get_time() - timedelta(days=1)).strftime("%Y-%m-%d")
+                try:
+                    y_rss = self.storage_manager.get_rss_data(y_date)
+                except Exception as e:
+                    print(f"[24h窗口] 读取昨日 RSS 失败: {e}")
+                    y_rss = None
+                if y_rss and y_rss.items:
+                    if not all_data:
+                        all_data = y_rss
+                    else:
+                        today_urls = {
+                            it.url for items in all_data.items.values() for it in items if it.url
+                        }
+                        merged_count = 0
+                        for feed_id, items in y_rss.items.items():
+                            keep = [it for it in items if not it.url or it.url not in today_urls]
+                            if keep:
+                                all_data.items.setdefault(feed_id, []).extend(keep)
+                                merged_count += len(keep)
+                        for fid, fname in y_rss.id_to_name.items():
+                            all_data.id_to_name.setdefault(fid, fname)
+                        print(f"[24h窗口] 已并入昨日 RSS {merged_count} 条")
             if all_data:
                 raw_rss_items = self._convert_rss_items_to_list(all_data.items, all_data.id_to_name)
 
@@ -1477,6 +1519,7 @@ class NewsAnalyzer:
 
         # 使用 schedule 决定的 frequency_file 覆盖默认值
         self.frequency_file = schedule.frequency_file
+        self.lookback_days = getattr(schedule, "lookback_days", 0)
 
         # 使用 schedule 决定的筛选策略覆盖默认值
         self.filter_method = schedule.filter_method or self.ctx.filter_method

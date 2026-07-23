@@ -153,87 +153,59 @@ presets:
 
   
   # ───────────────────────────────────────────────────────────
-  # workday_us - 工作日节奏 + 美股时段（为 8:30-18:00 上班族定制）
+  # twice_daily - 每天两推（当前使用的正式预设）
   #
-  # 设计逻辑（北京时间）：
-  #   美股常规时段约为北京时间 21:30-04:00（夏令时）/ 22:30-05:00（冬令时），
-  #   隔夜数据在深夜静默期持续采集，早晨上班前汇总成晨报。
-  #
-  #   06:30-08:30 晨间简报：隔夜美股 + 昨夜资讯的当日汇总（AI 分析，一次）
-  #   11:30-13:30 午间速览：上午新增热点（不做 AI，省 API，一次）
-  #   16:30-18:30 收工汇总：全天完整汇总（AI 分析，一次）→ 下班前读完
-  #   21:30-23:30 美股开盘：开盘后首波资讯，有新增才推（不打扰）
-  #   其余时间：静默采集，不推送
+  # 设计逻辑（北京时间，cron 每小时第 33 分唤醒）：
+  #   08:00-09:25 晨报（约 08:33 送达）：
+  #     过去 24 小时汇总（lookback_days: 1 跨天并入昨日仍活跃条目），
+  #     AI 全量分析，总结性优先
+  #   19:00-20:25 晚间行业总结（约 19:33 送达，美股开盘前）：
+  #     当日行业动态总结，使用行业专用词表（无公司监控段），
+  #     重在总结而非新闻展示
+  #   其余时间：静默采集（保证轨迹与 24h 数据完整），不推送
+  #   周末：只推晨报一次
   # ───────────────────────────────────────────────────────────
-  workday_us:
-    name: "工作日+美股"
-    description: "晨间隔夜美股简报 → 午间速览 → 收工汇总 → 美股开盘增量。为 8:30-18:00 上班族定制。"
+  twice_daily:
+    name: "每天两推"
+    description: "早8点后24h汇总 + 晚19:33行业总结（美股开盘前）。周末只推早上。"
 
     default:
-      collect: true                # 全天持续采集（含美股夜盘时段）
+      collect: true                # 全天持续采集
       analyze: false
-      ai_mode: "current"
+      ai_mode: "daily"
       push: false                  # 静默期不推送
-      report_mode: "current"
+      report_mode: "daily"
       once:
         analyze: true              # 每个时段只分析一次
         push: true                 # 每个时段只推送一次
 
     periods:
-      morning_briefing:
-        name: "晨间简报"
-        start: "06:30"
-        end: "08:30"               # 8:30 到岗前收到
-        analyze: true
-        ai_mode: "daily"           # 汇总隔夜（00:00 起，覆盖美股收盘时段）内容
-        push: true
-        report_mode: "daily"
-
-      noon_update:
-        name: "午间速览"
-        start: "11:30"
-        end: "13:30"
-        push: true
-        report_mode: "incremental" # 只推上午新增，读得快
-        # analyze 继承 default: false → 省 API
-
-      closing_summary:
-        name: "收工汇总"
-        start: "16:30"
-        end: "18:30"               # 18:00 下班前后收到
+      morning_24h:
+        name: "晨报·24小时汇总"
+        start: "08:00"
+        end: "09:25"               # 08:33 tick 送达
         analyze: true
         ai_mode: "daily"
         push: true
         report_mode: "daily"
+        lookback_days: 1           # 并入昨日仍在 24h 窗口内的数据
 
-      us_market_open:
-        name: "美股开盘"
-        start: "21:30"
-        end: "23:30"               # 美股开盘后首波（夏令时 21:30 开盘）
-        push: true
-        report_mode: "incremental" # 有新增才推，没有就安静
-
-      weekend_morning:
-        name: "周末晨报"
-        start: "09:30"
-        end: "11:30"
+      evening_industry:
+        name: "晚间·行业总结"
+        start: "19:00"
+        end: "20:25"               # 19:33 tick 送达（美股夏令时 21:30 开盘前）
         analyze: true
         ai_mode: "daily"
         push: true
         report_mode: "daily"
-
-      weekend_evening:
-        name: "周末晚报"
-        start: "20:00"
-        end: "22:00"
-        push: true
-        report_mode: "daily"
+        # 行业专用词表：无公司监控段 → 不触发公司监控
+        frequency_file: "config/custom/keyword/frequency_words_industry.txt"
 
     day_plans:
       workday:
-        periods: ["morning_briefing", "noon_update", "closing_summary", "us_market_open"]
+        periods: ["morning_24h", "evening_industry"]
       weekend:
-        periods: ["weekend_morning", "weekend_evening"]
+        periods: ["morning_24h"]   # 周末只推晨报
 
     week_map:
       1: "workday"

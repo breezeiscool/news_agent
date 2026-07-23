@@ -2987,13 +2987,19 @@ def render_html_content(
             if ai_analysis is not None
             else []
         )
+        # 主流簇（us/cn/other）逐公司展示；垂直与热门新兴归入默认折叠块
+        all_group_clusters = [
+            c for c in ai_clusters_all
+            if c.get("group") in ("", stat["word"]) and c.get("section") != "market"
+        ]
         group_clusters = sorted(
-            (
-                c for c in ai_clusters_all
-                if c.get("group") in ("", stat["word"]) and c.get("section") != "market"
-            ),
+            (c for c in all_group_clusters if c.get("section") not in ("vertical", "emerging")),
             key=lambda c: _SECTION_RANK.get(c.get("section"), 2),
         )
+        folded_specs = [
+            ("vertical", "垂直行业动态"),
+            ("emerging", "热门与新兴"),
+        ]
 
         count = stat["count"]
         count_class = "hot" if count >= 10 else ("warm" if count >= 5 else "")
@@ -3032,6 +3038,39 @@ def render_html_content(
             )
 
         group_html += clusters_html
+
+        # 垂直 / 热门新兴：大类簇归并进默认折叠块（用户要求默认收起）
+        for fold_section, fold_title in folded_specs:
+            fold_clusters = [c for c in all_group_clusters if c.get("section") == fold_section]
+            fold_html = ""
+            fold_count = 0
+            for c in fold_clusters:
+                items = []
+                for ct in c.get("titles", []):
+                    match = next((t for t in remaining if t.get("title") == ct), None)
+                    if match is None:
+                        match = next(
+                            (t for t in remaining if _titles_similar(t.get("title", ""), ct)),
+                            None,
+                        )
+                    if match is not None:
+                        remaining.remove(match)
+                        items.append(match)
+                if not items:
+                    continue
+                fold_count += len(items)
+                fold_html += (
+                    '<div class="cluster">'
+                    f'<div class="cluster-hd">{html_escape(c["company"])}<span class="cluster-cnt">{len(items)} 条</span></div>'
+                    f'<div class="cluster-sum">{html_escape(c["summary"])}<span class="cites">{build_cluster_cites(items)}</span></div>'
+                    '</div>'
+                )
+            if fold_html:
+                group_html += (
+                    f'<details class="more-items fold-{fold_section}">'
+                    f'<summary>{fold_title}（{fold_count} 条）</summary>'
+                    f'{fold_html}</details>'
+                )
 
         # AI 未覆盖的条目：少量直接展示，多了折叠收纳（降低信息量，脉络优先）
         if remaining:

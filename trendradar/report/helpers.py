@@ -201,7 +201,7 @@ def format_rank_display(
 
     return f"{rank_str} {trend_arrow}" if trend_arrow else rank_str
 
-def titles_similar(a: str, b: str, threshold: float = 0.6) -> bool:
+def titles_similar(a: str, b: str, threshold: float = 0.55) -> bool:
     """判断两条新闻标题是否为同一事件（字符二元组 Jaccard 相似度）
 
     用于跨平台同题合并：不同平台对同一事件的标题措辞略有差异，
