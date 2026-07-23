@@ -1,0 +1,80 @@
+name: Preview 24h Morning Report
+
+# ═══════════════════════════════════════════════════════════════
+# 24h 晨报调试按钮：随时手动触发，立即生成并发送一版
+# "过去 24 小时晨报"（与每天 08:33 的正式晨报同配置）
+#
+# 与正式晨报的差异：
+#   - 不受时段限制、不限次数（SCHEDULE_PRESET=preview_24h）
+#   - 不把报告提交回仓库（避免调试快照污染历史导航与 Pages）
+#   - 报告可在本次 run 的 Artifacts（html-report-preview-24h）下载
+#
+# 数据来源：仓库中由正式线每小时提交的 output/ 数据库
+# （含今日与昨日数据，因此 24h 跨天合并是真实数据）
+# ═══════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: preview-24h-${{ github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          clean: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-dev
+
+      - name: Run 24h morning report preview
+        env:
+          # 强制 24h 晨报行为：daily + lookback_days 1 + AI 全量 + 必推送
+          SCHEDULE_PRESET: "preview_24h"
+
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_SMTP_SERVER: ${{ secrets.EMAIL_SMTP_SERVER }}
+          EMAIL_SMTP_PORT: ${{ secrets.EMAIL_SMTP_PORT }}
+          # AI 配置（与主线共用）
+          AI_ANALYSIS_ENABLED: ${{ secrets.AI_ANALYSIS_ENABLED }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          AI_API_BASE: ${{ secrets.AI_API_BASE }}
+          # 远程存储（可选）
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
+          S3_REGION: ${{ secrets.S3_REGION }}
+          GITHUB_ACTIONS: true
+        run: uv run python -m trendradar
+
+      - name: 上传 HTML 报告（供下载预览）
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: html-report-preview-24h
+          path: output/html/
+          retention-days: 3
+          if-no-files-found: warn

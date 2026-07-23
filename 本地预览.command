@@ -46,7 +46,7 @@ fi
 
 # 本地预览专用开关
 export ENABLE_NOTIFICATION=false   # 硬性禁止发邮件/推送
-export SCHEDULE_PRESET=test_mode   # 不受时段限制，任何时间都生成完整报告
+export SCHEDULE_PRESET=preview_24h # 24h晨报同款配置：daily+跨天回看，不受时段限制
 
 echo "[运行] 抓取数据并生成报告（完成后自动在浏览器打开）..."
 .venv-local/bin/python -m trendradar

@@ -152,6 +152,44 @@ presets:
       7: "all_day"
 
   
+  # =====================================================
+  # preview_24h - 24h 晨报调试预设
+  #
+  # 用途：随时手动触发一版"过去 24 小时晨报"（与正式晨报
+  #       morning_24h 完全同配置：daily + lookback_days:1 + AI 全量），
+  #       不受时段限制、不限次数。
+  # 触发：Actions → "Preview 24h Morning Report" 按钮，
+  #       或本地 ./本地预览.command
+  # =====================================================
+  preview_24h:
+    name: "24h晨报预览"
+    description: "调试用：任何时间手动触发都生成过去24小时晨报（采集+AI+推送）。"
+
+    default:
+      collect: true
+      analyze: true
+      ai_mode: "daily"
+      push: true
+      report_mode: "daily"
+      lookback_days: 1           # 与正式晨报一致：并入昨日仍活跃的条目
+      once:
+        analyze: false           # 不限次数，随时可再触发
+        push: false
+
+    periods: {}
+    day_plans:
+      all_day:
+        periods: []
+    week_map:
+      1: "all_day"
+      2: "all_day"
+      3: "all_day"
+      4: "all_day"
+      5: "all_day"
+      6: "all_day"
+      7: "all_day"
+
+
   # ───────────────────────────────────────────────────────────
   # twice_daily - 每天两推（当前使用的正式预设）
   #
