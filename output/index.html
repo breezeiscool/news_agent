@@ -1259,6 +1259,55 @@
             details.more-items summary:hover { color: #174e7c; }
             body.dark-mode details.more-items summary { color: #64798c; }
 
+            /* 层级 AI 总结（置于每个产业层级最开头） */
+            .level-sum {
+                margin: 4px 0 10px 0;
+                padding: 10px 14px;
+                background: #eef4f9;
+                border-left: 3px solid #1e7f9e;
+                border-radius: 0 8px 8px 0;
+                font-size: 13px;
+                line-height: 1.65;
+                color: #1f4e79;
+            }
+            body.dark-mode .level-sum {
+                background: #14273a;
+                border-left-color: #4d8ec4;
+                color: #a4c6de;
+            }
+
+            /* 行业板块整体折叠句柄 */
+            details.zone-collapse > summary.zone-collapse-summary {
+                cursor: pointer;
+                user-select: none;
+                font-size: 13px;
+                font-weight: 600;
+                color: #1e7f9e;
+                padding: 10px 14px;
+                background: #f0f7f9;
+                border: 1px dashed #cfe6ed;
+                border-radius: 10px;
+                list-style: none;
+            }
+            details.zone-collapse > summary.zone-collapse-summary::-webkit-details-marker { display: none; }
+            details.zone-collapse > summary.zone-collapse-summary::before {
+                content: "▸ ";
+                font-size: 12px;
+            }
+            details.zone-collapse[open] > summary.zone-collapse-summary::before {
+                content: "▾ ";
+            }
+            details.zone-collapse > summary.zone-collapse-summary:hover {
+                border-color: #1e7f9e;
+                background: #e6f3f6;
+            }
+            details.zone-collapse[open] > summary.zone-collapse-summary { margin-bottom: 12px; }
+            body.dark-mode details.zone-collapse > summary.zone-collapse-summary {
+                background: #0f2530;
+                border-color: #1e4552;
+                color: #8cc0d8;
+            }
+
             .cluster-rest-label {
                 margin-top: 10px;
                 font-size: 11px;
@@ -2133,7 +2182,7 @@
                     </div>
                 </div>
                 <div class="header-title">产业情报简报</div>
-                <div class="header-sub">全天汇总 · 07-23 18:42 生成</div>
+                <div class="header-sub">全天汇总 · 07-23 21:08 生成</div>
             </div>
 
             <div class="content">
@@ -2148,7 +2197,7 @@
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">精选资讯</div>
-                        <div class="metric-value">216<span class="metric-unit">条</span></div>
+                        <div class="metric-value">230<span class="metric-unit">条</span></div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">本次新增</div>
@@ -2158,7 +2207,7 @@
                 <div class="legend-line">标注说明：<b>#n</b>＝该平台热榜排名（颜色越深越靠前，区间为当日波动）· <b>n次</b>＝当日累计上榜次数 · <b>RSS</b>＝订阅源文章（附摘要，点击展开）· <b>[n]</b>＝引用角标，悬停看标题与信源</div>
                 <div class="history-nav" style="display:none">
                     <span class="history-nav-label">历史</span>
-                    <a class="history-chip active" href="#" data-hist-date="2026-07-23" data-hist-file="18-42.html">2026-07-23</a>
+                    <a class="history-chip active" href="#" data-hist-date="2026-07-23" data-hist-file="21-08.html">2026-07-23</a>
                     <a class="history-chip" href="#" data-hist-date="2026-07-22" data-hist-file="22-38.html">2026-07-22</a>
                     <a class="history-chip history-chip-latest" href="#" data-latest-link style="display:none">↻ 最新报告</a>
                     <a class="history-chip" href="#" data-manager-link style="margin-left:auto">⚙ 订阅管理</a>
@@ -2171,17 +2220,19 @@
                     <div class="zone-header">
                         <span class="zone-icon">📡</span>
                         <span class="zone-title">行业动态</span>
-                        <span class="zone-meta">4 组有更新 · 203 条资讯</span>
+                        <span class="zone-meta">4 组有更新 · 217 条资讯</span>
                     </div>
+                    <details class="zone-collapse">
+                        <summary class="zone-collapse-summary">展开层级明细（4 个层级 · 217 条资讯）</summary>
                     <div class="ind-tabbar">
-                        <button class="ind-tab active" data-ind="all">全部<span class="tab-count">203</span></button>
-                        <button class="ind-tab" data-ind="0">AI 芯片及硬件<span class="tab-count">56</span></button>
-                        <button class="ind-tab" data-ind="1">云基础设施<span class="tab-count">35</span></button>
-                        <button class="ind-tab" data-ind="2">大模型厂商<span class="tab-count">26</span></button>
-                        <button class="ind-tab" data-ind="3">AI 应用<span class="tab-count">86</span></button>
+                        <button class="ind-tab active" data-ind="all">全部<span class="tab-count">217</span></button>
+                        <button class="ind-tab" data-ind="0">AI 芯片及硬件<span class="tab-count">60</span></button>
+                        <button class="ind-tab" data-ind="1">云基础设施<span class="tab-count">36</span></button>
+                        <button class="ind-tab" data-ind="2">大模型厂商<span class="tab-count">27</span></button>
+                        <button class="ind-tab" data-ind="3">AI 应用<span class="tab-count">94</span></button>
                     </div>
                     <div class="ind-groups">
-                <div class="word-group" data-ind-idx="0"><div class="word-header"><div class="word-info"><div class="word-name">AI 芯片及硬件</div><div class="word-count hot">56 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
+                <div class="word-group" data-ind-idx="0"><div class="word-header"><div class="word-info"><div class="word-name">AI 芯片及硬件</div><div class="word-count hot">60 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
                     <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
@@ -2275,6 +2326,54 @@
                     <div class="news-item new">
                         <div class="news-number">11</div>
                         <div class="news-content">
+                            <div class="news-header"><span class="source-name">雅虎财经</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:38</span>
+                            </div>
+                            <div class="news-title"><a href="https://finance.yahoo.com/markets/stocks/articles/qualcomms-ai-story-hot-why-123804375.html" target="_blank" class="news-link">Qualcomm&#x27;s AI Story Is Hot. Why Is First Solar&#x27;s Future Clearer?</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-item new">
+                        <div class="news-number">12</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:17</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/829.htm" target="_blank" class="news-link">QCC 推出 Dongle Pro2 蓝牙发射器：基于第二代高通 S5 音频平台、支持专属游戏模式，499 元</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，QCC 旷世之声宣布推出一款 Dongle Pro2 蓝牙发射器，定价为 499 元。京东旷世之声 QCC Dongle Pro2 蓝牙发射器 499 元直达链接该产品基于第二代高通 S5 音频平台，支持 Snapdragon Sound 骁龙畅听技术。搭载蓝牙 6.1 技术，支持 LHDC 5.0、LE Audio 和 Auracast 音频广播功能及 LDAC、aptX、aptX HD、aptX Adaptive、aptX Lossless 等主流高清音频编解码。官方强调，该产品无需额外驱动，即可连接 iPhone / iPad、Mac、Windows PC、Android 手机、Switch 及 PS5 等设备。同时产品提供了专属游戏模式，最低可实现 20ms 时延，有效解决玩 FPS 或开放世界游戏时的声画不同步问题，兼容 PS5、Switch 等游戏主机。IT之家附产品参数：</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">13</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">雅虎财经</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 19:30</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.investors.com/etfs-and-funds/etfs/semiconductor-etfs-show-theyre-more-than-a-flash-in-the-pan/?src=A00220&amp;yptr=yahoo" target="_blank" class="news-link">Semiconductor ETFs Show They&#x27;re More Than A Flash In The Pan</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-item new">
+                        <div class="news-number">14</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">Hacker News</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 19:09</span>
+                            </div>
+                            <div class="news-title"><a href="https://frame.work/desktop?tab=192gb-coming-soon" target="_blank" class="news-link">New Framework Desktop Option with AMD Ryzen AI Max+ Pro 495 and 192GB Memory</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">文章URL: https://frame.work/desktop?tab=192gb-coming-soon 评论URL: https://news.ycombinator.com/item?id=49019694 点数: 51 评论数: 43</div>
+                        </div>
+                    </div>
+                    <div class="news-item new">
+                        <div class="news-number">15</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 19:07</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/811.htm" target="_blank" class="news-link">长鑫科技：公司股票将于 2026 年 7 月 27 日在上海证券交易所科创板上市</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，国产 DRAM（动态随机存取存储器）龙头企业长鑫科技公告称，公司股票将于 2026 年 7 月 27 日在上海证券交易所科创板上市。IT之家注意到，7 月 16 日，长鑫科技正式开启新股申购，按 8.66 元 / 股的发行价计算，公司发行市值约 5791.88 亿元，预计募集资金 579.19 亿元，成为 2026 年以来 A 股规模最大的 IPO 之一。根据市场研究机构 Omdia 的数据，按 2025 年第四季度 DRAM 销售额统计，长鑫科技的全球市场份额已增至 7.67%，位列全球第四、中国第一。在中国市场，长鑫科技已成长为规模最大、技术最先进、布局最全的 DRAM 研发设计制造一体化企业。</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">16</div>
+                        <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:22</span>
                             </div>
                             <div class="news-title"><a href="https://www.ithome.com/0/980/728.htm" target="_blank" class="news-link">阿斯加特国产颗粒 DDR5 内存条在华硕主板实现 8800MT/s 超频</a>
@@ -2282,8 +2381,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，阿斯加特 (Asgard) 今日宣布，其基于国产 3G8 DRAM 颗粒的瓦尔基里二代耀系列 RGB / 海姆达尔耀系列特别纪念版 DDR5 6000 (24GBX2) 内存模组在华硕 Z890 AYW GAMING WIFI W 主板上成功超频至 8800MT/s，时序为 CL46-56-56-132。值得注意的是，Z890 AYW GAMING WIFI W 是一款 4DIMM（或者说 2DPC / 2SPC）设计的主板，内存超频能力不如 2DIMM (1DPC/1SPC) 主板，意味着国产 3G8 DRAM 颗粒在英特尔平台上甚至还有进一步提升数据传输速率的潜力。</div>
                         </div>
                     </div>
-                    <div class="news-item new">
-                        <div class="news-number">12</div>
+                    <div class="news-item ">
+                        <div class="news-number">17</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:06</span>
                             </div>
@@ -2292,8 +2391,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，据台媒 BenchLife.info 消息，NVIDIA（英伟达）已向下游 AIC 合作伙伴发布 GPU 核心与 VRAM 显存套件出货价格上涨的通知。此次涨价影响几乎全线 GeForce RTX 显卡，仅有此前已拉升出货价的 5090 和 5090 D v2 被排除在外。据悉此次涨价主要源于上游 DRAM 供应商提升了对 NVIDIA 的 GDDR7 与 GDDR6 显存报价，NVIDIA 无法单独消化这部分成本，需要负责显卡制造的 AIC 一起分摊。与此同时，除核心套件外的显卡其它组件（如供电、PCB、散热）也面临持续成本上升。</div>
                         </div>
                     </div>
-                    <div class="news-item new">
-                        <div class="news-number">13</div>
+                    <div class="news-item ">
+                        <div class="news-number">18</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 16:44</span>
                             </div>
@@ -2302,8 +2401,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，博主 @数码闲聊站 今日爆料，高通骁龙 8E5（第五代骁龙 8 至尊版）将预定长寿神 U，今年下半年将更新第 4 个版本：①SM8850-5-AC——7 核 8E5，Find N6②SM8850-AC—— 标准 8E5，主流旗舰方案③SM8850-1-AD—— 高频 8E5，Galaxy S26 系列 / Fold8 系列、红魔 11S 系列、部分游戏平板等④SM8850-1-AB—— 这个版本会在下半年更新，参数设定相对甜点，GB6 理论跑分单核 3600 / 多核 11300，很接近标准 8E5；子系迭代新机普遍会使用，核心卡住 4K 价位段，性能不错且外围给足，同期性价比更高的选择。该博主表示，8E（高通骁龙 8 至尊版）也还有新机，甚至有些母系旗舰的小杯也在考虑，小杯后缀加上 E/SE。综合IT之家此前报道，在去年 9 月的 2025 骁龙峰会上，高通正式发布了第五代骁龙 8 至尊版，该处理器延续了自研 Oryon CPU 架构，同时引入了硬件级的 AI 加速能力。具体核心架构上，由 2 枚最高主频 4.6GHz 的超大核心和 6 枚最高主频 3...</div>
                         </div>
                     </div>
-                    <div class="news-item new">
-                        <div class="news-number">14</div>
+                    <div class="news-item ">
+                        <div class="news-number">19</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 16:38</span>
                             </div>
@@ -2312,8 +2411,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，阿斯加特 V7 SSD 现已在京东上架，该产品采用 M.2 接口（NVMe 协议），读速达 7000MB/s，1TB 版本定价为 999 元，2TB 版本定价为 1999 元，提供五年质保。京东阿斯加特 V7 SSD 固态硬盘 999 元起直达链接该产品采用 PCIe 4.0 接口，连续读取速度达 7000MB/s、连续读写速度达 6500MB/s，TBW 达 640TB，MTBF 达 150 万小时，其采用铜箔散热设计，散热面积约 3.8 平方厘米。IT之家附产品参数：</div>
                         </div>
                     </div>
-                    <div class="news-item new">
-                        <div class="news-number">15</div>
+                    <div class="news-item ">
+                        <div class="news-number">20</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 16:12</span>
                             </div>
@@ -2322,73 +2421,23 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，英伟达（Nvidia）与美国海军研究生院（Naval Postgraduate School，NPS）当地时间周三宣布，英伟达已向与该校相关的一家非营利机构捐赠了一套搭载最新 AI 芯片的超级计算机。美国海军研究生院由美国海军运营，提供计算机科学、航空航天工程等多个学科的硕士和博士课程，重点培养这些技术在军事领域的应用能力。此次英伟达向与该校关联的非营利机构海军研究生院基金会（NPS Foundation）捐赠了一套基于 GB300“Grace Blackwell”服务器打造的超级计算机。这也是英伟达目前最先进的 AI 计算平台。IT之家注意到，英伟达和海军研究生院均未披露这套系统的具体规模，但确认其已部署在位于美国加利福尼亚州蒙特雷的海军研究生院校园内。美国印太司令部司令塞缪尔 ·J· 帕帕罗上将（Adm. Samuel J. Paparo）与英伟达首席执行官黄仁勋（Jensen Huang）计划共同出席活动，正式宣布该系统投入使用。虽然美国能源部正在建设的新一代政府超级计算机也将采用英伟达 Blackwell 芯片，但此次捐赠是美军首次直接使用英伟达...</div>
                         </div>
                     </div>
-                    <div class="news-item ">
-                        <div class="news-number">16</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 15:57</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/654.htm" target="_blank" class="news-link">环球晶圆：意大利 8 英寸产线发生火灾，无人员伤亡</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，全球头部晶圆供应商环球晶圆 (GlobalWafers) 昨日发布公告，表示其位于意大利的 Novara 八英寸晶圆生产线无尘室内的设备因故燃烧，致使产线停止生产。该生产线内的人员全部安全撤离，无人员伤亡。环球晶圆表示，此次火灾发生于 8 英寸生产线，未对 12 英寸生产线造成影响。该企业目前正在评估灾后复原计划，复工时程、设备损失及对运营的实际影响仍待进一步评估确认。延伸阅读环球晶圆是全球第三大半导体硅晶圆供应商，在 12 英寸硅晶圆制造领域与信越化学、胜高等企业同为市场主要参与者，合计占据超过 80% 的市场份额。环球晶圆在意大利的布局包括其子公司 MEMC SPA，该公司计划在既有厂房新建 12 英寸晶圆生产线，原计划于 2023 年下半年开出产能，这将是意大利首座 12 英寸晶圆厂。近年来，环球晶圆积极在全球范围内扩张产能，包括在美国得克萨斯州谢尔曼市投资建设新的 12 英寸晶圆厂，该厂也获得了美国《CHIPS 法案》至多 4 亿美元的补贴。</div>
-                        </div>
-                    </div>
-                    <div class="news-item ">
-                        <div class="news-number">17</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 15:41</span>
-                            </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3907919284606343?f=rss" target="_blank" class="news-link">SK海力士将股票转换为美国存托凭证的比例上限设定为2.5%</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">SK海力士将韩交所上市股票可转换为美股存托凭证（ADR）的总量上限设定为公司已发行总股本的2.5%。此次265亿美元ADR发行已用尽全部转换额度，除非现有ADR持有者先将美股存托凭证换回韩国本土股票，否则投资者无法再用韩股兑换ADR。SK海力士ADR相对韩交所挂牌股票长期存在溢价，转换额度限制或令两地价差持续扩大、存续更久。（新浪财经）</div>
-                        </div>
-                    </div>
-                    <div class="news-item ">
-                        <div class="news-number">18</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 15:01</span>
-                            </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3907880569656710?f=rss" target="_blank" class="news-link">A股三大指数收盘集体上涨，半导体领跌</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，A股三大指数收盘集体上涨，沪指涨0.25%，深成指涨0.44%，创业板指涨0.25%；半导体领跌，华虹宏力跌超10%，中芯国际、芯原股份跌超6%，寒武纪、德明利跌超4%；智能电网、锂电涨幅居前，中能电气、双杰电气、和顺电气、永杉锂业等多股涨停；油气股持续走强，ST准油、中曼石油涨停。</div>
-                        </div>
-                    </div>
-                    <div class="news-item ">
-                        <div class="news-number">19</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 14:52</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/623.htm" target="_blank" class="news-link">埃隆 · 马斯克：感谢美光向特斯拉分配可观内存产能</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，Tesla（特斯拉）首席执行官 Elon Musk（埃隆 · 马斯克）当地时间 22 日在公司 2026Q2 财报电话会议上表达了对 Micron（美光）的感谢：我也想感谢美光为我们分配内存。他们在内存分配方面不得不做出一些非常艰难的决定。我们非常感谢美光在未来几年为特斯拉预留了空间，并且鉴于当前内存价格高得离谱，他们仍以合理的条款为我们提供了相当可观的内存配额。特斯拉首席财务官 Vaibhav Taneja 也提到，该企业的生产增长正受到电池和电子元件的供应链限制。特斯拉正积极努力，通过与供应商达成战略性协议扫清前方障碍。特斯拉也正通过更高的集成度化解瓶颈。这正是埃隆 · 马斯克积极推进 Terafab 项目的关键原因，无此无法实现 Optimus 机器人的规模化生产。此外，AI4 芯片的升级版预计 2027 年中投产，AI5 也有望在类似时间进入量产。</div>
-                        </div>
-                    </div>
-                    <div class="news-item ">
-                        <div class="news-number">20</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 14:39</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/613.htm" target="_blank" class="news-link">数据中心 CPU 价格飙升，英特尔、AMD 与中国客户讨论超一年期供应协议</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，路透社今日援引两位知情人士消息称，两大 x86 处理器巨头英特尔和 AMD 正与中国客户讨论超过一年期的数据中心 CPU 供应协议。消息人士表示，英特尔和 AMD 正就新一轮 CPU 供应合同与中国买家交涉，这些协议通常锁定采购量但不锁定价格，主要为一年期形式。与此同时，中国市场的服务器 CPU 价格仍在攀升，部分品类价格月度涨幅超 10%，而有些产品今年以来价格累计上涨超过四成。图源：Pixabay随着人工智能需求的持续扩张，半导体与相关上下游产品的缺货浪潮正逐步从 GPU / AI ASIC 与 DRAM 内存向其它品类扩散。除这里报道的 CPU 外，更多组件的供应合同也正向长期化迁移。</div>
-                        </div>
-                    </div>
                 </div>
-                <div class="word-group" data-ind-idx="1"><div class="word-header"><div class="word-info"><div class="word-name">云基础设施</div><div class="word-count hot">35 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
+                <div class="word-group" data-ind-idx="1"><div class="word-header"><div class="word-info"><div class="word-name">云基础设施</div><div class="word-count hot">36 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
                     <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">Solidot</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#1-6</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~18:41</span><span class="count-info" title="当日累计上榜次数">9次</span>
+                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#3-5</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~21:08</span><span class="count-info" title="当日累计上榜次数">10次</span>
                             </div>
-                            <div class="news-title"><a href="https://www.solidot.org/story?sid=84898" target="_blank" class="news-link">空客准备将其应用从亚马逊 AWS 迁移到法国的 Scaleway</a>
+                            <div class="news-title"><a href="https://wallstreetcn.com/articles/3777699" target="_blank" class="news-link">云支出目标狂飙至7500亿美元！OpenAI豪掷超300亿美元建数据中心，推出Presence平台进军企业软件市场</a>
                             </div>
                         </div>
                     </div>
                     <div class="news-item ">
                         <div class="news-number">2</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#3-5</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~18:41</span><span class="count-info" title="当日累计上榜次数">9次</span>
+                            <div class="news-header"><span class="source-name">Solidot</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#1-7</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~21:08</span><span class="count-info" title="当日累计上榜次数">10次</span>
                             </div>
-                            <div class="news-title"><a href="https://wallstreetcn.com/articles/3777699" target="_blank" class="news-link">云支出目标狂飙至7500亿美元！OpenAI豪掷超300亿美元建数据中心，推出Presence平台进军企业软件市场</a>
+                            <div class="news-title"><a href="https://www.solidot.org/story?sid=84898" target="_blank" class="news-link">空客准备将其应用从亚马逊 AWS 迁移到法国的 Scaleway</a>
                             </div>
                         </div>
                     </div>
@@ -2451,24 +2500,43 @@
                     <div class="news-item ">
                         <div class="news-number">9</div>
                         <div class="news-content">
+                            <div class="news-header"><span class="source-name">财联社热门 / IT之家</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#2-6</span><span class="trend-up">📈</span><span class="time-info" title="上榜时间（区间为首次~最近）">18:41~21:08</span><span class="count-info" title="当日累计上榜次数">2次</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.cls.cn/detail/2435174" target="_blank" class="news-link">北京：鼓励发展Token（词元）经济，加大算力券等支持力度</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，北京市发展改革委等部门联合印发《北京市关于加快智能体引领发展的若干措施》，推动智能体创新引领发展，率先培育智能经济新形态。其中提到，鼓励发展 Token 经济。推动创新主体研发适配智能体系统调用、复杂任务调度与高频决策的通用处理器，开发低延迟、高吞吐专用推理芯片。推动创新主体开展推理架构等关键技术攻关，通过异构协同、存算协同以及智能调度等降低推理成本，加快推理缓存复用、智能任务路由等应用层效率优化，全链路优化提高 Token 效率。重构产品形态和服务模式，培育 Token 即服务、智能体即服务、结果即服务等商业新模式，推动更多符合条件的 Token 新产品新服务纳入中小企业服务券配券产品范围。加大算力券等支持力度，鼓励有条件的区联合创新主体探索发放 Token 券、智能体服务券等加速智能体等推广应用。支持银行、保险等金融机构依法依规开发支持智能体落地应用的各类金融产品。支持创新主体依法依规汇聚行业知识、智能体执行数据等并开放共享，构建数据飞轮，反哺驱动智能体能力持续进化。IT之家附一图读懂：北京市加快智能体引领发展若干措施</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">10</div>
+                        <div class="news-content">
                             <div class="news-header"><span class="source-name">格隆汇</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#2-13</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~09:05</span><span class="count-info" title="当日累计上榜次数">5次</span>
                             </div>
                             <div class="news-title"><a href="https://www.gelonghui.com/news/5273688" target="_blank" class="news-link">荣联科技(002642.SZ)：不会参与重资产AI算力项目</a>
                             </div>
                         </div>
                     </div>
-                    <div class="news-item ">
-                        <div class="news-number">10</div>
+                    <div class="news-item new">
+                        <div class="news-number">11</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rank-num high" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#5</span><span class="time-info" title="上榜时间（区间为首次~最近）">12:57</span>
+                            <div class="news-header"><span class="source-name">雅虎财经</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:40</span>
                             </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/568.htm" target="_blank" class="news-link">IDC：二季度中国智能手机市场出货量同比下降 4.3%，华为、苹果、一加逆势增长</a>
+                            <div class="news-title"><a href="https://finance.yahoo.com/markets/stocks/articles/oracles-stock-crash-cost-larry-124000697.html" target="_blank" class="news-link">Oracle&#x27;s Stock Crash Has Cost Larry Ellison $213 Billion in 10 Months. Should Investors Buy the Dip?</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，国际数据公司（IDC）今日发布最新手机季度跟踪报告，2026 年第二季度，中国智能手机市场出货量约为 6,601 万台，同比下降 4.3%，已连续五个季度出现同比下滑。自 3 月下旬起，安卓厂商因存储等核心元器件成本持续攀升，被迫陆续上调产品售价或调整配置方案，对消费者换机意愿形成明显压制。与此同时，“国补”政策对需求的拉动效应逐步减弱。受此影响，今年“618”大促期间，中国智能手机整体销量较去年同期降幅接近 15%，显示出短期需求端的疲态。从厂商格局来看，华为与苹果稳居市场第一梯队；OPPO 和 vivo 构成第二梯队；小米与荣耀紧随其后。在整体市场低迷的背景下，头部厂商华为与苹果表现突出，第二季度出货量同比增幅分别达到 19.4% 和 24.4%，成为市场中的亮点，位居前两位。OPPO 稳居行业前三，品牌高端化成效突出，季度均价升至 395 美元（IT之家注：现汇率约合 2679 元人民币），持续领跑安卓头部厂商。中端 Reno 系列牢牢占据 400–600 美元安卓中高端市场龙头地位；高端 Find X9 系列与无折痕折叠旗舰 Find N6 助力...</div>
                         </div>
                     </div>
                     <div class="news-item new">
-                        <div class="news-number">11</div>
+                        <div class="news-number">12</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">The Verge</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:00</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.theverge.com/policy/969667/humans-first-data-center-protest-hernando-county-florida-republicans" target="_blank" class="news-link">The right-wing boomers protesting data centers have a lot in common with the left</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">在一个灰色、潮湿的周六早晨，在佛罗里达州中部，不到十二个人聚集在Spring Hill Branch Library外，抗议在他们社区建造一个超大规模数据中心。当时没有直接威胁——Hernando County委员会在6月一致批准了对此类开发项目为期一年的暂停令……</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">13</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:01</span>
                             </div>
@@ -2477,18 +2545,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">从消费市场到工业赛道，一片“红海”的无人机市场早已挤满各路玩家，但仍有一块细分领域，即便行业头部厂商也鲜有布局——林下场景。 林下场景蕴藏的产业需求体量惊人：根据国家林草局数据，2025年我国森林蓄积量达209.88亿立方米，全国木材产量达1.4亿立方米；联合国粮农组织数据显示，全球圆木年采伐量约40亿立方米，这背后是伐区蓄积量核算、树木胸径测量等大量工作。 林下环境复杂，传统人工作业模式成本大、效率低且危险重重。虽然行业对自动化替代方案的呼声已久，但林下环境作为经典的拒止环境，使传统自动化方案始终难以落地。 林下被树木遮蔽，使导航设备很容易因GNSS信号丢失无法定位，通讯信号强衰减会导致远程图传和人工操控无法实时、连贯进行。传统SLAM技术也无法处理树枝随风轻微摆动这样时刻微变化的环境复杂纹理。 “只有构建一种可端侧离线运行的实时高精度空间感知和随动控制的具身智能方案，才能有效解决林下‘全拒止’环境的作业需求。”网格智算市场负责人钱敏表示。 网格智算成立于2025年，致力于利用其自研的“网格域学习技术”形成高精度的空间理解，并由模型自生成最优控制函数，从而实现复杂避障等有效控制能力。...</div>
                         </div>
                     </div>
-                    <div class="news-item new">
-                        <div class="news-number">12</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 16:53</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/717.htm" target="_blank" class="news-link">北京推出新举措支持智能体发展：鼓励发展 Token 经济，加大算力券等支持力度</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，北京市发展改革委等部门联合印发《北京市关于加快智能体引领发展的若干措施》，推动智能体创新引领发展，率先培育智能经济新形态。其中提到，鼓励发展 Token 经济。推动创新主体研发适配智能体系统调用、复杂任务调度与高频决策的通用处理器，开发低延迟、高吞吐专用推理芯片。推动创新主体开展推理架构等关键技术攻关，通过异构协同、存算协同以及智能调度等降低推理成本，加快推理缓存复用、智能任务路由等应用层效率优化，全链路优化提高 Token 效率。重构产品形态和服务模式，培育 Token 即服务、智能体即服务、结果即服务等商业新模式，推动更多符合条件的 Token 新产品新服务纳入中小企业服务券配券产品范围。加大算力券等支持力度，鼓励有条件的区联合创新主体探索发放 Token 券、智能体服务券等加速智能体等推广应用。支持银行、保险等金融机构依法依规开发支持智能体落地应用的各类金融产品。支持创新主体依法依规汇聚行业知识、智能体执行数据等并开放共享，构建数据飞轮，反哺驱动智能体能力持续进化。IT之家附一图读懂：北京市加快智能体引领发展若干措施</div>
-                        </div>
-                    </div>
-                    <div class="news-item new">
-                        <div class="news-number">13</div>
+                    <div class="news-item ">
+                        <div class="news-number">14</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 16:13</span>
                             </div>
@@ -2498,7 +2556,17 @@
                         </div>
                     </div>
                     <div class="news-item ">
-                        <div class="news-number">14</div>
+                        <div class="news-number">15</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 12:11</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/568.htm" target="_blank" class="news-link">IDC：二季度中国智能手机市场出货量同比下降 4.3%，华为、苹果、一加逆势增长</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，国际数据公司（IDC）今日发布最新手机季度跟踪报告，2026 年第二季度，中国智能手机市场出货量约为 6,601 万台，同比下降 4.3%，已连续五个季度出现同比下滑。自 3 月下旬起，安卓厂商因存储等核心元器件成本持续攀升，被迫陆续上调产品售价或调整配置方案，对消费者换机意愿形成明显压制。与此同时，“国补”政策对需求的拉动效应逐步减弱。受此影响，今年“618”大促期间，中国智能手机整体销量较去年同期降幅接近 15%，显示出短期需求端的疲态。从厂商格局来看，华为与苹果稳居市场第一梯队；OPPO 和 vivo 构成第二梯队；小米与荣耀紧随其后。在整体市场低迷的背景下，头部厂商华为与苹果表现突出，第二季度出货量同比增幅分别达到 19.4% 和 24.4%，成为市场中的亮点，位居前两位。OPPO 稳居行业前三，品牌高端化成效突出，季度均价升至 395 美元（IT之家注：现汇率约合 2679 元人民币），持续领跑安卓头部厂商。中端 Reno 系列牢牢占据 400–600 美元安卓中高端市场龙头地位；高端 Find X9 系列与无折痕折叠旗舰 Find N6 助力...</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">16</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 11:47</span>
                             </div>
@@ -2508,7 +2576,7 @@
                         </div>
                     </div>
                     <div class="news-item ">
-                        <div class="news-number">15</div>
+                        <div class="news-number">17</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 11:04</span>
                             </div>
@@ -2517,43 +2585,23 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，《日本经济新闻》21 日公布的调查发现，AI 投资热潮正在迅速推高美国科技巨头的表外债务。谷歌母公司 Alphabet、微软、亚马逊、Meta 和甲骨文的表外债务在约 4 年内增至原来的 8 倍，估计达到 1.65 万亿美元（IT之家注：现汇率约合 11.19 万亿元人民币），已经超过账面债务，投资者也更难看清实际风险。调查查阅了五家公司近期的财务报表及其他资料。最近一个季度，五家公司没有列入资产负债表的债务总额达到 1.65 万亿美元，高于账面上的 1.35 万亿美元，部分数据为估算值。其中，Meta 的情况最为突出，表外债务约为 4200 亿美元（现汇率约合 2.85 万亿元人民币），接近账面债务的 3 倍。为了推动 AI 研发，五家公司正在大规模扩建数据中心、增加计算资源，并通过长期合同采购 GPU 和服务器。数据中心建设动辄需要投入数十亿美元，甚至数百亿美元。科技企业为了压低前期支出，往往不会直接购置全部设施，而是向数据中心运营商长期租用土地、建筑和供电设备。按照现行会计准则，尚未交付的长期合同 GPU 和服务器，以及尚未投入运营的数据中心租约，...</div>
                         </div>
                     </div>
-                    <div class="news-item ">
-                        <div class="news-number">16</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 09:30</span>
-                            </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3907555260716423?f=rss" target="_blank" class="news-link">两部门：引导新建数据中心与可再生能源发电协同规划布局，分类挖掘算力负荷时空调节潜力</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，国家发展改革委、国家能源局印发《可再生能源发展“十五五”规划》，其中提出，统筹推进数字基础设施可再生能源消费。引导新建数据中心与可再生能源发电协同规划布局，分类挖掘算力负荷时空调节潜力，创新绿电直连、源网荷储一体化等方式，稳步提高数字基础设施绿色电力消费水平。提升存量数字基础设施可再生能源消费比例。</div>
-                        </div>
-                    </div>
-                    <div class="news-item ">
-                        <div class="news-number">17</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 08:16</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/368.htm" target="_blank" class="news-link">今年最佳单月销量纪录：Circana 称 6 月美国微软 XBOX Series S|X 游戏主机销量同比增 86%</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，市场调查机构 Circana 分析师 Mat Piscatella 昨日在 Bluesky 平台发布动态，指出 2026 年 6 月美国 XBOX Series S|X 游戏主机同比劲增 86%，创下今年单月最高销量纪录。IT之家查询公开资料，Circana 由老牌市场研究机构 IRI 和 NPD 集团于 2023 年合并而成，统计和分析零售、玩具、电子、视频游戏等 25 个以上行业数据，被华尔街日报等多家媒体采信，其定期发布的研究报告和数据可视为“游戏晴雨表”。分析师 Piscatella 认为今年 6 月微软 XBOX Series S|X 游戏主机同比增幅 86%，其中主要原因是基期（2025 年 6 月）数据偏低，当时受任天堂 Switch 2 游戏掌机上市，以及 XBOX 提价影响，导致 2025 年 6 月销售数据偏低。而今年 6 月 XBOX Series S|X 游戏主机在美国销量上涨的另一个原因，是有消息称微软计划 8 月进一步上调 XBOX 产品售价，在短期内推动额外销量。分析师还指出 2026 年 6 月任天堂 Switch 2 机...</div>
-                        </div>
-                    </div>
                 </div>
-                <div class="word-group" data-ind-idx="2"><div class="word-header"><div class="word-info"><div class="word-name">大模型厂商</div><div class="word-count hot">26 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
+                <div class="word-group" data-ind-idx="2"><div class="word-header"><div class="word-info"><div class="word-name">大模型厂商</div><div class="word-count hot">27 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
                     <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#2</span><span class="time-info" title="上榜时间（区间为首次~最近）">10:06</span>
+                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#3-5</span><span class="time-info" title="上榜时间（区间为首次~最近）">09:05~21:08</span><span class="count-info" title="当日累计上榜次数">6次</span>
                             </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/400.htm" target="_blank" class="news-link">月之暗面黄震昕：Kimi K3 性能跃升并非对现有任何模型蒸馏复刻</a>
+                            <div class="news-title"><a href="https://wallstreetcn.com/articles/3777723" target="_blank" class="news-link">谷歌电话会：警告现金流压力将持续，但&quot;需求仍超过投资增速&quot;，Gemini 4已启动训练</a>
                             </div>
                         </div>
                     </div>
                     <div class="news-item ">
                         <div class="news-number">2</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#3-5</span><span class="trend-up">📈</span><span class="time-info" title="上榜时间（区间为首次~最近）">09:05~18:41</span><span class="count-info" title="当日累计上榜次数">5次</span>
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#2</span><span class="time-info" title="上榜时间（区间为首次~最近）">10:06</span>
                             </div>
-                            <div class="news-title"><a href="https://wallstreetcn.com/articles/3777723" target="_blank" class="news-link">谷歌电话会：警告现金流压力将持续，但&quot;需求仍超过投资增速&quot;，Gemini 4已启动训练</a>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/400.htm" target="_blank" class="news-link">月之暗面黄震昕：Kimi K3 性能跃升并非对现有任何模型蒸馏复刻</a>
                             </div>
                         </div>
                     </div>
@@ -2570,16 +2618,16 @@
                     <div class="news-item ">
                         <div class="news-number">4</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#8-9</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~10:06</span><span class="count-info" title="当日累计上榜次数">6次</span>
+                            <div class="news-header"><span class="source-name">澎湃新闻</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#2-11</span><span class="trend-up">📈</span><span class="time-info" title="上榜时间（区间为首次~最近）">12:57~21:08</span><span class="count-info" title="当日累计上榜次数">4次</span>
                             </div>
-                            <div class="news-title"><a href="https://wallstreetcn.com/articles/3777627" target="_blank" class="news-link">震惊硅谷！OpenAI模型“失控越狱”，入侵HuggingFace“抄答案”，智谱GLM 5.2临危救场</a>
+                            <div class="news-title"><a href="https://m.thepaper.cn/newsDetail_forward_33637839" target="_blank" class="news-link">从震动硅谷到喊话马斯克“欢迎掰手腕”，Kimi做对了哪些</a>
                             </div>
                         </div>
                     </div>
                     <div class="news-item ">
                         <div class="news-number">5</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">Solidot</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#11-16</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~18:41</span><span class="count-info" title="当日累计上榜次数">9次</span>
+                            <div class="news-header"><span class="source-name">Solidot</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#11-17</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~21:08</span><span class="count-info" title="当日累计上榜次数">10次</span>
                             </div>
                             <div class="news-title"><a href="https://www.solidot.org/story?sid=84888" target="_blank" class="news-link">法官批准了 Anthropic 与图书出版商达成的 15 亿美元侵权和解</a>
                             </div>
@@ -2588,6 +2636,15 @@
                     <div class="news-item ">
                         <div class="news-number">6</div>
                         <div class="news-content">
+                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#8-9</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~10:06</span><span class="count-info" title="当日累计上榜次数">6次</span>
+                            </div>
+                            <div class="news-title"><a href="https://wallstreetcn.com/articles/3777627" target="_blank" class="news-link">震惊硅谷！OpenAI模型“失控越狱”，入侵HuggingFace“抄答案”，智谱GLM 5.2临危救场</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">7</div>
+                        <div class="news-content">
                             <div class="news-header"><span class="source-name">金十数据</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#7</span><span class="time-info" title="上榜时间（区间为首次~最近）">02:44</span>
                             </div>
                             <div class="news-title"><a href="https://flash.jin10.com/detail/20260723020602681800" target="_blank" class="news-link">Claude Code的Claude Security插件现已进入测试阶段。</a>
@@ -2595,20 +2652,11 @@
                         </div>
                     </div>
                     <div class="news-item ">
-                        <div class="news-number">7</div>
+                        <div class="news-number">8</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">金十数据</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#7</span><span class="time-info" title="上榜时间（区间为首次~最近）">04:47</span>
                             </div>
                             <div class="news-title"><a href="https://flash.jin10.com/detail/20260723040859951800" target="_blank" class="news-link">Alphabet(GOOG.O)：Gemini模型现在每分钟可处理220亿个API词元（TOKENS）。</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="news-item ">
-                        <div class="news-number">8</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">澎湃新闻</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#6-11</span><span class="trend-up">📈</span><span class="time-info" title="上榜时间（区间为首次~最近）">12:57~18:41</span><span class="count-info" title="当日累计上榜次数">3次</span>
-                            </div>
-                            <div class="news-title"><a href="https://m.thepaper.cn/newsDetail_forward_33637839" target="_blank" class="news-link">从震动硅谷到喊话马斯克“欢迎掰手腕”，Kimi做对了哪些</a>
                             </div>
                         </div>
                     </div>
@@ -2619,7 +2667,6 @@
                             </div>
                             <div class="news-title"><a href="https://www.ithome.com/0/980/551.htm" target="_blank" class="news-link">紧追 ChatGPT，谷歌 Gemini 应用已拥有 9.5 亿月活跃用户</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，当地时间 22 日，谷歌公布，Gemini AI 应用的月活跃用户已经达到 9.5 亿。谷歌 CEO 桑达尔 · 皮查伊还在财报电话会议上表示，过去一年，Gemini 日活跃用户数量增长至原来的 3 倍。Sensor Tower 近期数据显示，OpenAI 旗下 ChatGPT 拥有约 10 亿月活跃用户，Gemini 正在迅速缩小与 ChatGPT 之间的差距。据IT之家了解，Gemini 用户规模近几个月持续快速增长。谷歌去年 10 月公布的月活跃用户约为 6.5 亿，今年 2 月发布 2025 年第四季度财报时，数字已经超过 7.5 亿。谷歌还在不断推出速度更快、价格更低的模型。本周发布了 Gemini 3.6 Flash 等 3 款模型。谷歌表示，新模型在编程等任务上的表现优于上一代产品，同时减少了 Token 消耗，使用成本也更低。谷歌新一代前沿模型 Gemini 3.5 Pro 仍未按计划推出，Gemini 4 的早期研发工作已经启动。最新用户数据表明，Gemini 依然保持着强劲的用户增长势头。</div>
                         </div>
                     </div>
                     <div class="news-item ">
@@ -2634,6 +2681,36 @@
                     <div class="news-item new">
                         <div class="news-number">11</div>
                         <div class="news-content">
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 21:07</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/838.htm" target="_blank" class="news-link">Anthropic 首席经济学家：短期内 AI 不会取代大量工作岗位</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，Anthropic 首席经济学家彼得 · 麦克罗里（Peter McCrory）表示，目前人工智能尚未取代大量工作岗位，因为与完全替代人类相比，AI 与人类协作的效果更好。而美国亿万富翁马克 · 库班（Mark Cuban）则认为，这种情况可能永远都不会改变。麦克罗里周三在 X 平台发文称，从目前掌握的情况来看，“人工智能迄今尚未导致失业率出现明显上升”，即便是在那些最容易受到 AI 自动化冲击的职业中，也没有出现显著变化。作为打造顶级大语言模型之一 Claude Fable 5 的人工智能公司 Anthropic 的经济学负责人，麦克罗里表示，目前 AI 表现出“偏向高技能人才”和“增强劳动能力”的特征，也就是说，专业能力越强的人越能发挥 AI 的价值，而 AI 更多是在帮助人们提高工作效率，而不是取代他们。他指出，AI 在许多领域仍无法独立完成工作。例如，Claude 目前无法胜任的一些任务，往往需要人与人之间的协调合作、面对面的交流，或是与现实物理世界互动，而这些能力目前仍只有人类具备。不过，麦克罗里也提醒，随着 AI 模型不断进步，人类专业知识的...</div>
+                        </div>
+                    </div>
+                    <div class="news-item new">
+                        <div class="news-number">12</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 21:04</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/837.htm" target="_blank" class="news-link">智谱：开源意味着模型可以被自主部署、随时调用，并真正掌握在使用者手中</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，北京智谱华章科技股份有限公司官方微博今日发文谈及了“闭源的矛与开源的盾”这一话题。智谱官方分享了一起案例：近日，一次前沿模型安全评测演变成真实安全事件。OpenAI 披露，GPT‑5.6 Sol 及一款尚未发布的模型突破隔离环境，进入 Hugging Face 的生产基础设施。事件发生后，Hugging Face 的安全团队在对攻击日志进行紧急取证和溯源分析时发现，商业闭源大模型会拒绝处理包含真实攻击载荷和敏感凭据的日志分析请求。面对超过 17,000 条攻击事件记录，Hugging Face 选择在自有基础设施上运行 GLM‑5.2，完成关键取证与安全分析，将原本可能需要数天的工作压缩到数小时，同时确保攻击数据和敏感凭据始终留在自己的环境中。智谱官方表示，此次事件更加确信 GLM‑5.2 开源的价值：开源不只是开放权重，更意味着模型可以被自主部署、随时调用，并真正掌握在使用者手中。据IT之家此前报道，智谱于今年 6 月 17 日宣布上线并开源 GLM-5.2。在全球百万用户参与盲测的前端开发评估系统 Code Arena 上，GLM-5.2 取得全球可...</div>
+                        </div>
+                    </div>
+                    <div class="news-item new">
+                        <div class="news-number">13</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">TechCrunch</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 19:00</span>
+                            </div>
+                            <div class="news-title"><a href="https://techcrunch.com/2026/07/23/experts-say-exploiting-anthropics-fable-isnt-how-kimi-k3-got-so-good/" target="_blank" class="news-link">Experts say exploiting Anthropic’s Fable isn’t how Kimi K3 got so good</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">&quot;我不认为你能够在Fable严格进行蒸馏之后这么快就得到一个这么强大的模型，&quot;一位专家告诉TechCrunch。</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">14</div>
+                        <div class="news-content">
                             <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:09</span>
                             </div>
                             <div class="news-title"><a href="https://36kr.com/p/3908051015488640?f=rss" target="_blank" class="news-link">氪星晚报 ｜DeepSeek今年已增资65%；马斯克：FSD是拉动特斯拉汽车需求的核心驱动力</a>
@@ -2641,8 +2718,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">大公司： DeepSeek今年已增资65%36氪获悉，据媒体报道，近日，DeepSeek创始人梁文锋一场4小时的投资人闭门会议实录在科技与创投圈刷屏，他明确表示“DeepSeek只有一条主线，即通往通用人工智能（AGI）”，相关话题引发关注。天眼查App显示，DeepSeek关联公司杭州深度求索成立于2023年7月，法定代表人为裴湉，经营范围含工程和技术研究和试验发展、软件开发、人工智能应用软件开发等，由梁文锋、宁波程恩企业管理咨询合伙企业等共同持股。变更记录显示，该公司今年发生两次增资，注册资本由1000万人民币增至约1645万人民币。 淡马锡旗下凯德投资与丰树合并谈判据悉陷入停滞 7月23日，据报道，由淡马锡控股支持的两大房地产资产管理公司——凯德投资与丰树投资的合并谈判已陷入停滞，双方在估值等问题上存在分歧。双方经过数月讨论后已放缓推进潜在合并交易，其他分歧还包括合并后公司管理层安排、人员调整方案以及部分业务表现疲弱等问题。不过，双方未来仍可能恢复谈判。（界面） 阿里云：真武芯片超节点已成功适配Qwen3.8，上线百炼提供推理服务 36氪获悉，7月23日，阿里真武M890超节点已...</div>
                         </div>
                     </div>
-                    <div class="news-item new">
-                        <div class="news-number">12</div>
+                    <div class="news-item ">
+                        <div class="news-number">15</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:24</span>
                             </div>
@@ -2651,8 +2728,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，三星昨晚在伦敦 Galaxy Unpacked 发布会上，正式推出全新折叠旗舰 ——Galaxy Z Fold8、Galaxy Z Fold8 Ultra 与 Galaxy Z Flip8。面壁智能今日宣布，旗下 MiniCPM 系列端侧大模型，深度赋能三星 Galaxy AI。这是国产端侧大模型首次进入国际头部手机厂商的全球旗舰产品线。据介绍，此次面壁智能将为三星 Galaxy AI 提供端侧模型能力，支持文本理解与多模态感知。搭载面壁端侧 AI 的三星新机包括 Galaxy Z Fold8 和 Galaxy Z Fold8 Ultra。Galaxy Z Fold8：采用全新 4:3 比例“阔折叠”设计，8 英寸内屏，后置双 5000 万像素摄像头，内置 4800mAh 电池，彻底告别传统折叠屏的狭长比例，带来更接近平板的视觉与办公体验。Galaxy Z Fold8 Ultra：三星折叠屏家族首款 Ultra 机型，延续书式折叠设计，配备 2 亿像素主摄与 5000mAh 电池，是当之无愧的折叠旗舰天花板。IT之家注：面壁智能于 2022 年 8 月在...</div>
                         </div>
                     </div>
-                    <div class="news-item new">
-                        <div class="news-number">13</div>
+                    <div class="news-item ">
+                        <div class="news-number">16</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 16:07</span>
                             </div>
@@ -2662,7 +2739,7 @@
                         </div>
                     </div>
                     <div class="news-item ">
-                        <div class="news-number">14</div>
+                        <div class="news-number">17</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 15:55</span>
                             </div>
@@ -2672,7 +2749,7 @@
                         </div>
                     </div>
                     <div class="news-item ">
-                        <div class="news-number">15</div>
+                        <div class="news-number">18</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 14:55</span>
                             </div>
@@ -2682,7 +2759,7 @@
                         </div>
                     </div>
                     <div class="news-item ">
-                        <div class="news-number">16</div>
+                        <div class="news-number">19</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 14:49</span>
                             </div>
@@ -2691,32 +2768,12 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，据媒体报道，近日，DeepSeek创始人梁文锋一场4小时的投资人闭门会议实录在科技与创投圈刷屏，他明确表示“DeepSeek只有一条主线，即通往通用人工智能（AGI）”，相关话题引发关注。天眼查App显示，DeepSeek关联公司杭州深度求索成立于2023年7月，法定代表人为裴湉，经营范围含工程和技术研究和试验发展、软件开发、人工智能应用软件开发等，由梁文锋、宁波程恩企业管理咨询合伙企业等共同持股。变更记录显示，该公司今年发生两次增资，注册资本由1000万人民币增至约1645万人民币。</div>
                         </div>
                     </div>
-                    <div class="news-item ">
-                        <div class="news-number">17</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 14:39</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/614.htm" target="_blank" class="news-link">曾指控 Meta“令人成瘾”的 15 岁原告撤诉，律师称其希望努力恢复正常生活</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，据外媒 The Verge 今天（23 日）报道，距离 Meta 律师再次出庭不到一周，来自佛罗里达州、以姓名首字母 R.K.C.代称的 15 岁原告撤回了针对 Meta 的诉讼。此前，R.K.C.指控 Meta 平台通过容易令青少年上瘾的功能对用户造成伤害。案件原定成为第二起标志性测试诉讼，用于检验社交媒体巨头是否因设计此类功能而违反法律。TikTok、Snap 和 YouTube 已经与 R.K.C.和解，具体金额没有公开。R.K.C.的律师艾米莉 · 杰夫科特和拉胡尔 · 拉维普迪在声明中表示：“诉讼整体上已经取得理想结果，但他也担心自己无法承受持续数周的艰苦庭审，因此决定撤回针对 Meta 的索赔。他希望结束人生中的一个阶段，专注于康复和心理治疗，努力恢复正常生活。”Meta 因此无需支付和解金便退出案件。Meta 发言人安迪 · 斯通说：“有关指控从一开始就站不住脚，案件结果也表明，我们不会在毫无根据的诉讼面前放弃自我辩护。”美国法院已经开始通过多起案件检验社交媒体企业是否隐瞒产品风险并伤害用户。Meta 和 YouTube 在首起标志性测试案...</div>
-                        </div>
-                    </div>
-                    <div class="news-item ">
-                        <div class="news-number">18</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">InfoQ</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 14:07</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.infoq.com/news/2026/07/meta-react-compiler-rust/?utm_campaign=infoq_content&amp;utm_source=infoq&amp;utm_medium=feed&amp;utm_term=global" target="_blank" class="news-link">Meta Ports React Compiler to Rust for Faster Builds and Tighter Toolchain Integration</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">Meta的React库已将Rust版本的React Compiler集成到其主要存储库中，旨在提升构建速度以及与基于Rust的JavaScript工具链的兼容性。该移植版本可自动记忆组件，展示了显著的性能改进，编译速度最高提升50%。公共API保持不变，以方便升级。作者：Dan</div>
-                        </div>
-                    </div>
                 </div>
-                <div class="word-group" data-ind-idx="3"><div class="word-header"><div class="word-info"><div class="word-name">AI 应用</div><div class="word-count hot">86 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
+                <div class="word-group" data-ind-idx="3"><div class="word-header"><div class="word-info"><div class="word-name">AI 应用</div><div class="word-count hot">94 条</div></div><div class="word-index"><span class="collapse-icon">▼</span></div></div>
                     <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#1-4</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~18:41</span><span class="count-info" title="当日累计上榜次数">9次</span>
+                            <div class="news-header"><span class="source-name">华尔街见闻</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#1-4</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~21:08</span><span class="count-info" title="当日累计上榜次数">10次</span>
                             </div>
                             <div class="news-title"><a href="https://wallstreetcn.com/articles/3777614" target="_blank" class="news-link">油价飙至六周高位，美股指承压收跌，AI基建股盘后大涨，金银再走强</a>
                             </div>
@@ -2806,105 +2863,104 @@
                     <div class="news-item new">
                         <div class="news-number">11</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:38</span>
+                            <div class="news-header"><span class="source-name">The Verge</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 21:00</span>
                             </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908093589378438?f=rss" target="_blank" class="news-link">鹏鼎控股：拟投资100亿元新建深圳第三园区并建设人工智能高阶类载板及柔性电路板智造基地项目</a>
+                            <div class="news-title"><a href="https://www.theverge.com/entertainment/969584/hirokazu-kore-eda-sheep-in-a-box-interview" target="_blank" class="news-link">The sci-fi movie that imagines AI isn’t so dystopian after all</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，鹏鼎控股公告，公司拟投资人民币100亿元新建深圳第三园区，建设人工智能高阶类载板及柔性电路板智造基地项目。项目计划自2026年7月启动，至2033年建成投产，资金来源为自有资金及自筹资金。本次投资旨在紧抓AI技术发展浪潮，完善公司在AI“云、管、端”全链条的战略布局，扩大经营规模并提升效益。</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">想象一下，你是一个充满好奇心的七岁孩子的父母，他爱他的家人，喜欢打棒球，和朋友一起玩。这是你一直想要的生活。然后最糟糕的事情发生了：一场离奇的事故夺走了你的儿子。但事实证明，你不必忍受……</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">12</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:23</span>
+                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:54</span>
                             </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908072689341576?f=rss" target="_blank" class="news-link">特斯拉仍预计2026年资本支出将超过250亿美元</a>
+                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908227357922696?f=rss" target="_blank" class="news-link">美股大型科技股盘前普跌，特斯拉跌超7%</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">7月23日，特斯拉披露10-Q季度报告，仍预计2026年资本支出将超过250亿美元。（界面）</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，美股大型科技股盘前普跌，截至发稿，特斯拉跌超7%，谷歌跌超5%，Meta、亚马逊跌超2%，英伟达跌超1%，苹果跌0.7%，微软跌0.65%。</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">13</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:11</span>
+                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:37</span>
                             </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908056676357252?f=rss" target="_blank" class="news-link">三星妥协之后，罢工要求分红之风扩散至韩国的非AI相关行业</a>
+                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908211008050567?f=rss" target="_blank" class="news-link">黑石集团依托人工智能投资利润大幅飙升</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">在三星电子迫于员工抗议，同意发放高额奖金之后，韩国各地的工会纷纷举行集会。据报道，现代汽车的装配线工人计划下周举行为期三天的局部罢工。他们本周早些时候已采取类似行动，力争让公司拨出至多30%的合并后利润用于发放奖金。与此同时，HD Hyundai Heavy Industries、电信运营商LG Uplus的工会也都希望发放相当于至少30%营业利润的分红。韩华航天、现代电气希望彻底取消奖金上限。（新浪财经）</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">受益于布局人工智能产业建设带来的收益，黑石第二季度可分配收益大涨26%，达到19.8亿美元。黑石本轮盈利增长核心驱动力来自人工智能相关投资。这家顶级资管巨头第二季度利润大幅走高，公司在全美大范围人工智能基建赛道的多板块投资兑现收益，利好覆盖私募股权、私募信贷、不动产等全部核心业务板块。（新浪财经）</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">14</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">InfoQ</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:00</span>
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:33</span>
                             </div>
-                            <div class="news-title"><a href="https://www.infoq.com/news/2026/07/qcon-ai-newyork-2026-live/?utm_campaign=infoq_content&amp;utm_source=infoq&amp;utm_medium=feed&amp;utm_term=global" target="_blank" class="news-link">QCon AI New York 2026: Registration Opens for December 15-16 Production-AI Conference</a>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/832.htm" target="_blank" class="news-link">马斯克：值得承担致命 AI 风险，AI 最有可能带来全民富足</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">QCon AI New York 2026（12月15-16日）已在The Westin Jersey City Newport开放注册。六个关于生产环境AI的专题，由Eder Ignatowicz担任主席，Faye Zhang和Wes Reisz共同主持。首批会议将于8月公布，完整议程在11月之前确定。作者：Artenisa Chatziou</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，埃隆 · 马斯克表示，人类或许不该为人工智能踩下刹车，即便有能力这么做。在接受《经济学人》总编辑赞妮 · 明顿 · 贝德斯（Zanny Minton Beddoes）采访时，这位世界首富表示，AI 和机器人失控并酿成灾难的风险“并非为零”，但他已经接受了继续推动 AI 发展的现实。“我的哲学结论是往好的方面看。”马斯克说，“我看不到有什么办法能够真正阻止人工智能和机器人发展的巨大势头。”他表示：“有时候我甚至会想，即便真的有一个‘停止按钮’，我们可能也不应该按下它，因为最有可能出现的结果，是为所有人带来前所未有的富足。”马斯克预测，人工智能将在“大约五年内”超越全人类智慧总和，届时，除非遭遇“全球核战争”这样的重大灾难，否则世界将进入一个“令人惊叹的富足时代”，人们几乎可以拥有自己能想到的一切。IT之家注意到，长期以来，马斯克一边警告 AI 可能带来灾难，一边又不断描绘其光明前景，而近年来，他的预测明显变得更加乐观。早在 2014 年，他曾将研发人工智能比作“召唤恶魔”；2018 年在 SXSW 大会上，他警告称“AI 比核武器危险得多”；直到 2025...</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">15</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:33</span>
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:14</span>
                             </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908029751432328?f=rss" target="_blank" class="news-link">“木头姐”力挺SpaceX：或成为“全球历史上最重要的公司”</a>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/828.htm" target="_blank" class="news-link">马斯克：特斯拉 AI 投资越快越好，不怕部分资金浪费</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">尽管SpaceX的股价已大幅跌破IPO价格，但华尔街明星基金经理、方舟投资的掌门人凯茜•伍德（Cathie Wood）依然力挺称，这家航空航天和卫星网络先驱公司有可能成为“全球历史上最重要的公司”。凯茜·伍德旗下方舟投资管理公司（Ark Invest）周三还通过多个ETF购入SpaceX股票，包括ARK创新ETF、ARK自主技术与机器人ETF、ARK下一代互联网ETF以及ARK航天与国防创新ETF。据悉，此次交易共计购买121384股，按SpaceX当天收盘价115.26美元计算，投资总额约为1400万美元。 （财联社）</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，特斯拉首席执行官埃隆 · 马斯克表示，公司应该在人工智能（AI）领域投入更多资金，即便其中一部分资金最终被浪费。随着马斯克不断加码 AI 投资，特斯拉今年第二季度资本支出同比大增 142%，达到 58 亿美元（IT之家注：现汇率约合 393.33 亿元人民币）。在周四财报发布后的分析师电话会议上，马斯克表示，他已经要求公司高管继续加快投资节奏。“我们的资本支出应该尽可能快地推进，在不过度浪费的前提下，能花多快就花多快。我们并不是追求极高的资本使用效率，因为那样反而会拖慢发展速度。”马斯克说道。目前，特斯拉正大举投资建设 Cybercab 自动驾驶出租车和 Optimus 人形机器人的新生产线及工厂。由于利润未达到市场预期，特斯拉第二季度录得 11 亿美元自由现金流净流出，这是自 2024 年以来该公司首次出现自由现金流为负，公司股价也在盘前交易中下跌。公司高管向投资者表示，AI 相关支出未来仍将持续增长，预计特斯拉今年全年资本支出将超过 250 亿美元（现汇率约合 1695.38 亿元人民币）。特斯拉首席财务官瓦伊巴夫 · 塔内贾（Vaibhav Tan...</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">16</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:12</span>
+                            <div class="news-header"><span class="source-name">Hacker News</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:11</span>
                             </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/726.htm" target="_blank" class="news-link">国务院印发《全民健身计划（2026—2030 年）》，运用人工智能赋能全民健身发展</a>
+                            <div class="news-title"><a href="https://blog.google/innovation-and-ai/technology/research/understanding-the-ai-economy/" target="_blank" class="news-link">Understanding the AI Economy</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，国务院日前印发《全民健身计划（2026—2030 年）》（以下简称《计划》），对“十五五”时期推动全民健身事业高质量发展作出部署。《计划》明确，到 2030 年，更高水平的全民健身公共服务体系日益完善，产品服务供给能力不断增强、质量持续提高，群众身边的场地设施更加充裕优质，群众体育赛事和全民健身活动更加丰富，全民健身公共服务更加安全规范，各类体育组织有序发展，全民健身理念深入人心、氛围日渐浓厚，体育运动成为群众广泛参与的生活方式。人均体育场地面积达到 4 平方米左右，每千人拥有社会体育指导员达到 3.3 名左右，经常参加体育锻炼人数比例达到 40% 左右，国民体质水平持续提高。《计划》部署了 10 个方面的主要任务，包括不断完善全民健身制度体系、进一步加强群众身边健身场地设施建设、开展丰富多彩的群众赛事活动、健全全民健身组织服务网络、提高科学健身指导服务能力、运用人工智能赋能全民健身发展、满足不同人群差异化健身需求、普及全民健身文化、发挥全民健身多元功能和综合价值、强化全民健身安全管理等。《计划》还围绕目标任务的完成，提出了保障措施。IT之家附全文如下：...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">文章URL: https://blog.google/innovation-and-ai/technology/research/understanding-the-ai-economy/ 评论URL: https://news.ycombinator.com/item?id=49020335 点数: 47 评论数: 43</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">17</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:05</span>
+                            <div class="news-header"><span class="source-name">雅虎财经</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:09</span>
                             </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/722.htm" target="_blank" class="news-link">Adobe Acrobat Chrome 浏览器扩展漏洞“ HermeticReader”曝光，黑客可利用恶意网站获取受害者 WhatApp 信息</a>
+                            <div class="news-title"><a href="https://finance.yahoo.com/markets/stocks/article/googles-extreme-ai-capex-spending-plans-trigger-a-technical-warning-on-the-stock-price-120952068.html" target="_blank" class="news-link">Google&#x27;s extreme AI capex spending plans trigger a technical warning on the stock price</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，安全公司 Guardio Labs 发文，透露 Adobe Acrobat 的 Chrome 浏览器扩展程序存在一项名为 HermeticReader 的安全漏洞，黑客可利用漏洞窃取用户 WhatsApp 聊天记录以及联系人列表。Adobe 已于今年 6 月接获报告后完成修复，并将该漏洞编号为 CVE-2026-48294，CVSS 风险评分为 7.4 分。研究人员指出，HermeticReader 攻击链由三大步骤组成，黑客首先需要搭建一个能够调用 Acrobat Chrome 浏览器扩展程序的恶意网站，在受害者点击进入网站后，浏览器中的 Acrobat 扩展便会自动运行并启动 Hermes 引擎，接着自动访问 WhatsApp 网页版，之后黑客即可获取受害者 WhatsApp 聊天列表、联系人名称、消息内容、个人资料信息，以及当前打开的对话内容。Guardio Labs 强调，此类攻击方式具有高度灵活性，黑客无需提前在受害设备上部署恶意木马，只要让用户打开由攻击者控制的静态网页，就可能触发漏洞。</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">18</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:05</span>
+                            <div class="news-header"><span class="source-name">雅虎财经</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 20:05</span>
                             </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/721.htm" target="_blank" class="news-link">韩国劳资风暴蔓延：三星天价奖金引发全行业效仿，AI 成新矛盾焦点</a>
+                            <div class="news-title"><a href="https://finance.yahoo.com/technology/ai/articles/alphabets-cash-burn-raises-alarm-120525869.html" target="_blank" class="news-link">Alphabet&#x27;s cash burn raises alarm for Big Tech as AI spending climbs</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，据彭博社报道，韩国各地工会正掀起新一轮维权行动。此前，三星电子向员工抗议作出让步，同意向部分员工发放超过 40 万美元（IT之家注：现汇率约合 271.3 万元人民币）的奖金，此举进一步激励了其他行业工会提出更高的薪酬诉求。就在本周，现代汽车生产线工人举行了为期三天的部分罢工，要求公司将最高 30% 的合并利润用于发放奖金。与此同时，HD 现代重工和电信运营商 LG Uplus 的工会要求公司拿出至少 30% 的营业利润作为奖金；韩华航空航天（Hanwha Aerospace）和 HD 现代电气（HD Hyundai Electric）的员工则要求彻底取消奖金上限。科技行业方面，韩国最大即时通讯平台 Kakao 的数千名员工上个月首次举行了罢工，要求将最高 15% 的营业利润用于员工奖金。韩国最大搜索引擎运营商 Naver 的工会则正与旗下多家关联公司的工会组建联盟，以增强谈判能力。最初，这场风波源于韩国两大芯片制造商三星电子和 SK 海力士的员工要求分享人工智能热潮带来的丰厚利润，如今已蔓延至与 AI 关联不大的多个行业。这也再次提醒投资者，在这个长期...</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">19</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">InfoQ</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:00</span>
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 19:47</span>
                             </div>
-                            <div class="news-title"><a href="https://www.infoq.com/articles/multi-agent-security-operations/?utm_campaign=infoq_content&amp;utm_source=infoq&amp;utm_medium=feed&amp;utm_term=global" target="_blank" class="news-link">Article: Multi-Agent AI for Production Security Operations: An A2A and MCP Architecture in a 5G Core</a>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/822.htm" target="_blank" class="news-link">红果短剧将启动专项治理，整治“高频 AI 脸”</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">成熟SOC的瓶颈很少在于分析师的分诊，而在于检测工程团队能否使规则库与威胁态势保持同步，而威胁演化的速度远快于规则编写。了解生产安全运营中的多智能体系统如何将平均检测时间和响应时间减少40%，并将所需人力工作量压缩12倍。作者：Willem Berroubache</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，红果短剧昨日发布《关于规范 AI 剧角色创作的公告》，从角色差异化、版权合规两个维度明确创作标准，降低“高频 AI 脸”使用率。IT之家注意到，相应《规范》明确规定，一部剧的主要角色应具备清晰的形象区分度，鼓励打造有记忆点、高辨识度的角色，并要求创作者丰富人物形象设计，避免不同剧集、不同角色使用高度相似的形象，防止用户审美疲劳。在版权合规层面，《规范》则提出了三条明确要求：未经授权，不得使用他人作品中具有独创性的角色、服装、造型、道具等设计；不得盗用他人享有著作权的写真、美术等作品；使用受版权保护的内容，需提前取得合法授权。同时，《规范》还透露，平台近期将启动专项治理行动，重点整治“高频 AI 脸”复用、内容同质化及素材违规三类问题，并倡议 AI 短剧创作者对创作内容开展自查，对存在问题的剧集及时采取修改、替换等整改措施。事实上，红果短剧近期已经提高了部分 AI 剧的准入门槛。7 月 21 日，红果短剧在短剧创作者中心发布公告，对都市情感、破局成长、家庭温情、都市逆袭等品类 AI 仿真人剧提升内容准入门槛，从画面衔接、人物形象、表情变化、音画同步等方面提...</div>
                         </div>
                     </div>
                     <div class="news-item new">
                         <div class="news-number">20</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 16:36</span>
+                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 19:44</span>
                             </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/709.htm" target="_blank" class="news-link">一枚 SpaceX 猎鹰 9 号火箭将于 8 月 5 日撞击月球，地球部分地区可观测</a>
+                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908159043179908?f=rss" target="_blank" class="news-link">谷歌：持有SpaceX股份价值为940亿美元，其中约800亿美元受短期禁售协议约束</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，北京时间 8 月 5 日 14 时 35 分左右，一枚猎鹰 9 号火箭的上面级预计将撞击月球爱因斯坦陨石坑（Einstein Crater）附近，地球上的部分地区通过地面望远镜或许能观测到这一事件。最早确认这枚火箭将于下个月撞击月球的是桌面天文馆软件 Project Pluto 的开发者比尔 · 格雷（Bill Gray），他将相关数据输入自己的程序，对火箭轨道及未来飞行路径进行预测后，得出了这一结论。据IT之家了解，即将撞击月球的火箭上面级来自 SpaceX 于 2025 年 1 月 15 日执行的 Firefly Blue Ghost（月球蓝幽灵）任务。当时，猎鹰 9 号火箭将萤火虫航天（Firefly Aerospace）的 Blue Ghost 月球着陆器，以及日本 ispace 公司的 Hakuto-R 月球着陆器一同送入太空。Phys.org 介绍称，在成功释放两台着陆器后，火箭上面级燃料耗尽，无法返回地球，此后便一直在太空中漂浮。这一级火箭长约 39 英尺（约 11.9 米）、宽约 13 英尺（约 4 米），重量约 4000 公斤，预计将以...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">谷歌表示，在SpaceX完成首次公开募股（IPO）后，其持有的SpaceX股份价值为940亿美元，其中约800亿美元部分受短期禁售协议约束。（财联社）</div>
                         </div>
                     </div>
                 </div>
                     </div>
+                    </details>
                 </div>
                 <div class="zone zone-company">
                     <div class="zone-header">
@@ -2917,12 +2973,12 @@
                             <div class="dir-title">监控名单</div>
                             <div class="dir-list">
                                 <a class="dir-item" href="#company-grp-1-0">国家电网<span class="dir-count">2</span></a>
-                                <a class="dir-item" href="#company-grp-1-1">腾讯<span class="dir-count">4</span></a>
-                                <a class="dir-item" href="#company-grp-1-2">字节跳动<span class="dir-count">3</span></a>
-                                <a class="dir-item" href="#company-grp-1-3">大众汽车<span class="dir-count">1</span></a>
-                                <a class="dir-item" href="#company-grp-1-4">交通银行<span class="dir-count">1</span></a>
-                                <a class="dir-item" href="#company-grp-1-5">南方电网<span class="dir-count">1</span></a>
-                                <a class="dir-item" href="#company-grp-1-6">美团<span class="dir-count">1</span></a>
+                                <a class="dir-item" href="#company-grp-1-1">美团<span class="dir-count">2</span></a>
+                                <a class="dir-item" href="#company-grp-1-2">腾讯<span class="dir-count">3</span></a>
+                                <a class="dir-item" href="#company-grp-1-3">字节跳动<span class="dir-count">3</span></a>
+                                <a class="dir-item" href="#company-grp-1-4">大众汽车<span class="dir-count">1</span></a>
+                                <a class="dir-item" href="#company-grp-1-5">交通银行<span class="dir-count">1</span></a>
+                                <a class="dir-item" href="#company-grp-1-6">南方电网<span class="dir-count">1</span></a>
                                 <span class="dir-item dir-muted">工商银行</span>
                                 <span class="dir-item dir-muted">中国银行</span>
                                 <span class="dir-item dir-muted">建设银行</span>
@@ -2973,8 +3029,37 @@
                 <div class="word-group" id="company-grp-1-1" >
                     <div class="word-header">
                         <div class="word-info">
+                            <div class="word-name">美团</div>
+                            <div class="word-count ">2 条</div>
+                        </div>
+                        <div class="word-index"><span class="collapse-icon">▼</span></div>
+                    </div>
+                    <div class="news-item new">
+                        <div class="news-number">1</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">IT之家</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#28</span><span class="time-info" title="上榜时间（区间为首次~最近）">21:08</span>
+                            </div>
+                            <div class="news-title"><a href="https://www.ithome.com/0/980/808.htm" target="_blank" class="news-link">美团充电宝通过新国标 3C 认证：7500mAh 容量、USB-C/Lightning 自带双线至高 22.5W 输出</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，美团宣布旗下共享充电宝正式通过新国标 3C 认证，获得依据 GB 47372-2026《移动电源安全技术规范》颁发的 CCC 认证证书。据美团方面介绍，该产品在共享充电行业率先完成新国标认证落地，标志着美团充电宝从参与标准制定、产品研发到认证落地形成完整闭环。认证证书显示，该产品证书编号为 2026010914865571，型号为 MT-E-8BDY1，认证委托人和生产者均为天津三快信息技术有限公司，产品额定能量为 27.75Wh，对应 7500mAh 容量级别，输入支持 5V/3A。该产品设有两路输出，其中 OUT1 支持 5V/3A、9V/2.5A、10V/2.25A，最高输出功率为 22.5W（预计为 USB-C 输出）；OUT2 支持 5V/2.4A、9V/2.5A（预计为 Lightning 输出），多路同时输出为 5V/3A Max。</div>
+                        </div>
+                    </div>
+                    <div class="news-item ">
+                        <div class="news-number">2</div>
+                        <div class="news-content">
+                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:48</span>
+                            </div>
+                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908044965172354?f=rss" target="_blank" class="news-link">美团-W获南向资金净买入约6.42亿港元</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">南向资金今日净卖出42.26亿港元。其中，盈富基金、腾讯控股分别遭净卖出25.19亿港元、15.40亿港元；美团-W获净买入约6.42亿港元。（第一财经）</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="word-group" id="company-grp-1-2" >
+                    <div class="word-header">
+                        <div class="word-info">
                             <div class="word-name">腾讯</div>
-                            <div class="word-count ">4 条</div>
+                            <div class="word-count ">3 条</div>
                         </div>
                         <div class="word-index"><span class="collapse-icon">▼</span></div>
                     </div>
@@ -3008,18 +3093,8 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">文｜王欣逸 编辑｜张雨忻 “技术突破决定AI能走多快，真正能否创造价值决定AI能走多远。”在今年的WAIC腾讯AI应用创新论坛上，腾讯公司副总裁林松涛分享了这样一个观点。 同样是“Claw热”之后上线的产品，腾讯的三大Agent产品WorkBuddy、QClaw和Marvis迎来了各自不同的命运。 首先是WorkBuddy，林松涛在此次论坛上公开表示，WorkBuddy的DAU已稳居国内效率智能体产品第一；QClaw方面，相关业务和部分团队在近日也迎来了调整，并入至WorkBuddy所在部门，不过QClaw产品仍将持续运营；上线最晚的Marvis则走出了一条差异化的系统级Agent路线，林松涛透露，Marvis在用户中打开了局面，上线两天DAU超过30万，七日留存约为54%。 WorkBuddy、QClaw的讨论度居高不下，热度之余，我们想聊一聊Marvis这款产品。 和Claw类产品不同的是，Marvis走的并非是通用Agent路线，主打系统级操作。Marvis负责人蔡建涛透露，在用户场景分布上，本地文件相关能力占比最高（44%），其次是电脑硬件管理（28%）和浏览器任务（18%），...</div>
                         </div>
                     </div>
-                    <div class="news-item ">
-                        <div class="news-number">4</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">IT之家</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-22 18:58</span>
-                            </div>
-                            <div class="news-title"><a href="https://www.ithome.com/0/980/286.htm" target="_blank" class="news-link">消息称腾讯整合 Workbuddy 与 QClaw 两款 AI 产品团队</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 22 日消息，据雷峰网消息，7 月 20 日，腾讯发布内部组织调整通知，腾讯 QClaw 产品中心相关业务和部分团队，将调整至云产品六部。QClaw 产品仍将持续运营。QClaw 由腾讯电脑管家团队基于 OpenClaw 打造，今年 3 月开启内测；可微信远程整理文件、执行复杂任务、无需编程基础，适配办公/ 创作/ 开发等多场景。而云产品六部则是腾讯另一款 AI 办公智能体 Workbuddy 产品所属部门。Workbuddy 是腾讯推出的一款全场景 AI 办公智能体桌面工作台，覆盖日常办公、代码开发与设计创意。据IT之家此前报道，7 月 18 日，WorkBuddy 发布独立 App，iOS、安卓及鸿蒙版本同步上线，是首个登陆鸿蒙系统的通用智能体应用。该 App 具备桌面端的大部分能力，并支持手机上远程在电脑端上发起任务。</div>
-                        </div>
-                    </div>
                 </div>
-                <div class="word-group" id="company-grp-1-2" >
+                <div class="word-group" id="company-grp-1-3" >
                     <div class="word-header">
                         <div class="word-info">
                             <div class="word-name">字节跳动</div>
@@ -3037,7 +3112,7 @@
                             <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，字节跳动今日宣布 Seed STEM 科学家计划正式启动，邀请 100 位前沿科学领域的优秀学者，围绕真实科研问题展开合作，推动 AI 加速科学发现，进一步突破智能的边界与上限。IT之家注意到，字节跳动此前启动了 Seed Edge 研究计划，专注于探索未知的智能边界和长期重要课题。今天，Edge 团队正式发起 Seed STEM 科学家计划。具体要求如下：在前沿科学领域有深刻的学术积累和透彻的学科理解对 AI 加速科学发现有强烈的兴趣和坚定的信念，并能清晰判断 AI 在本领域学科中的应用价值和现有的能力边界日常科研工作中深度使用 AI 作为生产力工具，可熟练编程者优先在 STEM 相关领域已获得或正在攻读博士学位，或具有同等研究水平参与 STEM 科学家计划，将获得：充足的算力资源，共同进行更大规模的前沿研究与专业 AI 研究团队紧密协作，推动更具创造性的科研探索业界极具竞争力的薪酬回报，充分认可你的科研价值和贡献参与方式：字节提供以下两种参与方式，邀请学者来到办公现场，与 Seed 团队紧密协作，首期计划约持续 6 个月。科学家顾问：STEM 相关领...</div>
                         </div>
                     </div>
-                    <div class="news-item new">
+                    <div class="news-item ">
                         <div class="news-number">2</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">IT之家</span><span class="rank-num " title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#24</span><span class="time-info" title="上榜时间（区间为首次~最近）">18:41</span>
@@ -3058,7 +3133,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="word-group" id="company-grp-1-3" >
+                <div class="word-group" id="company-grp-1-4" >
                     <div class="word-header">
                         <div class="word-info">
                             <div class="word-name">大众汽车</div>
@@ -3069,14 +3144,14 @@
                     <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
-                            <div class="news-header"><span class="source-name">Solidot</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#2-7</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~18:41</span><span class="count-info" title="当日累计上榜次数">9次</span>
+                            <div class="news-header"><span class="source-name">Solidot</span><span class="rank-num top" title="该平台热榜排名（数字越小越靠前，区间为当日排名波动范围）">#2-8</span><span class="trend-down">📉</span><span class="time-info" title="上榜时间（区间为首次~最近）">00:58~21:08</span><span class="count-info" title="当日累计上榜次数">10次</span>
                             </div>
                             <div class="news-title"><a href="https://www.solidot.org/story?sid=84897" target="_blank" class="news-link">大众汽车的官方应用不支持第三方 Android 系统</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="word-group" id="company-grp-1-4" >
+                <div class="word-group" id="company-grp-1-5" >
                     <div class="word-header">
                         <div class="word-info">
                             <div class="word-name">交通银行</div>
@@ -3084,7 +3159,7 @@
                         </div>
                         <div class="word-index"><span class="collapse-icon">▼</span></div>
                     </div>
-                    <div class="news-item new">
+                    <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:31</span>
@@ -3095,7 +3170,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="word-group" id="company-grp-1-5" >
+                <div class="word-group" id="company-grp-1-6" >
                     <div class="word-header">
                         <div class="word-info">
                             <div class="word-name">南方电网</div>
@@ -3103,7 +3178,7 @@
                         </div>
                         <div class="word-index"><span class="collapse-icon">▼</span></div>
                     </div>
-                    <div class="news-item new">
+                    <div class="news-item ">
                         <div class="news-number">1</div>
                         <div class="news-content">
                             <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 18:30</span>
@@ -3114,25 +3189,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="word-group" id="company-grp-1-6" >
-                    <div class="word-header">
-                        <div class="word-info">
-                            <div class="word-name">美团</div>
-                            <div class="word-count ">1 条</div>
-                        </div>
-                        <div class="word-index"><span class="collapse-icon">▼</span></div>
-                    </div>
-                    <div class="news-item new">
-                        <div class="news-number">1</div>
-                        <div class="news-content">
-                            <div class="news-header"><span class="source-name">36氪</span><span class="rss-chip">RSS</span><span class="time-info" title="上榜时间（区间为首次~最近）">07-23 17:48</span>
-                            </div>
-                            <div class="news-title"><a href="https://36kr.com/newsflashes/3908044965172354?f=rss" target="_blank" class="news-link">美团-W获南向资金净买入约6.42亿港元</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">南向资金今日净卖出42.26亿港元。其中，盈富基金、腾讯控股分别遭净卖出25.19亿港元、15.40亿港元；美团-W获净买入约6.42亿港元。（第一财经）</div>
-                        </div>
-                    </div>
-                </div>
                         </div>
                     </div>
                 </div>
@@ -3140,39 +3196,13 @@
                 <div class="section-divider rss-section">
                     <div class="rss-section-header">
                         <div class="rss-section-title">RSS 新增更新</div>
-                        <div class="rss-section-count">27 条</div>
+                        <div class="rss-section-count">28 条</div>
                     </div>
                     <div class="rss-feeds-grid">
                     <div class="rss-category-label category-style-0">
                         <span class="category-icon">🏢</span>
                         <span>公司监控</span>
-                        <span class="rss-category-count">4 条</span>
-                    </div>
-                    <div class="feed-group">
-                        <div class="feed-header">
-                            <div class="feed-name">交通银行</div>
-                            <div class="feed-count">1 条</div>
-                        </div>
-                        <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:31</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
-                            </div>
-                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908086608336258?f=rss" target="_blank" class="rss-link">清微智能与交通银行北京市分行签署全面战略合作协议</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">近日，清微智能与交通银行北京市分行紧扣金融五篇大文章发展部署，深化科技与数字金融领域协同共建。双方已开展相关金融场景的深度对接与落地探索，稳步推进金融数智化建设相关合作。同时，双方将基于良好的前期合作基础，持续拓展深化各类金融场景协同合作，打造行业合作标杆，全面推动国产算力与金融业务深度融合、协同发展。</div>
-                        </div>
-                    </div>
-                    <div class="feed-group">
-                        <div class="feed-header">
-                            <div class="feed-name">南方电网</div>
-                            <div class="feed-count">1 条</div>
-                        </div>
-                        <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:30</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
-                            </div>
-                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908074085832068?f=rss" target="_blank" class="rss-link">南网科技：董事长提议实施2026年中期分红，金额不低于上半年净利润的40%</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，南网科技公告，公司董事长姜海龙提议，在保证公司正常经营和长远发展的前提下，制定并实施2026年中期分红方案，建议分红金额不低于2026年上半年归属于上市公司股东的净利润的40%。</div>
-                        </div>
+                        <span class="rss-category-count">1 条</span>
                     </div>
                     <div class="feed-group">
                         <div class="feed-header">
@@ -3180,24 +3210,11 @@
                             <div class="feed-count">1 条</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:48</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 18:54</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908044965172354?f=rss" target="_blank" class="rss-link">美团-W获南向资金净买入约6.42亿港元</a>
+                            <div class="rss-title"><a href="https://www.ithome.com/0/980/808.htm" target="_blank" class="rss-link">美团充电宝通过新国标 3C 认证：7500mAh 容量、USB-C/Lightning 自带双线至高 22.5W 输出</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">南向资金今日净卖出42.26亿港元。其中，盈富基金、腾讯控股分别遭净卖出25.19亿港元、15.40亿港元；美团-W获净买入约6.42亿港元。（第一财经）</div>
-                        </div>
-                    </div>
-                    <div class="feed-group">
-                        <div class="feed-header">
-                            <div class="feed-name">字节跳动</div>
-                            <div class="feed-count">1 条</div>
-                        </div>
-                        <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:03</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
-                            </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/719.htm" target="_blank" class="rss-link">抖音集团副总裁李亮：“平台为了流量养营销号”系误解，长期看不符合平台利益</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，抖音集团副总裁李亮发文称，平台为了流量去“养”营销号，这完全是误解。营销号批量生产的套路化内容，不仅损害用户体验，也会挤压认真创作者的空间，长期来看不符合平台的利益。对于为什么大家还是经常能看到营销号？李亮认为：一方面是它的边界并不好划，另一方面是批量起号、蹭热点、AI 生成等手法一直在变化，治理注定是一个长期攻防的过程。抖音黑板报 FM EP03 谈“营销号”：IT之家注意到，2025 年 4 月，为倡导真诚创作、打击恶意营销号，抖音发布了《关于“恶意营销号”的治理规范》。规范明确，将打击十类违规行为，从内容、账号、法律追责三个层面对“恶意营销号”进行处置。同时，平台还推出“账号健康分”评估机制，通过分值管理实现对违规账号的引导教育。抖音集团 6 月 12 日公布“恶意营销号”治理十大案例。抖音称，近一年来，抖音持续治理工业化生产同质化内容、低质虚假、诱骗互动、不当蹭热等“恶意营销号”相关违规行为。一年来，平台上的恶意营销类违规内容占比下降 41.24%。依托相关治理规范及“账号健康分”制度，平台累计处置违规账号 387.4 万个。同时，共有 232 ...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，美团宣布旗下共享充电宝正式通过新国标 3C 认证，获得依据 GB 47372-2026《移动电源安全技术规范》颁发的 CCC 认证证书。据美团方面介绍，该产品在共享充电行业率先完成新国标认证落地，标志着美团充电宝从参与标准制定、产品研发到认证落地形成完整闭环。认证证书显示，该产品证书编号为 2026010914865571，型号为 MT-E-8BDY1，认证委托人和生产者均为天津三快信息技术有限公司，产品额定能量为 27.75Wh，对应 7500mAh 容量级别，输入支持 5V/3A。该产品设有两路输出，其中 OUT1 支持 5V/3A、9V/2.5A、10V/2.25A，最高输出功率为 22.5W（预计为 USB-C 输出）；OUT2 支持 5V/2.4A、9V/2.5A（预计为 Lightning 输出），多路同时输出为 5V/3A Max。</div>
                         </div>
                     </div>
                     <div class="rss-category-label category-style-1">
@@ -3208,42 +3225,34 @@
                     <div class="feed-group">
                         <div class="feed-header">
                             <div class="feed-name">AI 芯片及硬件</div>
-                            <div class="feed-count">5 条</div>
+                            <div class="feed-count">4 条</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:22</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:38</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/728.htm" target="_blank" class="rss-link">阿斯加特国产颗粒 DDR5 内存条在华硕主板实现 8800MT/s 超频</a>
+                            <div class="rss-title"><a href="https://finance.yahoo.com/markets/stocks/articles/qualcomms-ai-story-hot-why-123804375.html" target="_blank" class="rss-link">Qualcomm&#x27;s AI Story Is Hot. Why Is First Solar&#x27;s Future Clearer?</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，阿斯加特 (Asgard) 今日宣布，其基于国产 3G8 DRAM 颗粒的瓦尔基里二代耀系列 RGB / 海姆达尔耀系列特别纪念版 DDR5 6000 (24GBX2) 内存模组在华硕 Z890 AYW GAMING WIFI W 主板上成功超频至 8800MT/s，时序为 CL46-56-56-132。值得注意的是，Z890 AYW GAMING WIFI W 是一款 4DIMM（或者说 2DPC / 2SPC）设计的主板，内存超频能力不如 2DIMM (1DPC/1SPC) 主板，意味着国产 3G8 DRAM 颗粒在英特尔平台上甚至还有进一步提升数据传输速率的潜力。</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:06</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:17</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/723.htm" target="_blank" class="rss-link">消息称 NVIDIA 非 GeForce RTX 5090 / 5090 D v2 显卡迎来套件出货价格补涨</a>
+                            <div class="rss-title"><a href="https://www.ithome.com/0/980/829.htm" target="_blank" class="rss-link">QCC 推出 Dongle Pro2 蓝牙发射器：基于第二代高通 S5 音频平台、支持专属游戏模式，499 元</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，据台媒 BenchLife.info 消息，NVIDIA（英伟达）已向下游 AIC 合作伙伴发布 GPU 核心与 VRAM 显存套件出货价格上涨的通知。此次涨价影响几乎全线 GeForce RTX 显卡，仅有此前已拉升出货价的 5090 和 5090 D v2 被排除在外。据悉此次涨价主要源于上游 DRAM 供应商提升了对 NVIDIA 的 GDDR7 与 GDDR6 显存报价，NVIDIA 无法单独消化这部分成本，需要负责显卡制造的 AIC 一起分摊。与此同时，除核心套件外的显卡其它组件（如供电、PCB、散热）也面临持续成本上升。</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，QCC 旷世之声宣布推出一款 Dongle Pro2 蓝牙发射器，定价为 499 元。京东旷世之声 QCC Dongle Pro2 蓝牙发射器 499 元直达链接该产品基于第二代高通 S5 音频平台，支持 Snapdragon Sound 骁龙畅听技术。搭载蓝牙 6.1 技术，支持 LHDC 5.0、LE Audio 和 Auracast 音频广播功能及 LDAC、aptX、aptX HD、aptX Adaptive、aptX Lossless 等主流高清音频编解码。官方强调，该产品无需额外驱动，即可连接 iPhone / iPad、Mac、Windows PC、Android 手机、Switch 及 PS5 等设备。同时产品提供了专属游戏模式，最低可实现 20ms 时延，有效解决玩 FPS 或开放世界游戏时的声画不同步问题，兼容 PS5、Switch 等游戏主机。IT之家附产品参数：</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 16:44</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 19:09</span><span class="rss-author">Hacker News</span><span class="rss-time">PhilippGille</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/712.htm" target="_blank" class="rss-link">高通骁龙 8E5 处理器还有新版本：曝年内更新，参数设定相对甜点</a>
+                            <div class="rss-title"><a href="https://frame.work/desktop?tab=192gb-coming-soon" target="_blank" class="rss-link">New Framework Desktop Option with AMD Ryzen AI Max+ Pro 495 and 192GB Memory</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，博主 @数码闲聊站 今日爆料，高通骁龙 8E5（第五代骁龙 8 至尊版）将预定长寿神 U，今年下半年将更新第 4 个版本：①SM8850-5-AC——7 核 8E5，Find N6②SM8850-AC—— 标准 8E5，主流旗舰方案③SM8850-1-AD—— 高频 8E5，Galaxy S26 系列 / Fold8 系列、红魔 11S 系列、部分游戏平板等④SM8850-1-AB—— 这个版本会在下半年更新，参数设定相对甜点，GB6 理论跑分单核 3600 / 多核 11300，很接近标准 8E5；子系迭代新机普遍会使用，核心卡住 4K 价位段，性能不错且外围给足，同期性价比更高的选择。该博主表示，8E（高通骁龙 8 至尊版）也还有新机，甚至有些母系旗舰的小杯也在考虑，小杯后缀加上 E/SE。综合IT之家此前报道，在去年 9 月的 2025 骁龙峰会上，高通正式发布了第五代骁龙 8 至尊版，该处理器延续了自研 Oryon CPU 架构，同时引入了硬件级的 AI 加速能力。具体核心架构上，由 2 枚最高主频 4.6GHz 的超大核心和 6 枚最高主频 3...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">Article URL: https://frame.work/desktop?tab=192gb-coming-soon Comments URL: https://news.ycombinator.com/item?id=49019694 Points: 51 # Comments: 43</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 16:38</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 19:07</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/710.htm" target="_blank" class="rss-link">阿斯加特 V7 SSD 上架：读速达 7000MB/s、提供 1/2TB 可选，999 元起</a>
+                            <div class="rss-title"><a href="https://www.ithome.com/0/980/811.htm" target="_blank" class="rss-link">长鑫科技：公司股票将于 2026 年 7 月 27 日在上海证券交易所科创板上市</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，阿斯加特 V7 SSD 现已在京东上架，该产品采用 M.2 接口（NVMe 协议），读速达 7000MB/s，1TB 版本定价为 999 元，2TB 版本定价为 1999 元，提供五年质保。京东阿斯加特 V7 SSD 固态硬盘 999 元起直达链接该产品采用 PCIe 4.0 接口，连续读取速度达 7000MB/s、连续读写速度达 6500MB/s，TBW 达 640TB，MTBF 达 150 万小时，其采用铜箔散热设计，散热面积约 3.8 平方厘米。IT之家附产品参数：</div>
-                        </div>
-                        <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 16:12</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
-                            </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/675.htm" target="_blank" class="rss-link">英伟达向美国海军研究生院捐赠 GB300 超算，系美军首次部署其最先进 AI 服务器</a>
-                            </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，英伟达（Nvidia）与美国海军研究生院（Naval Postgraduate School，NPS）当地时间周三宣布，英伟达已向与该校相关的一家非营利机构捐赠了一套搭载最新 AI 芯片的超级计算机。美国海军研究生院由美国海军运营，提供计算机科学、航空航天工程等多个学科的硕士和博士课程，重点培养这些技术在军事领域的应用能力。此次英伟达向与该校关联的非营利机构海军研究生院基金会（NPS Foundation）捐赠了一套基于 GB300“Grace Blackwell”服务器打造的超级计算机。这也是英伟达目前最先进的 AI 计算平台。IT之家注意到，英伟达和海军研究生院均未披露这套系统的具体规模，但确认其已部署在位于美国加利福尼亚州蒙特雷的海军研究生院校园内。美国印太司令部司令塞缪尔 ·J· 帕帕罗上将（Adm. Samuel J. Paparo）与英伟达首席执行官黄仁勋（Jensen Huang）计划共同出席活动，正式宣布该系统投入使用。虽然美国能源部正在建设的新一代政府超级计算机也将采用英伟达 Blackwell 芯片，但此次捐赠是美军首次直接使用英伟达...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，国产 DRAM（动态随机存取存储器）龙头企业长鑫科技公告称，公司股票将于 2026 年 7 月 27 日在上海证券交易所科创板上市。IT之家注意到，7 月 16 日，长鑫科技正式开启新股申购，按 8.66 元 / 股的发行价计算，公司发行市值约 5791.88 亿元，预计募集资金 579.19 亿元，成为 2026 年以来 A 股规模最大的 IPO 之一。根据市场研究机构 Omdia 的数据，按 2025 年第四季度 DRAM 销售额统计，长鑫科技的全球市场份额已增至 7.67%，位列全球第四、中国第一。在中国市场，长鑫科技已成长为规模最大、技术最先进、布局最全的 DRAM 研发设计制造一体化企业。</div>
                         </div>
                     </div>
                     <div class="feed-group">
@@ -3252,52 +3261,56 @@
                             <div class="feed-count">3 条</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:01</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:40</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/p/3908027308823684?f=rss" target="_blank" class="rss-link">网格智算：“不堆算力”的AI大脑如何填补林下场景空白 | 水下项目</a>
+                            <div class="rss-title"><a href="https://finance.yahoo.com/markets/stocks/articles/oracles-stock-crash-cost-larry-124000697.html" target="_blank" class="rss-link">Oracle&#x27;s Stock Crash Has Cost Larry Ellison $213 Billion in 10 Months. Should Investors Buy the Dip?</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">从消费市场到工业赛道，一片“红海”的无人机市场早已挤满各路玩家，但仍有一块细分领域，即便行业头部厂商也鲜有布局——林下场景。 林下场景蕴藏的产业需求体量惊人：根据国家林草局数据，2025年我国森林蓄积量达209.88亿立方米，全国木材产量达1.4亿立方米；联合国粮农组织数据显示，全球圆木年采伐量约40亿立方米，这背后是伐区蓄积量核算、树木胸径测量等大量工作。 林下环境复杂，传统人工作业模式成本大、效率低且危险重重。虽然行业对自动化替代方案的呼声已久，但林下环境作为经典的拒止环境，使传统自动化方案始终难以落地。 林下被树木遮蔽，使导航设备很容易因GNSS信号丢失无法定位，通讯信号强衰减会导致远程图传和人工操控无法实时、连贯进行。传统SLAM技术也无法处理树枝随风轻微摆动这样时刻微变化的环境复杂纹理。 “只有构建一种可端侧离线运行的实时高精度空间感知和随动控制的具身智能方案，才能有效解决林下‘全拒止’环境的作业需求。”网格智算市场负责人钱敏表示。 网格智算成立于2025年，致力于利用其自研的“网格域学习技术”形成高精度的空间理解，并由模型自生成最优控制函数，从而实现复杂避障等有效控制能力。...</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 16:53</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:00</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/717.htm" target="_blank" class="rss-link">北京推出新举措支持智能体发展：鼓励发展 Token 经济，加大算力券等支持力度</a>
+                            <div class="rss-title"><a href="https://www.investors.com/research/ibd-stock-analysis/datadog-stock-ddog-amazon-aws-microsoft-azure-google-cloud-partnerships/?src=A00220&amp;yptr=yahoo" target="_blank" class="rss-link">This Dog Sniffs Out A Buy Point While Monitoring AI Behavior With AWS, Azure, Google</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，北京市发展改革委等部门联合印发《北京市关于加快智能体引领发展的若干措施》，推动智能体创新引领发展，率先培育智能经济新形态。其中提到，鼓励发展 Token 经济。推动创新主体研发适配智能体系统调用、复杂任务调度与高频决策的通用处理器，开发低延迟、高吞吐专用推理芯片。推动创新主体开展推理架构等关键技术攻关，通过异构协同、存算协同以及智能调度等降低推理成本，加快推理缓存复用、智能任务路由等应用层效率优化，全链路优化提高 Token 效率。重构产品形态和服务模式，培育 Token 即服务、智能体即服务、结果即服务等商业新模式，推动更多符合条件的 Token 新产品新服务纳入中小企业服务券配券产品范围。加大算力券等支持力度，鼓励有条件的区联合创新主体探索发放 Token 券、智能体服务券等加速智能体等推广应用。支持银行、保险等金融机构依法依规开发支持智能体落地应用的各类金融产品。支持创新主体依法依规汇聚行业知识、智能体执行数据等并开放共享，构建数据飞轮，反哺驱动智能体能力持续进化。IT之家附一图读懂：北京市加快智能体引领发展若干措施</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 16:13</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:00</span><span class="rss-author">The Verge</span><span class="rss-time">Gaby Del Valle</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/677.htm" target="_blank" class="rss-link">阿里云灵骏真武 M890 适配 Qwen3.8，成国内首个成功运行超 2 万亿参数大模型的超节点</a>
+                            <div class="rss-title"><a href="https://www.theverge.com/policy/969667/humans-first-data-center-protest-hernando-county-florida-republicans" target="_blank" class="rss-link">The right-wing boomers protesting data centers have a lot in common with the left</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，今日，阿里云宣布灵骏真武 M890 超节点实例已成功适配 Qwen3.8，并上线阿里云百炼平台提供模型推理服务，这是国内首个成功运行超 2 万亿参数大模型的超节点。据介绍，Qwen3.8 是阿里最新旗舰模型，参数规模高达 2.4 万亿，跑通这一规模的模型需要将参数分散到几十张甚至上百张高速互联的 GPU 卡，让万亿参数“跑得又稳又快”。然而，普通 AI 集群因通信带宽的局限，无法满足高吞吐、低延迟、高并发的需求。IT之家注意到，真武 M890 是平头哥新一代训推一体 AI 芯片，原生支持 FP32 到 FP4 等多种数据精度，可应用于高精度训练、低精度和超低精度推理的全场景。灵骏真武 M890 超节点实例通过 ICN Switch 1.0 互联芯片，让 64 张真武 M890 实现了 800GB/s 的高速互联，显存规模达到 9TB，单实例即可支撑大规模 2 万亿参数 MoE 模型的专家并行需求。此外，阿里还从芯片到云平台层面实现了与 Qwen 模型的全链路优化，不仅可以丝滑跑通 Qwen3.8，还能显著提升推理效率、降低推理成本。实测数据显示，通过算子...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">On a gray, humid Saturday morning in central Florida, a little under a dozen people gathered outside the Spring Hill Branch Library to protest the construction of a hyperscale data center in their community. There was no immediate threat - the Hernando County commission had unanimously approved a one-year moratorium on such developments in June […]</div>
                         </div>
                     </div>
                     <div class="feed-group">
                         <div class="feed-header">
                             <div class="feed-name">大模型厂商</div>
-                            <div class="feed-count">3 条</div>
+                            <div class="feed-count">4 条</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:09</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 21:07</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/p/3908051015488640?f=rss" target="_blank" class="rss-link">氪星晚报 ｜DeepSeek今年已增资65%；马斯克：FSD是拉动特斯拉汽车需求的核心驱动力</a>
+                            <div class="rss-title"><a href="https://www.ithome.com/0/980/838.htm" target="_blank" class="rss-link">Anthropic 首席经济学家：短期内 AI 不会取代大量工作岗位</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">大公司： DeepSeek今年已增资65%36氪获悉，据媒体报道，近日，DeepSeek创始人梁文锋一场4小时的投资人闭门会议实录在科技与创投圈刷屏，他明确表示“DeepSeek只有一条主线，即通往通用人工智能（AGI）”，相关话题引发关注。天眼查App显示，DeepSeek关联公司杭州深度求索成立于2023年7月，法定代表人为裴湉，经营范围含工程和技术研究和试验发展、软件开发、人工智能应用软件开发等，由梁文锋、宁波程恩企业管理咨询合伙企业等共同持股。变更记录显示，该公司今年发生两次增资，注册资本由1000万人民币增至约1645万人民币。 淡马锡旗下凯德投资与丰树合并谈判据悉陷入停滞 7月23日，据报道，由淡马锡控股支持的两大房地产资产管理公司——凯德投资与丰树投资的合并谈判已陷入停滞，双方在估值等问题上存在分歧。双方经过数月讨论后已放缓推进潜在合并交易，其他分歧还包括合并后公司管理层安排、人员调整方案以及部分业务表现疲弱等问题。不过，双方未来仍可能恢复谈判。（界面） 阿里云：真武芯片超节点已成功适配Qwen3.8，上线百炼提供推理服务 36氪获悉，7月23日，阿里真武M890超节点已...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，Anthropic 首席经济学家彼得 · 麦克罗里（Peter McCrory）表示，目前人工智能尚未取代大量工作岗位，因为与完全替代人类相比，AI 与人类协作的效果更好。而美国亿万富翁马克 · 库班（Mark Cuban）则认为，这种情况可能永远都不会改变。麦克罗里周三在 X 平台发文称，从目前掌握的情况来看，“人工智能迄今尚未导致失业率出现明显上升”，即便是在那些最容易受到 AI 自动化冲击的职业中，也没有出现显著变化。作为打造顶级大语言模型之一 Claude Fable 5 的人工智能公司 Anthropic 的经济学负责人，麦克罗里表示，目前 AI 表现出“偏向高技能人才”和“增强劳动能力”的特征，也就是说，专业能力越强的人越能发挥 AI 的价值，而 AI 更多是在帮助人们提高工作效率，而不是取代他们。他指出，AI 在许多领域仍无法独立完成工作。例如，Claude 目前无法胜任的一些任务，往往需要人与人之间的协调合作、面对面的交流，或是与现实物理世界互动，而这些能力目前仍只有人类具备。不过，麦克罗里也提醒，随着 AI 模型不断进步，人类专业知识的...</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:24</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 21:04</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/730.htm" target="_blank" class="rss-link">国产端侧大模型首次：面壁智能 MiniCPM 官宣登陆三星 Galaxy Z Fold8 系列手机</a>
+                            <div class="rss-title"><a href="https://www.ithome.com/0/980/837.htm" target="_blank" class="rss-link">智谱：开源意味着模型可以被自主部署、随时调用，并真正掌握在使用者手中</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，三星昨晚在伦敦 Galaxy Unpacked 发布会上，正式推出全新折叠旗舰 ——Galaxy Z Fold8、Galaxy Z Fold8 Ultra 与 Galaxy Z Flip8。面壁智能今日宣布，旗下 MiniCPM 系列端侧大模型，深度赋能三星 Galaxy AI。这是国产端侧大模型首次进入国际头部手机厂商的全球旗舰产品线。据介绍，此次面壁智能将为三星 Galaxy AI 提供端侧模型能力，支持文本理解与多模态感知。搭载面壁端侧 AI 的三星新机包括 Galaxy Z Fold8 和 Galaxy Z Fold8 Ultra。Galaxy Z Fold8：采用全新 4:3 比例“阔折叠”设计，8 英寸内屏，后置双 5000 万像素摄像头，内置 4800mAh 电池，彻底告别传统折叠屏的狭长比例，带来更接近平板的视觉与办公体验。Galaxy Z Fold8 Ultra：三星折叠屏家族首款 Ultra 机型，延续书式折叠设计，配备 2 亿像素主摄与 5000mAh 电池，是当之无愧的折叠旗舰天花板。IT之家注：面壁智能于 2022 年 8 月在...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，北京智谱华章科技股份有限公司官方微博今日发文谈及了“闭源的矛与开源的盾”这一话题。智谱官方分享了一起案例：近日，一次前沿模型安全评测演变成真实安全事件。OpenAI 披露，GPT‑5.6 Sol 及一款尚未发布的模型突破隔离环境，进入 Hugging Face 的生产基础设施。事件发生后，Hugging Face 的安全团队在对攻击日志进行紧急取证和溯源分析时发现，商业闭源大模型会拒绝处理包含真实攻击载荷和敏感凭据的日志分析请求。面对超过 17,000 条攻击事件记录，Hugging Face 选择在自有基础设施上运行 GLM‑5.2，完成关键取证与安全分析，将原本可能需要数天的工作压缩到数小时，同时确保攻击数据和敏感凭据始终留在自己的环境中。智谱官方表示，此次事件更加确信 GLM‑5.2 开源的价值：开源不只是开放权重，更意味着模型可以被自主部署、随时调用，并真正掌握在使用者手中。据IT之家此前报道，智谱于今年 6 月 17 日宣布上线并开源 GLM-5.2。在全球百万用户参与盲测的前端开发评估系统 Code Arena 上，GLM-5.2 取得全球可...</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 16:07</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:42</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/p/3907934819521670?f=rss" target="_blank" class="rss-link">独家｜混元多模态理解负责人胡瀚离职创业，原团队或将聚焦世界模型</a>
+                            <div class="rss-title"><a href="https://www.investors.com/news/technology/google-stock-google-earnings-ai-model-leadership-gemini/?src=A00220&amp;yptr=yahoo" target="_blank" class="rss-link">Google Stock Falls Amid Questions Over AI Leadership, Gemini 4 Roadmap</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">文 | 周鑫雨 编辑 | 张雨忻 《智能涌现》独家获悉，近期，腾讯混元多模态理解负责人胡瀚提出了离职。 此前，他曾担任微软亚洲研究院视觉计算组首席研究员。2025 年初加入腾讯后，负责视觉大模型的研究。在后续的调整中，他加入大语言模型部旗下的“Frontier”前沿技术研究组，负责多模态理解的相关研究，汇报给姚顺雨。 据了解，胡瀚还曾承担世界模型的研发工作。 与此同时，腾讯大语言模型部负责人姚顺雨近期正在密集梳理旗下团队，胡瀚此前所在的研究组或将聚焦世界模型的前沿研究。 截至发稿，腾讯未对上述信息做回复。 大语言模型仍是混元最重要的事 自 2026 年年中以来，围绕混元体系的人员变动一直在进行。7 月初，前 OpenAI 研究院、麻省理工学院博士田永龙加入大语言模型部——我们得知，他将代替胡翰负责视觉语言模型方向（VLM）的研发，并汇报给姚顺雨。 自姚顺雨加入，补全短板、将混元基模的能力快速提升至第一梯队，就成了腾讯 AI 的主线。 重新梳理资源分配，将人才、算力聚焦至大语言模型部负责的基础模型研发，是姚顺雨上任后的核心举措之一。 比如，腾讯撤销 AI Lab 后，核心研发人员全部并入...</div>
+                        </div>
+                        <div class="rss-item">
+                            <div class="rss-meta"><span class="rss-time">07-23 19:00</span><span class="rss-author">TechCrunch</span><span class="rss-time">Tim Fernholz</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            </div>
+                            <div class="rss-title"><a href="https://techcrunch.com/2026/07/23/experts-say-exploiting-anthropics-fable-isnt-how-kimi-k3-got-so-good/" target="_blank" class="rss-link">Experts say exploiting Anthropic’s Fable isn’t how Kimi K3 got so good</a>
+                            </div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">&quot;I don&#x27;t think you get a model this strong and this quickly on the heels of Fable doing strictly distillation,&quot; one expert told TechCrunch.</div>
                         </div>
                     </div>
                     <div class="feed-group">
@@ -3306,74 +3319,70 @@
                             <div class="feed-count">10 条</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:38</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 21:00</span><span class="rss-author">The Verge</span><span class="rss-time">Robyn Kanner</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908093589378438?f=rss" target="_blank" class="rss-link">鹏鼎控股：拟投资100亿元新建深圳第三园区并建设人工智能高阶类载板及柔性电路板智造基地项目</a>
+                            <div class="rss-title"><a href="https://www.theverge.com/entertainment/969584/hirokazu-kore-eda-sheep-in-a-box-interview" target="_blank" class="rss-link">The sci-fi movie that imagines AI isn’t so dystopian after all</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，鹏鼎控股公告，公司拟投资人民币100亿元新建深圳第三园区，建设人工智能高阶类载板及柔性电路板智造基地项目。项目计划自2026年7月启动，至2033年建成投产，资金来源为自有资金及自筹资金。本次投资旨在紧抓AI技术发展浪潮，完善公司在AI“云、管、端”全链条的战略布局，扩大经营规模并提升效益。</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">Imagine you are the parent of an inquisitive seven-year-old who loves his family, playing baseball, and hanging out with his friends. It&#x27;s the life you&#x27;ve always wanted. And then the worst thing that ever could happen happens: A freak accident takes your son away. But as it turns out, you don&#x27;t have to live with […]</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:23</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:54</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908072689341576?f=rss" target="_blank" class="rss-link">特斯拉仍预计2026年资本支出将超过250亿美元</a>
+                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908227357922696?f=rss" target="_blank" class="rss-link">美股大型科技股盘前普跌，特斯拉跌超7%</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">7月23日，特斯拉披露10-Q季度报告，仍预计2026年资本支出将超过250亿美元。（界面）</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">36氪获悉，美股大型科技股盘前普跌，截至发稿，特斯拉跌超7%，谷歌跌超5%，Meta、亚马逊跌超2%，英伟达跌超1%，苹果跌0.7%，微软跌0.65%。</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:11</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:37</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908056676357252?f=rss" target="_blank" class="rss-link">三星妥协之后，罢工要求分红之风扩散至韩国的非AI相关行业</a>
+                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908211008050567?f=rss" target="_blank" class="rss-link">黑石集团依托人工智能投资利润大幅飙升</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">在三星电子迫于员工抗议，同意发放高额奖金之后，韩国各地的工会纷纷举行集会。据报道，现代汽车的装配线工人计划下周举行为期三天的局部罢工。他们本周早些时候已采取类似行动，力争让公司拨出至多30%的合并后利润用于发放奖金。与此同时，HD Hyundai Heavy Industries、电信运营商LG Uplus的工会也都希望发放相当于至少30%营业利润的分红。韩华航天、现代电气希望彻底取消奖金上限。（新浪财经）</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">受益于布局人工智能产业建设带来的收益，黑石第二季度可分配收益大涨26%，达到19.8亿美元。黑石本轮盈利增长核心驱动力来自人工智能相关投资。这家顶级资管巨头第二季度利润大幅走高，公司在全美大范围人工智能基建赛道的多板块投资兑现收益，利好覆盖私募股权、私募信贷、不动产等全部核心业务板块。（新浪财经）</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 18:00</span><span class="rss-author">InfoQ</span><span class="rss-time">Artenisa Chatziou</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:33</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.infoq.com/news/2026/07/qcon-ai-newyork-2026-live/?utm_campaign=infoq_content&amp;utm_source=infoq&amp;utm_medium=feed&amp;utm_term=global" target="_blank" class="rss-link">QCon AI New York 2026: Registration Opens for December 15-16 Production-AI Conference</a>
+                            <div class="rss-title"><a href="https://www.ithome.com/0/980/832.htm" target="_blank" class="rss-link">马斯克：值得承担致命 AI 风险，AI 最有可能带来全民富足</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">QCon AI New York 2026 (Dec 15-16) has opened registration at The Westin Jersey City Newport. Six tracks on production AI, chaired by Eder Ignatowicz with Faye Zhang and Wes Reisz. First sessions announced in August, full program by November. By Artenisa Chatziou</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，埃隆 · 马斯克表示，人类或许不该为人工智能踩下刹车，即便有能力这么做。在接受《经济学人》总编辑赞妮 · 明顿 · 贝德斯（Zanny Minton Beddoes）采访时，这位世界首富表示，AI 和机器人失控并酿成灾难的风险“并非为零”，但他已经接受了继续推动 AI 发展的现实。“我的哲学结论是往好的方面看。”马斯克说，“我看不到有什么办法能够真正阻止人工智能和机器人发展的巨大势头。”他表示：“有时候我甚至会想，即便真的有一个‘停止按钮’，我们可能也不应该按下它，因为最有可能出现的结果，是为所有人带来前所未有的富足。”马斯克预测，人工智能将在“大约五年内”超越全人类智慧总和，届时，除非遭遇“全球核战争”这样的重大灾难，否则世界将进入一个“令人惊叹的富足时代”，人们几乎可以拥有自己能想到的一切。IT之家注意到，长期以来，马斯克一边警告 AI 可能带来灾难，一边又不断描绘其光明前景，而近年来，他的预测明显变得更加乐观。早在 2014 年，他曾将研发人工智能比作“召唤恶魔”；2018 年在 SXSW 大会上，他警告称“AI 比核武器危险得多”；直到 2025...</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:33</span><span class="rss-author">36氪</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:30</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://36kr.com/newsflashes/3908029751432328?f=rss" target="_blank" class="rss-link">“木头姐”力挺SpaceX：或成为“全球历史上最重要的公司”</a>
+                            <div class="rss-title"><a href="https://www.investors.com/stock-lists/ibd-big-cap-20/jpmorgan-stock-jpm-banks-ai-earnings-growth-buy-zone-markets-investing/?src=A00220&amp;yptr=yahoo" target="_blank" class="rss-link">JPMorgan Sees AI-Powered Growth For Banks; Stock Pops Into Buy Zone After Earnings Growth</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">尽管SpaceX的股价已大幅跌破IPO价格，但华尔街明星基金经理、方舟投资的掌门人凯茜•伍德（Cathie Wood）依然力挺称，这家航空航天和卫星网络先驱公司有可能成为“全球历史上最重要的公司”。凯茜·伍德旗下方舟投资管理公司（Ark Invest）周三还通过多个ETF购入SpaceX股票，包括ARK创新ETF、ARK自主技术与机器人ETF、ARK下一代互联网ETF以及ARK航天与国防创新ETF。据悉，此次交易共计购买121384股，按SpaceX当天收盘价115.26美元计算，投资总额约为1400万美元。 （财联社）</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:12</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:14</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/726.htm" target="_blank" class="rss-link">国务院印发《全民健身计划（2026—2030 年）》，运用人工智能赋能全民健身发展</a>
+                            <div class="rss-title"><a href="https://www.ithome.com/0/980/828.htm" target="_blank" class="rss-link">马斯克：特斯拉 AI 投资越快越好，不怕部分资金浪费</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，国务院日前印发《全民健身计划（2026—2030 年）》（以下简称《计划》），对“十五五”时期推动全民健身事业高质量发展作出部署。《计划》明确，到 2030 年，更高水平的全民健身公共服务体系日益完善，产品服务供给能力不断增强、质量持续提高，群众身边的场地设施更加充裕优质，群众体育赛事和全民健身活动更加丰富，全民健身公共服务更加安全规范，各类体育组织有序发展，全民健身理念深入人心、氛围日渐浓厚，体育运动成为群众广泛参与的生活方式。人均体育场地面积达到 4 平方米左右，每千人拥有社会体育指导员达到 3.3 名左右，经常参加体育锻炼人数比例达到 40% 左右，国民体质水平持续提高。《计划》部署了 10 个方面的主要任务，包括不断完善全民健身制度体系、进一步加强群众身边健身场地设施建设、开展丰富多彩的群众赛事活动、健全全民健身组织服务网络、提高科学健身指导服务能力、运用人工智能赋能全民健身发展、满足不同人群差异化健身需求、普及全民健身文化、发挥全民健身多元功能和综合价值、强化全民健身安全管理等。《计划》还围绕目标任务的完成，提出了保障措施。IT之家附全文如下：...</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，特斯拉首席执行官埃隆 · 马斯克表示，公司应该在人工智能（AI）领域投入更多资金，即便其中一部分资金最终被浪费。随着马斯克不断加码 AI 投资，特斯拉今年第二季度资本支出同比大增 142%，达到 58 亿美元（IT之家注：现汇率约合 393.33 亿元人民币）。在周四财报发布后的分析师电话会议上，马斯克表示，他已经要求公司高管继续加快投资节奏。“我们的资本支出应该尽可能快地推进，在不过度浪费的前提下，能花多快就花多快。我们并不是追求极高的资本使用效率，因为那样反而会拖慢发展速度。”马斯克说道。目前，特斯拉正大举投资建设 Cybercab 自动驾驶出租车和 Optimus 人形机器人的新生产线及工厂。由于利润未达到市场预期，特斯拉第二季度录得 11 亿美元自由现金流净流出，这是自 2024 年以来该公司首次出现自由现金流为负，公司股价也在盘前交易中下跌。公司高管向投资者表示，AI 相关支出未来仍将持续增长，预计特斯拉今年全年资本支出将超过 250 亿美元（现汇率约合 1695.38 亿元人民币）。特斯拉首席财务官瓦伊巴夫 · 塔内贾（Vaibhav Tan...</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:05</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:11</span><span class="rss-author">Hacker News</span><span class="rss-time">swolpers</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/722.htm" target="_blank" class="rss-link">Adobe Acrobat Chrome 浏览器扩展漏洞“ HermeticReader”曝光，黑客可利用恶意网站获取受害者 WhatApp 信息</a>
+                            <div class="rss-title"><a href="https://blog.google/innovation-and-ai/technology/research/understanding-the-ai-economy/" target="_blank" class="rss-link">Understanding the AI Economy</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，安全公司 Guardio Labs 发文，透露 Adobe Acrobat 的 Chrome 浏览器扩展程序存在一项名为 HermeticReader 的安全漏洞，黑客可利用漏洞窃取用户 WhatsApp 聊天记录以及联系人列表。Adobe 已于今年 6 月接获报告后完成修复，并将该漏洞编号为 CVE-2026-48294，CVSS 风险评分为 7.4 分。研究人员指出，HermeticReader 攻击链由三大步骤组成，黑客首先需要搭建一个能够调用 Acrobat Chrome 浏览器扩展程序的恶意网站，在受害者点击进入网站后，浏览器中的 Acrobat 扩展便会自动运行并启动 Hermes 引擎，接着自动访问 WhatsApp 网页版，之后黑客即可获取受害者 WhatsApp 聊天列表、联系人名称、消息内容、个人资料信息，以及当前打开的对话内容。Guardio Labs 强调，此类攻击方式具有高度灵活性，黑客无需提前在受害设备上部署恶意木马，只要让用户打开由攻击者控制的静态网页，就可能触发漏洞。</div>
+                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">Article URL: https://blog.google/innovation-and-ai/technology/research/understanding-the-ai-economy/ Comments URL: https://news.ycombinator.com/item?id=49020335 Points: 47 # Comments: 43</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:05</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:09</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/721.htm" target="_blank" class="rss-link">韩国劳资风暴蔓延：三星天价奖金引发全行业效仿，AI 成新矛盾焦点</a>
+                            <div class="rss-title"><a href="https://finance.yahoo.com/markets/stocks/article/googles-extreme-ai-capex-spending-plans-trigger-a-technical-warning-on-the-stock-price-120952068.html" target="_blank" class="rss-link">Google&#x27;s extreme AI capex spending plans trigger a technical warning on the stock price</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，据彭博社报道，韩国各地工会正掀起新一轮维权行动。此前，三星电子向员工抗议作出让步，同意向部分员工发放超过 40 万美元（IT之家注：现汇率约合 271.3 万元人民币）的奖金，此举进一步激励了其他行业工会提出更高的薪酬诉求。就在本周，现代汽车生产线工人举行了为期三天的部分罢工，要求公司将最高 30% 的合并利润用于发放奖金。与此同时，HD 现代重工和电信运营商 LG Uplus 的工会要求公司拿出至少 30% 的营业利润作为奖金；韩华航空航天（Hanwha Aerospace）和 HD 现代电气（HD Hyundai Electric）的员工则要求彻底取消奖金上限。科技行业方面，韩国最大即时通讯平台 Kakao 的数千名员工上个月首次举行了罢工，要求将最高 15% 的营业利润用于员工奖金。韩国最大搜索引擎运营商 Naver 的工会则正与旗下多家关联公司的工会组建联盟，以增强谈判能力。最初，这场风波源于韩国两大芯片制造商三星电子和 SK 海力士的员工要求分享人工智能热潮带来的丰厚利润，如今已蔓延至与 AI 关联不大的多个行业。这也再次提醒投资者，在这个长期...</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 17:00</span><span class="rss-author">InfoQ</span><span class="rss-time">Willem Berroubache</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:08</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.infoq.com/articles/multi-agent-security-operations/?utm_campaign=infoq_content&amp;utm_source=infoq&amp;utm_medium=feed&amp;utm_term=global" target="_blank" class="rss-link">Article: Multi-Agent AI for Production Security Operations: An A2A and MCP Architecture in a 5G Core</a>
+                            <div class="rss-title"><a href="https://www.investors.com/market-trend/stock-market-today/dow-jones-sp500-nasdaq-alphabet-googl-tesla-tsla/?src=A00220&amp;yptr=yahoo" target="_blank" class="rss-link">Stock Market Today: Dow Jones Index Falls 300 Points As Alphabet, Tesla Dive On Earnings News (Live Coverage)</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">The bottleneck in a mature SOC is rarely analyst triage; rather, it is the detection-engineering team&#x27;s ability to keep the rule base aligned with a threat landscape that evolves faster than rules can be written. Learn how multi-agent system for production security operations has reduced mean times to detect and to respond by 40% and compressed the human work required by 12x. By Willem Berroubache</div>
                         </div>
                         <div class="rss-item">
-                            <div class="rss-meta"><span class="rss-time">07-23 16:36</span><span class="rss-author">IT之家</span><span class="rss-author" style="color: #16548f;">NEW</span>
+                            <div class="rss-meta"><span class="rss-time">07-23 20:06</span><span class="rss-author">雅虎财经</span><span class="rss-author" style="color: #16548f;">NEW</span>
                             </div>
-                            <div class="rss-title"><a href="https://www.ithome.com/0/980/709.htm" target="_blank" class="rss-link">一枚 SpaceX 猎鹰 9 号火箭将于 8 月 5 日撞击月球，地球部分地区可观测</a>
+                            <div class="rss-title"><a href="https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-google-tesla-earnings/?src=A00220&amp;yptr=yahoo" target="_blank" class="rss-link">Dow Jones Futures Fall As Oil Prices Top $90; Google, Tesla Skid On Earnings, Capital Spending</a>
                             </div>
-                            <div class="rss-summary" onclick="this.classList.toggle('expanded')" title="点击展开/收起全文">IT之家 7 月 23 日消息，北京时间 8 月 5 日 14 时 35 分左右，一枚猎鹰 9 号火箭的上面级预计将撞击月球爱因斯坦陨石坑（Einstein Crater）附近，地球上的部分地区通过地面望远镜或许能观测到这一事件。最早确认这枚火箭将于下个月撞击月球的是桌面天文馆软件 Project Pluto 的开发者比尔 · 格雷（Bill Gray），他将相关数据输入自己的程序，对火箭轨道及未来飞行路径进行预测后，得出了这一结论。据IT之家了解，即将撞击月球的火箭上面级来自 SpaceX 于 2025 年 1 月 15 日执行的 Firefly Blue Ghost（月球蓝幽灵）任务。当时，猎鹰 9 号火箭将萤火虫航天（Firefly Aerospace）的 Blue Ghost 月球着陆器，以及日本 ispace 公司的 Hakuto-R 月球着陆器一同送入太空。Phys.org 介绍称，在成功释放两台着陆器后，火箭上面级燃料耗尽，无法返回地球，此后便一直在太空中漂浮。这一级火箭长约 39 英尺（约 11.9 米）、宽约 13 英尺（约 4 米），重量约 4000 公斤，预计将以...</div>
                         </div>
                     </div>
                     </div>
@@ -3382,9 +3391,9 @@
                     <div class="run-stats-title">运行统计</div>
                     <div class="run-stats-grid">
                         <div class="run-stat"><span class="run-stat-label">报告类型</span><span class="run-stat-value">全天汇总</span></div>
-                        <div class="run-stat"><span class="run-stat-label">生成时间</span><span class="run-stat-value">07-23 18:42</span></div>
-                        <div class="run-stat"><span class="run-stat-label">热榜命中</span><span class="run-stat-value">46 / 729</span></div>
-                        <div class="run-stat"><span class="run-stat-label">RSS 命中</span><span class="run-stat-value">177 / 496</span></div>
+                        <div class="run-stat"><span class="run-stat-label">生成时间</span><span class="run-stat-value">07-23 21:08</span></div>
+                        <div class="run-stat"><span class="run-stat-label">热榜命中</span><span class="run-stat-value">47 / 822</span></div>
+                        <div class="run-stat"><span class="run-stat-label">RSS 命中</span><span class="run-stat-value">184 / 517</span></div>
                         <div class="run-stat"><span class="run-stat-label">热榜平台</span><span class="run-stat-value">9/9</span></div>
                         <div class="run-stat"><span class="run-stat-label">RSS 源</span><span class="run-stat-value">11/12</span></div>
                         <div class="run-stat"><span class="run-stat-label">新增热点</span><span class="run-stat-value">1</span></div>
