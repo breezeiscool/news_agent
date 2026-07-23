@@ -1756,6 +1756,51 @@ def render_html_content(
                 line-height: 1.6;
                 color: #3c4650;
             }
+            .cluster-region {
+                font-size: 10px;
+                font-weight: 600;
+                color: #4d8ec4;
+                background: #e8f1f8;
+                padding: 1px 6px;
+                border-radius: 4px;
+                margin-left: 6px;
+                vertical-align: 1px;
+            }
+            body.dark-mode .cluster-region { background: #1b3550; color: #8fbcdb; }
+
+            .market-block {
+                margin-top: 16px;
+                padding: 12px 14px;
+                background: rgba(255,255,255,0.55);
+                border: 1px dashed #b9cede;
+                border-radius: 10px;
+            }
+            .market-hd {
+                font-size: 13px;
+                font-weight: 700;
+                color: #5b7a94;
+                margin-bottom: 4px;
+            }
+            .market-cnt {
+                font-weight: 400;
+                font-size: 11px;
+                color: #93a8ba;
+                margin-left: 6px;
+            }
+            body.dark-mode .market-block { background: rgba(15,31,46,0.5); border-color: #2b4a63; }
+            body.dark-mode .market-hd { color: #8aa8c0; }
+
+            details.more-items { margin-top: 8px; }
+            details.more-items summary {
+                cursor: pointer;
+                font-size: 12px;
+                color: #6b8aa5;
+                padding: 4px 0;
+                user-select: none;
+            }
+            details.more-items summary:hover { color: #174e7c; }
+            body.dark-mode details.more-items summary { color: #64798c; }
+
             .cluster-rest-label {
                 margin-top: 10px;
                 font-size: 11px;
@@ -2519,6 +2564,7 @@ def render_html_content(
             html += f"""
                     <a class="history-chip{active_class}" href="#" data-hist-date="{html_escape(h["date"])}" data-hist-file="{html_escape(h["file"])}">{html_escape(short_date)}</a>"""
         html += """
+                    <a class="history-chip history-chip-latest" href="#" data-latest-link style="display:none">↻ 最新报告</a>
                     <a class="history-chip" href="#" data-manager-link style="margin-left:auto">⚙ 订阅管理</a>
                 </div>"""
 
@@ -2649,22 +2695,45 @@ def render_html_content(
         return group_html
 
 
-    def render_industry_group(stat, extra_attr=""):
-        """渲染行业词组：按 AI 判定的公司主体聚合资讯（而非按信息源）
+    def build_cluster_cites(items):
+        """构建引用角标（悬停显示标题/信源/时间，点击打开原文）"""
+        cites = ""
+        for ci, t in enumerate(items, 1):
+            link = t.get("mobile_url") or t.get("url", "")
+            tip = f"{t.get('title', '')} ｜ {t.get('source_name', '')}"
+            time_disp = (t.get("time_display") or "").replace("[", "").replace("]", "")
+            if time_disp:
+                tip += f" · {time_disp}"
+            if link:
+                cites += f'<a class="cite" href="{html_escape(link)}" target="_blank" title="{html_escape(tip)}">[{ci}]</a>'
+            else:
+                cites += f'<span class="cite" title="{html_escape(tip)}">[{ci}]</span>'
+        return cites
 
-        AI 在 industry_clusters 中为每条行业新闻判定"最值得关注的公司主体"，
-        同一公司的多条新闻合为一簇：公司名 + 1-2 句整合总结 + 引用角标
-        （悬停显示标题与信源，点击打开原文）。
-        AI 未运行或未覆盖的条目回退为普通列表。
+    # AI 判定的公司主体阵营排序：美国头部 → 中国头部 → 其他主题
+    _SECTION_RANK = {"us": 0, "cn": 1}
+    _SECTION_LABEL = {"us": "美国头部", "cn": "中国头部"}
+
+    def render_industry_group(stat, extra_attr="", claimed_ids=None):
+        """渲染行业词组：按 AI 判定的公司主体聚合产业实质资讯
+
+        - 簇排序：美国头部厂商 → 中国头部厂商 → 其他公司/主题；
+        - 市场涨跌类条目已被"投资市场动向"区认领（claimed_ids），此处跳过；
+        - AI 未覆盖的条目折叠收纳，降低视觉信息量。
         """
+        claimed_ids = claimed_ids or set()
         ai_clusters_all = (
             getattr(ai_analysis, "industry_clusters", None) or []
             if ai_analysis is not None
             else []
         )
-        group_clusters = [
-            c for c in ai_clusters_all if c.get("group") in ("", stat["word"])
-        ]
+        group_clusters = sorted(
+            (
+                c for c in ai_clusters_all
+                if c.get("group") in ("", stat["word"]) and c.get("section") != "market"
+            ),
+            key=lambda c: _SECTION_RANK.get(c.get("section"), 2),
+        )
 
         count = stat["count"]
         count_class = "hot" if count >= 10 else ("warm" if count >= 5 else "")
@@ -2677,7 +2746,7 @@ def render_html_content(
         )
 
         # 用 AI 返回的标题（逐字复制）匹配本组条目；精确优先、模糊兜底
-        remaining = list(stat["titles"])
+        remaining = [t for t in stat["titles"] if id(t) not in claimed_ids]
         clusters_html = ""
         for c in group_clusters:
             items = []
@@ -2693,32 +2762,31 @@ def render_html_content(
                     items.append(match)
             if not items:
                 continue
-            cites = ""
-            for ci, t in enumerate(items, 1):
-                link = t.get("mobile_url") or t.get("url", "")
-                tip = f"{t.get('title', '')} ｜ {t.get('source_name', '')}"
-                time_disp = (t.get("time_display") or "").replace("[", "").replace("]", "")
-                if time_disp:
-                    tip += f" · {time_disp}"
-                if link:
-                    cites += f'<a class="cite" href="{html_escape(link)}" target="_blank" title="{html_escape(tip)}">[{ci}]</a>'
-                else:
-                    cites += f'<span class="cite" title="{html_escape(tip)}">[{ci}]</span>'
+            region = _SECTION_LABEL.get(c.get("section"))
+            region_html = f'<span class="cluster-region">{region}</span>' if region else ""
             clusters_html += (
                 '<div class="cluster">'
-                f'<div class="cluster-hd">{html_escape(c["company"])}<span class="cluster-cnt">{len(items)} 条</span></div>'
-                f'<div class="cluster-sum">{html_escape(c["summary"])}<span class="cites">{cites}</span></div>'
+                f'<div class="cluster-hd">{html_escape(c["company"])}{region_html}<span class="cluster-cnt">{len(items)} 条</span></div>'
+                f'<div class="cluster-sum">{html_escape(c["summary"])}<span class="cites">{build_cluster_cites(items)}</span></div>'
                 '</div>'
             )
 
         group_html += clusters_html
 
-        # AI 未覆盖的条目：普通列表兜底
+        # AI 未覆盖的条目：少量直接展示，多了折叠收纳（降低信息量，脉络优先）
         if remaining:
-            if clusters_html:
-                group_html += '<div class="cluster-rest-label">其他条目</div>'
-            for j, t in enumerate(remaining, 1):
-                group_html += render_news_item(j, t)
+            if clusters_html and len(remaining) > 3:
+                group_html += (
+                    f'<details class="more-items"><summary>更多条目（{len(remaining)}）</summary>'
+                )
+                for j, t in enumerate(remaining, 1):
+                    group_html += render_news_item(j, t)
+                group_html += "</details>"
+            else:
+                if clusters_html:
+                    group_html += '<div class="cluster-rest-label">其他条目</div>'
+                for j, t in enumerate(remaining, 1):
+                    group_html += render_news_item(j, t)
 
         group_html += "\n                </div>"
         return group_html
@@ -2790,6 +2858,39 @@ def render_html_content(
                     </div>"""
                 else:
                     # ── 行业动态：子行业页签 + 词组 ──
+                    # 先让"投资市场动向"簇跨层级认领涨跌类条目，组内渲染时跳过
+                    ai_clusters_all = (
+                        getattr(ai_analysis, "industry_clusters", None) or []
+                        if ai_analysis is not None
+                        else []
+                    )
+                    market_clusters = [
+                        c for c in ai_clusters_all if c.get("section") == "market"
+                    ]
+                    all_ind_items = [t for s_ in cat_stats for t in s_["titles"]]
+                    claimed_ids = set()
+                    market_blocks = []
+                    for c in market_clusters:
+                        m_items = []
+                        for ct in c.get("titles", []):
+                            match = next(
+                                (t for t in all_ind_items
+                                 if id(t) not in claimed_ids and t.get("title") == ct),
+                                None,
+                            )
+                            if match is None:
+                                match = next(
+                                    (t for t in all_ind_items
+                                     if id(t) not in claimed_ids
+                                     and _titles_similar(t.get("title", ""), ct)),
+                                    None,
+                                )
+                            if match is not None:
+                                claimed_ids.add(id(match))
+                                m_items.append(match)
+                        if m_items:
+                            market_blocks.append((c, m_items))
+
                     if cat_stats:
                         stats_html += f"""
                     <div class="ind-tabbar">
@@ -2801,7 +2902,25 @@ def render_html_content(
                     </div>
                     <div class="ind-groups">"""
                         for k, s in enumerate(cat_stats):
-                            stats_html += render_industry_group(s, extra_attr=f'data-ind-idx="{k}"')
+                            stats_html += render_industry_group(
+                                s, extra_attr=f'data-ind-idx="{k}"', claimed_ids=claimed_ids
+                            )
+                        stats_html += """
+                    </div>"""
+
+                    # 投资市场动向：涨跌/资金类资讯统一收纳，与产业实质资讯分离
+                    if market_blocks:
+                        market_total = sum(len(items) for _, items in market_blocks)
+                        stats_html += f"""
+                    <div class="market-block">
+                        <div class="market-hd">投资市场动向<span class="market-cnt">{market_total} 条</span></div>"""
+                        for c, m_items in market_blocks:
+                            stats_html += (
+                                '<div class="cluster">'
+                                f'<div class="cluster-hd">{html_escape(c["company"])}<span class="cluster-cnt">{len(m_items)} 条</span></div>'
+                                f'<div class="cluster-sum">{html_escape(c["summary"])}<span class="cites">{build_cluster_cites(m_items)}</span></div>'
+                                '</div>'
+                            )
                         stats_html += """
                     </div>"""
                     if cat_empty:
@@ -4295,6 +4414,15 @@ def render_html_content(
                     });
                     var managerChip = histNav.querySelector('[data-manager-link]');
                     if (managerChip) managerChip.href = prefix + 'manager.html';
+                    // 「最新报告」入口：仅在浏览历史快照时显示，永远指向根 index.html
+                    var latestChip = histNav.querySelector('[data-latest-link]');
+                    if (latestChip) {
+                        var snapMatch = p.match(/^(.*?)(?:output\\/)?html\\/[^/]+\\/[^/]+\\.html$/);
+                        if (snapMatch) {
+                            latestChip.href = snapMatch[1] + 'index.html';
+                            latestChip.style.display = '';
+                        }
+                    }
                     histNav.style.display = 'flex';
                 }
 

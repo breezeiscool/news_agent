@@ -687,11 +687,15 @@ class AIAnalyzer:
                     titles = c.get("titles")
                     if not (c.get("company") and c.get("summary") and isinstance(titles, list)):
                         continue
+                    section = str(c.get("section", "other")).lower()
+                    if section not in ("us", "cn", "other", "market"):
+                        section = "other"
                     parsed_clusters.append({
                         "group": str(c.get("group", "")),
                         "company": str(c["company"]),
                         "summary": str(c["summary"]),
                         "titles": [str(t) for t in titles if t],
+                        "section": section,
                     })
             result.industry_clusters = parsed_clusters
             result.sentiment_controversy = data.get("sentiment_controversy", "")
