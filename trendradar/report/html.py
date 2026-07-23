@@ -2400,6 +2400,260 @@ def render_html_content(
             body.dark-mode .badge-new {
                 background: #2c5876;
             }
+
+            /* ═══════════ v2 卡片化设计（参照复盘笔记风格，保留科技蓝配色）═══════════ */
+            body {
+                background: #f2f4f7;
+                padding: 20px 16px;
+            }
+            .container {
+                background: transparent;
+                box-shadow: none;
+                border-radius: 0;
+                overflow: visible;
+            }
+            body.wide-mode .container { max-width: 1240px; }
+
+            /* 页头：白色标题卡 */
+            .header {
+                background: #ffffff;
+                border: 1px solid #e3e9f0;
+                border-radius: 14px;
+                padding: 20px 24px;
+                text-align: left;
+                color: #1a2b3c;
+                margin-bottom: 14px;
+            }
+            .header-watermark { display: none; }
+            .header-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: #1a2b3c;
+                margin: 0 0 4px 0;
+            }
+            .header-sub {
+                font-size: 12.5px;
+                color: #8494a6;
+                opacity: 1;
+                margin: 0;
+            }
+            .save-buttons { top: 18px; right: 18px; }
+            .save-btn, .toggle-wide-btn, .toggle-dark-btn, .save-dropdown-trigger {
+                background: #ffffff;
+                border: 1px solid #d7e0e9;
+                color: #33506b;
+                backdrop-filter: none;
+            }
+            .save-btn:hover, .toggle-wide-btn:hover, .toggle-dark-btn:hover,
+            .save-dropdown-trigger:hover {
+                background: #f2f7fb;
+                border-color: #2a6f97;
+                color: #14456b;
+                transform: none;
+            }
+
+            /* 内容区：透明画布，卡片自管间距 */
+            .content { padding: 0; }
+            body.wide-mode .content { padding: 0; }
+            .section-divider {
+                border-top: none;
+                padding-top: 0;
+                margin-top: 0;
+            }
+            .ai-section, .run-stats { margin-bottom: 14px; }
+
+            /* 研判横幅卡 */
+            .headline-card {
+                background: #e9f2f9;
+                border: 1px solid #cfe2ef;
+                border-radius: 14px;
+                padding: 14px 20px;
+                font-size: 15px;
+                font-weight: 600;
+                line-height: 1.65;
+                color: #14456b;
+                margin-bottom: 14px;
+            }
+
+            /* 大数字指标卡 */
+            .metric-row {
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+                margin-bottom: 10px;
+            }
+            .metric-card {
+                flex: 1;
+                min-width: 130px;
+                background: #ffffff;
+                border: 1px solid #e3e9f0;
+                border-radius: 14px;
+                padding: 14px 18px;
+            }
+            .metric-label {
+                font-size: 11.5px;
+                color: #8494a6;
+                margin-bottom: 6px;
+                letter-spacing: 0.03em;
+            }
+            .metric-value {
+                font-size: 26px;
+                font-weight: 700;
+                color: #1a2b3c;
+                line-height: 1;
+            }
+            .metric-unit {
+                font-size: 12px;
+                font-weight: 400;
+                color: #8494a6;
+                margin-left: 5px;
+            }
+            .legend-line {
+                font-size: 11px;
+                color: #93a3b4;
+                line-height: 1.7;
+                margin: 2px 4px 16px 4px;
+            }
+            .legend-line b { color: #5b7a94; }
+
+            /* 历史导航与搜索 */
+            .history-nav { padding: 0 2px 12px 2px; }
+            .search-input {
+                border: 1px solid #e3e9f0;
+                border-radius: 12px;
+                background: #ffffff;
+            }
+
+            /* 分区：白色卡片 + "｜标题" 竖条强调 */
+            .zone,
+            .zone-company,
+            .zone-industry {
+                background: #ffffff;
+                border: 1px solid #e3e9f0;
+                border-radius: 14px;
+                padding: 20px 22px;
+                margin-bottom: 14px;
+            }
+            .zone-header { border-bottom: 1px solid #edf1f5; }
+            .zone-icon { display: none; }
+            .zone-title::before {
+                content: "";
+                display: inline-block;
+                width: 4px;
+                height: 16px;
+                border-radius: 2px;
+                margin-right: 9px;
+                vertical-align: -2px;
+                background: #2a6f97;
+            }
+            .zone-industry .zone-title::before { background: #1e7f9e; }
+            .zone-company .zone-title::before { background: #2a6f97; }
+            .zone-industry .zone-title, .zone-company .zone-title { color: #1a2b3c; }
+
+            /* AI 区：白卡 + 竖条标题；侧栏改深海军蓝摘要卡 */
+            .ai-section {
+                background: #ffffff;
+                border: 1px solid #e3e9f0;
+                border-radius: 14px;
+                padding: 20px 22px;
+            }
+            .ai-section-title { color: #1a2b3c; }
+            .ai-section-title::before {
+                content: "";
+                display: inline-block;
+                width: 4px;
+                height: 16px;
+                border-radius: 2px;
+                margin-right: 9px;
+                vertical-align: -2px;
+                background: #2a6f97;
+            }
+            .ai-block {
+                background: #f7fafc;
+                border: 1px solid #eef2f6;
+                box-shadow: none;
+            }
+            .ai-side .ai-block {
+                background: #16324a;
+                border: none;
+                border-left: none;
+            }
+            .ai-side .ai-block-title { color: #ffffff; }
+            .ai-side .ai-block-content { color: #d5e3ef; }
+            .ai-side .ai-block .cite { color: #8fbcdb; }
+
+            /* 行业子页签：描边药丸组 */
+            .ind-tab {
+                background: #ffffff;
+                border-color: #dde5ec;
+            }
+            .ind-tab:hover { background: #f2f7fb; }
+            .ind-tab.active { background: #1e7f9e; border-color: #1e7f9e; }
+
+            /* 公司目录：浅灰内嵌卡 */
+            .company-directory {
+                background: #f7fafc;
+                border-color: #e3e9f0;
+            }
+
+            /* 市场动向：浅灰内嵌卡 */
+            .market-block {
+                background: #f8fafc;
+                border-color: #d7e0e9;
+            }
+
+            /* 运行统计与页脚 */
+            .run-stats {
+                background: #ffffff;
+                border: 1px solid #e3e9f0;
+                border-radius: 14px;
+                padding: 16px 20px;
+            }
+            .footer {
+                background: transparent;
+                border-top: none;
+                padding: 8px 0 0 0;
+            }
+
+            /* ── v2 暗色模式适配 ── */
+            body.dark-mode { background: #0e161f; }
+            body.dark-mode .container { background: transparent; box-shadow: none; }
+            body.dark-mode .header,
+            body.dark-mode .metric-card,
+            body.dark-mode .zone,
+            body.dark-mode .zone-company,
+            body.dark-mode .zone-industry,
+            body.dark-mode .ai-section,
+            body.dark-mode .run-stats {
+                background: #16202c;
+                border-color: #26364a;
+            }
+            body.dark-mode .header-title,
+            body.dark-mode .metric-value,
+            body.dark-mode .zone-industry .zone-title,
+            body.dark-mode .zone-company .zone-title,
+            body.dark-mode .ai-section-title { color: #e2e8f0; }
+            body.dark-mode .header-sub, body.dark-mode .metric-label,
+            body.dark-mode .metric-unit, body.dark-mode .legend-line { color: #64798c; }
+            body.dark-mode .headline-card {
+                background: #14273a;
+                border-color: #26364a;
+                color: #a4c6de;
+            }
+            body.dark-mode .save-btn, body.dark-mode .toggle-wide-btn,
+            body.dark-mode .toggle-dark-btn, body.dark-mode .save-dropdown-trigger {
+                background: #16202c;
+                border-color: #26364a;
+                color: #a4c3dc;
+            }
+            body.dark-mode .zone-header { border-bottom-color: #26364a; }
+            body.dark-mode .ai-block { background: #1b2836; border-color: #26364a; }
+            body.dark-mode .ai-side .ai-block { background: #12395c; }
+            body.dark-mode .ind-tab { background: #16202c; border-color: #26364a; }
+            body.dark-mode .company-directory { background: #121a24; border-color: #26364a; }
+            body.dark-mode .market-block { background: #121a24; border-color: #2b4a63; }
+            body.dark-mode .search-input { background: #16202c; border-color: #26364a; }
+            body.dark-mode .footer { background: transparent; border-top: none; }
         </style>
     </head>
     <body>
@@ -2436,12 +2690,16 @@ def render_html_content(
     else:
         mode_display = "全天汇总"
 
-    # ── 读者视角页头 ──
-    # 副标题：报告类型 + 生成时间
+    # ── 读者视角页头（卡片化设计）──
     html += f"""
                 <div class="header-sub">{mode_display} · {now.strftime("%m-%d %H:%M")} 生成</div>"""
 
-    # 一句话总研判（取 AI 核心研判的第一行）
+    html += """
+            </div>
+
+            <div class="content">"""
+
+    # 一句话总研判（取 AI 行业研判的第一行，独立强调卡）
     headline = ""
     if ai_analysis is not None and getattr(ai_analysis, "success", False):
         core_text = (getattr(ai_analysis, "core_trends", "") or "").strip()
@@ -2451,9 +2709,9 @@ def render_html_content(
                 headline = headline[:90] + "…"
     if headline:
         html += f"""
-                <div class="header-headline">「{html_escape(headline)}」</div>"""
+                <div class="headline-card">「{html_escape(headline)}」</div>"""
 
-    # 今日概览（读者关心的数字：几个行业方向、几家客户、共几条精选）
+    # 大数字指标卡行（读者关心的数字）
     def _hdr_is_company(cat):
         return bool(cat) and any(h in cat for h in ("公司", "客户", "监控"))
 
@@ -2466,25 +2724,27 @@ def render_html_content(
     total_picked = sum(s_["count"] for s_ in active_stats_hdr)
     new_count = report_data.get("total_new_count", 0)
 
-    quick_parts = []
-    if industry_updates:
-        quick_parts.append(f'<span class="hq-item">📡 行业动态 <b>{industry_updates}</b> 组更新</span>')
-    if company_updates:
-        quick_parts.append(f'<span class="hq-item">🏢 客户动态 <b>{company_updates}</b> 家</span>')
-    quick_parts.append(f'<span class="hq-item">📰 精选 <b>{total_picked}</b> 条</span>')
+    metric_cards = [
+        ("行业动态", industry_updates, "组更新"),
+        ("客户动态", company_updates, "家"),
+        ("精选资讯", total_picked, "条"),
+    ]
     if new_count:
-        quick_parts.append(f'<span class="hq-item">🆕 新增 <b>{new_count}</b> 条</span>')
-    html += f"""
-                <div class="header-quickstats">{"".join(quick_parts)}</div>"""
-
-    # 标注图例：来源旁数字的含义（放在页面最开头）
+        metric_cards.append(("本次新增", new_count, "条"))
     html += """
-                <div class="header-legend">标注说明：<b>#n</b>＝该平台热榜排名（颜色越深越靠前，区间为当日波动）· <b>n次</b>＝当日累计上榜次数 · <b>RSS</b>＝订阅源文章（附摘要，点击展开）</div>"""
-
+                <div class="metric-row">"""
+    for m_label, m_value, m_unit in metric_cards:
+        html += f"""
+                    <div class="metric-card">
+                        <div class="metric-label">{m_label}</div>
+                        <div class="metric-value">{m_value}<span class="metric-unit">{m_unit}</span></div>
+                    </div>"""
     html += """
-            </div>
+                </div>"""
 
-            <div class="content">"""
+    # 标注图例（页面最开头的读法说明）
+    html += """
+                <div class="legend-line">标注说明：<b>#n</b>＝该平台热榜排名（颜色越深越靠前，区间为当日波动）· <b>n次</b>＝当日累计上榜次数 · <b>RSS</b>＝订阅源文章（附摘要，点击展开）· <b>[n]</b>＝引用角标，悬停看标题与信源</div>"""
 
     # ── 运维指标（挪到页面底部展示） ──
     # 只统计热榜条目（RSS 已并入 stats，需排除，避免出现 12/9 这种口径错位）
