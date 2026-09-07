@@ -20,6 +20,105 @@ from trendradar.utils.time import convert_time_for_display
 from trendradar.ai.formatter import render_ai_analysis_html_rich
 
 
+def _render_cfo_signal_radar(ai_analysis: Any, stats: List[Dict]) -> str:
+    """渲染 CFO 商业信号 Top 5；旧报告没有该字段时静默降级。"""
+    if not ai_analysis or not getattr(ai_analysis, "success", False):
+        return ""
+    signals = getattr(ai_analysis, "cfo_top_signals", None) or []
+    if not signals:
+        return ""
+
+    all_titles = [title for stat in stats for title in stat.get("titles", [])]
+
+    def _find_evidence(title_texts: List[str]) -> List[Dict]:
+        matched = []
+        used_ids = set()
+        for expected in title_texts:
+            item = next(
+                (
+                    title for title in all_titles
+                    if id(title) not in used_ids and title.get("title") == expected
+                ),
+                None,
+            )
+            if item is None:
+                item = next(
+                    (
+                        title for title in all_titles
+                        if id(title) not in used_ids
+                        and _titles_similar(title.get("title", ""), expected)
+                    ),
+                    None,
+                )
+            if item is not None:
+                used_ids.add(id(item))
+                matched.append(item)
+        return matched
+
+    items_html = ""
+    for index, signal in enumerate(signals[:5], 1):
+        if not isinstance(signal, dict):
+            continue
+        subject = str(signal.get("subject", "")).strip()
+        summary = str(signal.get("summary", "")).strip()
+        relevance = str(signal.get("cfo_relevance", "")).strip()
+        if not (subject and summary and relevance):
+            continue
+        try:
+            score = max(0, min(100, int(signal.get("score", 0))))
+        except (TypeError, ValueError):
+            score = 0
+        score_class = "high" if score >= 80 else ("medium" if score >= 65 else "base")
+        direction = str(signal.get("direction", "观察"))
+        direction_class = {"机会": "opportunity", "风险": "risk"}.get(direction, "watch")
+        event_type = str(signal.get("event_type", "其他"))
+
+        cites = ""
+        evidence = _find_evidence(signal.get("titles") or [])
+        for cite_index, title in enumerate(evidence, 1):
+            link = title.get("mobile_url") or title.get("url", "")
+            tip = f"{title.get('title', '')} ｜ {title.get('source_name', '')}"
+            if link:
+                cites += (
+                    f'<a class="cfo-cite" href="{html_escape(link)}" target="_blank" '
+                    f'title="{html_escape(tip)}">[{cite_index}]</a>'
+                )
+            else:
+                cites += f'<span class="cfo-cite" title="{html_escape(tip)}">[{cite_index}]</span>'
+
+        items_html += f"""
+                    <article class="cfo-signal">
+                        <div class="cfo-rank">{index:02d}</div>
+                        <div class="cfo-signal-main">
+                            <div class="cfo-signal-meta">
+                                <span class="cfo-subject">{html_escape(subject)}</span>
+                                <span class="cfo-event-tag">{html_escape(event_type)}</span>
+                                <span class="cfo-direction {direction_class}">{html_escape(direction)}</span>
+                            </div>
+                            <div class="cfo-summary">{html_escape(summary)}{cites}</div>
+                            <div class="cfo-impact"><span>CFO 影响</span>{html_escape(relevance)}</div>
+                        </div>
+                        <div class="cfo-score {score_class}" title="商业相关度综合评分，不代表新闻热度">
+                            <strong>{score}</strong><span>/100</span>
+                        </div>
+                    </article>"""
+
+    if not items_html:
+        return ""
+    return f"""
+                <section class="cfo-radar" aria-label="CFO 商业信号排行榜">
+                    <div class="cfo-radar-header">
+                        <div>
+                            <div class="cfo-radar-kicker">CFO · TOP {min(len(signals), 5)}</div>
+                            <div class="cfo-radar-title">今日商业信号</div>
+                        </div>
+                        <div class="cfo-radar-note">综合收入影响、采购意图、紧迫性、可信度与新颖性排序</div>
+                    </div>
+                    <div class="cfo-signal-list">{items_html}
+                    </div>
+                </section>"""
+
+
 # 订阅管理面板样式（仅用于独立管理页面 output/html/manager.html）
 _CM_CSS = """
             /* ===== 订阅管理面板 ===== */
@@ -2557,6 +2656,75 @@ def render_html_content(
                 color: #8494a6;
                 margin-left: 5px;
             }
+
+            /* CFO 轻量机会雷达：把商业价值放在新闻数量之前 */
+            .cfo-radar {
+                background: #ffffff;
+                border: 1px solid #dbe5ee;
+                border-radius: 14px;
+                margin-bottom: 14px;
+                overflow: hidden;
+            }
+            .cfo-radar-header {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                gap: 20px;
+                padding: 17px 20px 14px;
+                background: linear-gradient(110deg, #edf5fb 0%, #f8fbfd 70%);
+                border-bottom: 1px solid #e3ebf2;
+            }
+            .cfo-radar-kicker {
+                color: #2a6f97;
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 0.14em;
+                margin-bottom: 3px;
+            }
+            .cfo-radar-title { color: #172c3e; font-size: 17px; font-weight: 750; }
+            .cfo-radar-note {
+                color: #7b8d9d;
+                font-size: 11px;
+                line-height: 1.45;
+                max-width: 420px;
+                text-align: right;
+            }
+            .cfo-signal { display: grid; grid-template-columns: 32px minmax(0, 1fr) 62px; gap: 12px; padding: 13px 20px; border-bottom: 1px solid #edf1f5; }
+            .cfo-signal:last-child { border-bottom: none; }
+            .cfo-rank { color: #9aabba; font: 700 11px/1.6 'SF Mono', Consolas, monospace; padding-top: 2px; }
+            .cfo-signal-main { min-width: 0; }
+            .cfo-signal-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+            .cfo-subject { color: #20384b; font-size: 13px; font-weight: 750; }
+            .cfo-event-tag, .cfo-direction {
+                border-radius: 4px;
+                padding: 2px 6px;
+                font-size: 10px;
+                font-weight: 650;
+                line-height: 1.4;
+            }
+            .cfo-event-tag { color: #45677f; background: #edf3f7; }
+            .cfo-direction.opportunity { color: #195e86; background: #dcecf6; }
+            .cfo-direction.risk { color: #50657a; background: #e5eaf0; }
+            .cfo-direction.watch { color: #64798c; background: #f0f3f6; }
+            .cfo-summary { color: #263b4c; font-size: 13px; line-height: 1.55; }
+            .cfo-impact { color: #718395; font-size: 11.5px; line-height: 1.5; margin-top: 3px; }
+            .cfo-impact span { color: #2a6f97; font-weight: 700; margin-right: 7px; }
+            .cfo-cite { color: #2a6f97; font-size: 10px; margin-left: 4px; text-decoration: none; vertical-align: 1px; }
+            .cfo-cite:hover { text-decoration: underline; }
+            .cfo-score {
+                align-self: center;
+                justify-self: end;
+                width: 58px;
+                border-radius: 9px;
+                padding: 7px 4px;
+                text-align: center;
+                background: #eef3f7;
+                color: #627789;
+            }
+            .cfo-score strong { display: block; font-size: 18px; line-height: 1; }
+            .cfo-score span { display: block; font-size: 8px; margin-top: 3px; opacity: 0.72; }
+            .cfo-score.medium { background: #dceaf4; color: #255f85; }
+            .cfo-score.high { background: #174e7c; color: #ffffff; }
             .legend-line {
                 font-size: 11px;
                 color: #93a3b4;
@@ -2669,6 +2837,7 @@ def render_html_content(
             body.dark-mode .container { background: transparent; box-shadow: none; }
             body.dark-mode .header,
             body.dark-mode .metric-card,
+            body.dark-mode .cfo-radar,
             body.dark-mode .zone,
             body.dark-mode .zone-company,
             body.dark-mode .zone-industry,
@@ -2684,6 +2853,19 @@ def render_html_content(
             body.dark-mode .ai-section-title { color: #e2e8f0; }
             body.dark-mode .header-sub, body.dark-mode .metric-label,
             body.dark-mode .metric-unit, body.dark-mode .legend-line { color: #64798c; }
+            body.dark-mode .cfo-radar-header { background: #14273a; border-bottom-color: #26364a; }
+            body.dark-mode .cfo-radar-title, body.dark-mode .cfo-subject,
+            body.dark-mode .cfo-summary { color: #dbe7f0; }
+            body.dark-mode .cfo-radar-note, body.dark-mode .cfo-impact,
+            body.dark-mode .cfo-rank { color: #71879a; }
+            body.dark-mode .cfo-signal { border-bottom-color: #26364a; }
+            body.dark-mode .cfo-event-tag { background: #223547; color: #a4bdd0; }
+            body.dark-mode .cfo-direction.opportunity { background: #164666; color: #b9d8eb; }
+            body.dark-mode .cfo-direction.risk { background: #2c3b4a; color: #b8c7d4; }
+            body.dark-mode .cfo-direction.watch { background: #22303e; color: #91a5b6; }
+            body.dark-mode .cfo-score { background: #223547; color: #a4bdd0; }
+            body.dark-mode .cfo-score.medium { background: #204c69; color: #c3ddec; }
+            body.dark-mode .cfo-score.high { background: #2a6f97; color: #ffffff; }
             body.dark-mode .headline-card {
                 background: #14273a;
                 border-color: #26364a;
@@ -2703,6 +2885,14 @@ def render_html_content(
             body.dark-mode .market-block { background: #121a24; border-color: #2b4a63; }
             body.dark-mode .search-input { background: #16202c; border-color: #26364a; }
             body.dark-mode .footer { background: transparent; border-top: none; }
+
+            @media (max-width: 600px) {
+                .cfo-radar-header { align-items: flex-start; flex-direction: column; gap: 5px; }
+                .cfo-radar-note { text-align: left; }
+                .cfo-signal { grid-template-columns: 24px minmax(0, 1fr) 50px; gap: 8px; padding: 12px 14px; }
+                .cfo-score { width: 48px; }
+                .cfo-score strong { font-size: 16px; }
+            }
         </style>
     </head>
     <body>
@@ -2790,6 +2980,9 @@ def render_html_content(
                     </div>"""
     html += """
                 </div>"""
+
+    # CFO 轻量机会雷达：AI 未返回新字段时不展示，兼容历史报告与旧模型响应。
+    html += _render_cfo_signal_radar(ai_analysis, report_data["stats"])
 
     # 标注图例（页面最开头的读法说明）
     html += """

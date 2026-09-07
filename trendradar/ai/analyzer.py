@@ -27,6 +27,7 @@ class AIAnalysisResult:
     industry_summaries: Dict[str, str] = field(default_factory=dict)   # （旧版兼容）行业区关键词聚类总结
     industry_clusters: List[Dict] = field(default_factory=list)         # 行业区按公司主体聚合 [{group, company, summary, titles}]
     industry_level_summaries: Dict[str, str] = field(default_factory=dict)  # 产业层级总结 {"层级名": 2-3句}
+    cfo_top_signals: List[Dict] = field(default_factory=list)           # CFO 商业信号 Top 5
 
     # 基础元数据
     raw_response: str = ""               # 原始响应
@@ -705,6 +706,48 @@ class AIAnalyzer:
                 if isinstance(level_summaries, dict)
                 else {}
             )
+            # CFO 轻量机会雷达：仅保留结构完整、评分有效的前 5 条，
+            # 并在本地重新排序，避免依赖模型输出顺序。
+            allowed_event_types = {
+                "招标采购", "预算资本开支", "项目扩建", "合作签约", "产品技术",
+                "经营财务", "融资并购", "政策监管", "供应链价格", "竞争风险", "其他",
+            }
+            allowed_directions = {"机会", "风险", "观察"}
+            parsed_cfo_signals = []
+            raw_cfo_signals = data.get("cfo_top_signals")
+            if isinstance(raw_cfo_signals, list):
+                for signal in raw_cfo_signals:
+                    if not isinstance(signal, dict):
+                        continue
+                    subject = str(signal.get("subject", "")).strip()
+                    summary = str(signal.get("summary", "")).strip()
+                    relevance = str(signal.get("cfo_relevance", "")).strip()
+                    if not (subject and summary and relevance):
+                        continue
+                    try:
+                        score = int(float(signal.get("score", 0)))
+                    except (TypeError, ValueError):
+                        continue
+                    score = max(0, min(100, score))
+                    event_type = str(signal.get("event_type", "其他")).strip()
+                    if event_type not in allowed_event_types:
+                        event_type = "其他"
+                    direction = str(signal.get("direction", "观察")).strip()
+                    if direction not in allowed_directions:
+                        direction = "观察"
+                    titles = signal.get("titles", [])
+                    parsed_cfo_signals.append({
+                        "subject": subject,
+                        "event_type": event_type,
+                        "direction": direction,
+                        "score": score,
+                        "summary": summary,
+                        "cfo_relevance": relevance,
+                        "titles": [str(t) for t in titles if t] if isinstance(titles, list) else [],
+                    })
+            result.cfo_top_signals = sorted(
+                parsed_cfo_signals, key=lambda item: item["score"], reverse=True
+            )[:5]
             result.sentiment_controversy = data.get("sentiment_controversy", "")
             result.signals = data.get("signals", "")
             result.rss_insights = data.get("rss_insights", "")
