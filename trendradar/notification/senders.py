@@ -18,11 +18,12 @@
 import smtplib
 import time
 import json
+import re
 from datetime import datetime
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.utils import formataddr, formatdate, make_msgid
+from email.utils import formataddr, formatdate, make_msgid, parseaddr
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional
 from urllib.parse import urlparse
@@ -585,6 +586,27 @@ def send_to_telegram(
     return True
 
 
+def _parse_email_recipients(value: str) -> tuple[list[str], int]:
+    """兼容常见分隔符；不把空项或格式错误的地址交给 SMTP。"""
+    recipients = []
+    invalid = 0
+    seen = set()
+    for part in re.split(r"[,;，；\r\n]+", value or ""):
+        candidate = part.strip().strip("\"'")
+        if not candidate:
+            continue
+        if candidate.lower().startswith("mailto:"):
+            candidate = candidate[7:]
+        address = parseaddr(candidate)[1] if "<" in candidate else candidate
+        if not re.fullmatch(r"[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+", address):
+            invalid += 1
+            continue
+        if address.casefold() not in seen:
+            recipients.append(address)
+            seen.add(address.casefold())
+    return recipients, invalid
+
+
 def send_to_email(
     from_email: str,
     password: str,
@@ -657,7 +679,9 @@ def send_to_email(
         msg["From"] = formataddr((sender_name, from_email))
 
         # 设置收件人
-        recipients = [addr.strip() for addr in to_email.split(",") if addr.strip()]
+        recipients, invalid_count = _parse_email_recipients(to_email)
+        if invalid_count:
+            print(f"[邮件] 忽略 {invalid_count} 个格式不正确的收件人配置项（地址不写入日志）")
         if not recipients:
             print("邮件发送失败：未配置有效收件人地址")
             return False
@@ -728,7 +752,8 @@ TrendRadar 热点分析报告
         print(f"详细错误: {str(e)}")
         return False
     except smtplib.SMTPRecipientsRefused as e:
-        print(f"邮件发送失败：收件人地址被拒绝 {e}")
+        codes = sorted({code for code, _ in e.recipients.values()})
+        print(f"邮件发送失败：SMTP 拒绝收件人（状态码 {codes}；地址不写入日志）")
         return False
     except smtplib.SMTPSenderRefused as e:
         print(f"邮件发送失败：发件人地址被拒绝 {e}")

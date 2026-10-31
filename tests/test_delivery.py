@@ -5,10 +5,17 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from trendradar.ai.client import AIClient
-from trendradar.notification.senders import send_to_email
+from trendradar.notification.senders import _parse_email_recipients, send_to_email
 
 
 class DeliveryTests(unittest.TestCase):
+    def test_recipient_parser_accepts_common_separators_and_reports_invalid(self):
+        addresses, invalid = _parse_email_recipients(
+            '"a@example.com"; b@example.com，c@example.com\nnot-an-email;'
+        )
+        self.assertEqual(addresses, ["a@example.com", "b@example.com", "c@example.com"])
+        self.assertEqual(invalid, 1)
+
     def test_trailing_comma_does_not_create_empty_smtp_recipient(self):
         with tempfile.TemporaryDirectory() as directory:
             report = Path(directory) / "report.html"
