@@ -917,7 +917,9 @@ class NewsAnalyzer:
                     date_str = self.ctx.format_date()
                     scheduler.record_execution(schedule.period_key, "push", date_str)
 
-            return True
+            if os.environ.get("SCHEDULE_PRESET") == "preview_24h":
+                return bool(results.get("email"))
+            return any(results.values())
 
         elif cfg["ENABLE_NOTIFICATION"] and not has_notification:
             print("⚠️ 警告：通知功能已启用但未配置任何通知渠道，将跳过通知发送")
@@ -1682,11 +1684,16 @@ class NewsAnalyzer:
             print(f"HTML报告已生成: {html_file}")
             print(f"最新报告已更新: output/html/latest/{self.report_mode}.html")
 
+        strict_preview = os.environ.get("SCHEDULE_PRESET") == "preview_24h"
+        if strict_preview and (not ai_result or not ai_result.success):
+            print("[预览] AI 研判未生成，停止邮件发送并将本次运行标记为失败")
+            raise SystemExit(1)
+
         # 发送通知
         if mode_strategy["should_send_notification"]:
             # standalone_data 已在分析流水线中翻译，直接复用（不再重新 prepare 原文，
             # 避免覆盖译文、避免重复翻译，并保证网页报告与推送译文一致）
-            self._send_notification_if_needed(
+            delivered = self._send_notification_if_needed(
                 stats,
                 mode_strategy["report_type"],
                 self.report_mode,
@@ -1701,6 +1708,9 @@ class NewsAnalyzer:
                 current_results=results,
                 schedule=schedule,
             )
+            if strict_preview and not delivered:
+                print("[预览] 邮件未发送成功，将本次运行标记为失败")
+                raise SystemExit(1)
 
         # 打开浏览器（仅在非容器环境）
         if self._should_open_browser() and html_file:

@@ -657,7 +657,10 @@ def send_to_email(
         msg["From"] = formataddr((sender_name, from_email))
 
         # 设置收件人
-        recipients = [addr.strip() for addr in to_email.split(",")]
+        recipients = [addr.strip() for addr in to_email.split(",") if addr.strip()]
+        if not recipients:
+            print("邮件发送失败：未配置有效收件人地址")
+            return False
         if len(recipients) == 1:
             msg["To"] = recipients[0]
         else:
@@ -688,7 +691,7 @@ TrendRadar 热点分析报告
         html_part = MIMEText(html_content, "html", "utf-8")
         msg.attach(html_part)
 
-        print(f"正在发送邮件到 {to_email}...")
+        print(f"正在发送邮件（{len(recipients)} 位收件人）...")
         print(f"SMTP 服务器: {smtp_server}:{smtp_port}")
         print(f"发件人: {from_email}")
 
@@ -710,10 +713,10 @@ TrendRadar 热点分析报告
             server.login(from_email, password)
 
             # 发送邮件
-            server.send_message(msg)
+            server.send_message(msg, to_addrs=recipients)
             server.quit()
 
-            print(f"邮件发送成功 [{report_type}] -> {to_email}")
+            print(f"邮件发送成功 [{report_type}]（{len(recipients)} 位收件人）")
             return True
 
         except smtplib.SMTPServerDisconnected:
