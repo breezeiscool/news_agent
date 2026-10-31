@@ -85,6 +85,12 @@ class AIClient:
         if max_tokens and max_tokens > 0:
             params["max_tokens"] = max_tokens
 
+        # DeepSeek V4 默认开启高强度思考；长篇日报容易在输出额度内只产生
+        # reasoning_content 而没有最终正文。此处是资讯整理，不需要思考模式。
+        if self.model.startswith("deepseek/deepseek-v4-"):
+            params["reasoning_effort"] = "none"
+            params["extra_body"] = {"thinking": {"type": "disabled"}}
+
         # 添加 fallback 模型（如果配置了）
         if self.fallback_models:
             params["fallbacks"] = self.fallback_models
@@ -104,6 +110,15 @@ class AIClient:
             content = "\n".join(
                 item.get("text", str(item)) if isinstance(item, dict) else str(item)
                 for item in content
+            )
+        if not content or not content.strip():
+            choice = response.choices[0]
+            usage = getattr(response, "usage", None)
+            completion_tokens = getattr(usage, "completion_tokens", None)
+            print(
+                "[AI] 模型返回空正文："
+                f"finish_reason={getattr(choice, 'finish_reason', 'unknown')}, "
+                f"completion_tokens={completion_tokens}"
             )
         return content or ""
 

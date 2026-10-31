@@ -59,7 +59,7 @@ China Merchants Bank
 /交行(?![业动驶])/ => 交行
 Bank of Communications
 
-[中信]
+[中信集团]
 中信集团
 中信股份
 中信泰富
