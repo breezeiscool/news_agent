@@ -7,6 +7,7 @@ AI 分析器模块
 """
 
 import json
+from collections import OrderedDict, deque
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, NamedTuple, Optional
 
@@ -28,6 +29,7 @@ class AIAnalysisResult:
     industry_clusters: List[Dict] = field(default_factory=list)         # 行业区按公司主体聚合 [{group, company, summary, titles}]
     industry_level_summaries: Dict[str, str] = field(default_factory=dict)  # 产业层级总结 {"层级名": 2-3句}
     cfo_top_signals: List[Dict] = field(default_factory=list)           # CFO 商业信号 Top 5
+    company_summaries: List[Dict] = field(default_factory=list)          # 有动态公司的逐公司摘要与证据
 
     # 基础元数据
     raw_response: str = ""               # 原始响应
@@ -57,6 +59,8 @@ class PreparedNewsContent(NamedTuple):
     analyzed_count: int
     hotlist_analyzed: int
     rss_analyzed: int
+    selected_hotlist_stats: List[Dict]
+    selected_rss_stats: List[Dict]
 
 
 class AIAnalyzer:
@@ -193,7 +197,9 @@ class AIAnalyzer:
         user_prompt = user_prompt.replace("{rss_content}", prepared.rss_content)
         user_prompt = user_prompt.replace("{language}", self.language)
         user_prompt = user_prompt.replace(
-            "{industry_clusters}", self._prepare_industry_clusters(stats, rss_stats)
+            "{industry_clusters}", self._prepare_industry_clusters(
+                prepared.selected_hotlist_stats, prepared.selected_rss_stats
+            )
         )
 
         # 构建独立展示区内容
@@ -238,6 +244,11 @@ class AIAnalyzer:
             if not self.include_standalone:
                 result.standalone_summaries = {}
 
+            # 仅让有原文证据的结构化条目进入网页，避免模型生成的标题无法回溯。
+            self._validate_evidence(
+                result, prepared.selected_hotlist_stats, prepared.selected_rss_stats
+            )
+
             # 填充统计数据
             result.total_news = total_news
             result.hotlist_count = prepared.hotlist_total
@@ -263,6 +274,62 @@ class AIAnalyzer:
                 success=False,
                 error=friendly_msg
             )
+
+    @staticmethod
+    def _validate_evidence(
+        result: AIAnalysisResult,
+        selected_hotlist_stats: List[Dict],
+        selected_rss_stats: List[Dict],
+    ) -> None:
+        """只保留输入中真实存在的标题和公司组；无证据的信号不展示。"""
+        selected = selected_hotlist_stats + selected_rss_stats
+        all_titles = {
+            title.get("title", "")
+            for stat in selected
+            for title in stat.get("titles", [])
+            if isinstance(title, dict) and title.get("title")
+        }
+        company_titles = {}
+        industry_titles = {}
+        for stat in selected:
+            category = stat.get("category") or ""
+            target = company_titles if any(part in category for part in ("公司", "客户", "监控")) else industry_titles
+            target.setdefault(stat.get("word"), set()).update(
+                title.get("title") for title in stat.get("titles", [])
+                if isinstance(title, dict) and title.get("title")
+            )
+
+        validated_companies = []
+        seen_companies = set()
+        for item in result.company_summaries:
+            company = item["company"]
+            if company in seen_companies:
+                continue
+            titles = [title for title in item["titles"] if title in company_titles.get(company, set())]
+            if titles:
+                validated_companies.append({**item, "titles": list(dict.fromkeys(titles))})
+                seen_companies.add(company)
+        result.company_summaries = validated_companies
+
+        all_industry_titles = set().union(*industry_titles.values()) if industry_titles else set()
+        validated_clusters = []
+        for cluster in result.industry_clusters:
+            allowed = all_industry_titles if cluster.get("section") == "market" else industry_titles.get(cluster.get("group"), set())
+            titles = [title for title in cluster.get("titles", []) if title in allowed]
+            if titles:
+                validated_clusters.append({**cluster, "titles": list(dict.fromkeys(titles))})
+        result.industry_clusters = validated_clusters
+        result.industry_level_summaries = {
+            group: summary for group, summary in result.industry_level_summaries.items()
+            if group in industry_titles
+        }
+
+        validated_signals = []
+        for item in result.cfo_top_signals:
+            titles = [title for title in item["titles"] if title in all_titles]
+            if titles:
+                validated_signals.append({**item, "titles": list(dict.fromkeys(titles))})
+        result.cfo_top_signals = validated_signals[:5]
 
     def _prepare_industry_clusters(
         self,
@@ -308,117 +375,101 @@ class AIAnalyzer:
         stats: List[Dict],
         rss_stats: Optional[List[Dict]] = None,
     ) -> PreparedNewsContent:
+        hotlist_total = sum(len(s.get("titles", [])) for s in stats or [])
+        rss_total = sum(len(s.get("titles", [])) for s in rss_stats or [])
+
+        def is_company(category: str) -> bool:
+            return any(part in (category or "") for part in ("公司", "客户", "监控"))
+
+        # 四条轮转队列使公司/行业、热榜/RSS 都有进入分析的机会；
+        # 每组逐轮取一条，避免首个高频公司耗尽整轮配额。
+        lanes = {key: OrderedDict() for key in (
+            "company_hot", "company_rss", "industry_hot", "industry_rss"
+        )}
+        for source_kind, stat_list in (("hot", stats or []), ("rss", rss_stats or [])):
+            if source_kind == "rss" and not self.include_rss:
+                continue
+            for stat in stat_list:
+                word = stat.get("word", "")
+                if not word:
+                    continue
+                key = f"{'company' if is_company(stat.get('category')) else 'industry'}_{source_kind}"
+                group = (stat.get("category") or "", word)
+                queue = lanes[key].setdefault(group, deque())
+                queue.extend(t for t in stat.get("titles", []) if isinstance(t, dict) and t.get("title"))
+
+        selected = {"hot": OrderedDict(), "rss": OrderedDict()}
+        seen_titles = set()
+        lane_order = ("company_hot", "industry_rss", "company_rss", "industry_hot")
+        while len(seen_titles) < self.max_news and any(lanes.values()):
+            progressed = False
+            for lane in lane_order:
+                if not lanes[lane]:
+                    continue
+                group, queue = lanes[lane].popitem(last=False)
+                while queue:
+                    item = queue.popleft()
+                    normalized = " ".join(item["title"].casefold().split())
+                    # 同一篇文章在不同监控公司/产业层级下可分别提供证据；
+                    # 只在同一个词组内合并热榜和 RSS 的重复标题。
+                    dedupe_key = (group, normalized)
+                    if dedupe_key in seen_titles:
+                        continue
+                    seen_titles.add(dedupe_key)
+                    kind = "rss" if lane.endswith("rss") else "hot"
+                    selected[kind].setdefault(group, []).append(item)
+                    progressed = True
+                    break
+                if queue:
+                    lanes[lane][group] = queue
+                if len(seen_titles) >= self.max_news:
+                    break
+            if not progressed:
+                break
+
+        def make_stats(kind):
+            return [
+                {"category": category, "word": word, "titles": titles}
+                for (category, word), titles in selected[kind].items()
+            ]
+
+        selected_hotlist_stats = make_stats("hot")
+        selected_rss_stats = make_stats("rss")
         news_lines = []
+        for stat in selected_hotlist_stats:
+            news_lines.append(f"\n**{stat['category']} / {stat['word']}**")
+            for item in stat["titles"]:
+                source = item.get("source_name") or item.get("source") or "未知来源"
+                line = f"- [{source}] {item['title']}"
+                if item.get("time_display"):
+                    line += f" | {item['time_display']}"
+                news_lines.append(line)
+
         rss_lines = []
-        news_count = 0
-        rss_count = 0
+        for stat in selected_rss_stats:
+            rss_lines.append(f"\n**{stat['category']} / {stat['word']}**")
+            for item in stat["titles"]:
+                source = item.get("source_name") or item.get("feed_name") or "未知来源"
+                line = f"- [{source}] {item['title']}"
+                if item.get("time_display"):
+                    line += f" | {item['time_display']}"
+                summary = (item.get("summary") or "").strip()
+                if summary and summary != item["title"]:
+                    line += f" | 摘要:{summary[:220]}"
+                rss_lines.append(line)
 
-        # 计算总新闻数
-        hotlist_total = sum(len(s.get("titles", [])) for s in stats) if stats else 0
-        rss_total = sum(len(s.get("titles", [])) for s in rss_stats) if rss_stats else 0
-
-        # 热榜内容
-        if stats:
-            for stat in stats:
-                word = stat.get("word", "")
-                titles = stat.get("titles", [])
-                if word and titles:
-                    news_lines.append(f"\n**{word}** ({len(titles)}条)")
-                    for t in titles:
-                        if not isinstance(t, dict):
-                            continue
-                        title = t.get("title", "")
-                        if not title:
-                            continue
-
-                        # 来源
-                        source = t.get("source_name", t.get("source", ""))
-
-                        # 构建行
-                        if source:
-                            line = f"- [{source}] {title}"
-                        else:
-                            line = f"- {title}"
-
-                        # 始终显示简化格式：排名范围 + 时间范围 + 出现次数
-                        ranks = t.get("ranks", [])
-                        if ranks:
-                            min_rank = min(ranks)
-                            max_rank = max(ranks)
-                            rank_str = f"{min_rank}" if min_rank == max_rank else f"{min_rank}-{max_rank}"
-                        else:
-                            rank_str = "-"
-
-                        first_time = t.get("first_time", "")
-                        last_time = t.get("last_time", "")
-                        time_str = self._format_time_range(first_time, last_time)
-
-                        appear_count = t.get("count", 1)
-
-                        line += f" | 排名:{rank_str} | 时间:{time_str} | 出现:{appear_count}次"
-
-                        # 开启完整时间线时，额外添加轨迹
-                        if self.include_rank_timeline:
-                            rank_timeline = t.get("rank_timeline", [])
-                            timeline_str = self._format_rank_timeline(rank_timeline)
-                            line += f" | 轨迹:{timeline_str}"
-
-                        news_lines.append(line)
-
-                        news_count += 1
-                        if news_count >= self.max_news:
-                            break
-                if news_count >= self.max_news:
-                    break
-
-        # RSS 内容（仅在启用时构建）
-        if self.include_rss and rss_stats:
-            remaining = self.max_news - news_count
-            for stat in rss_stats:
-                if rss_count >= remaining:
-                    break
-                word = stat.get("word", "")
-                titles = stat.get("titles", [])
-                if word and titles:
-                    rss_lines.append(f"\n**{word}** ({len(titles)}条)")
-                    for t in titles:
-                        if not isinstance(t, dict):
-                            continue
-                        title = t.get("title", "")
-                        if not title:
-                            continue
-
-                        # 来源
-                        source = t.get("source_name", t.get("feed_name", ""))
-
-                        # 发布时间
-                        time_display = t.get("time_display", "")
-
-                        # 构建行：[来源] 标题 | 发布时间
-                        if source:
-                            line = f"- [{source}] {title}"
-                        else:
-                            line = f"- {title}"
-                        if time_display:
-                            line += f" | {time_display}"
-                        rss_lines.append(line)
-
-                        rss_count += 1
-                        if rss_count >= remaining:
-                            break
-
-        news_content = "\n".join(news_lines) if news_lines else ""
-        rss_content = "\n".join(rss_lines) if rss_lines else ""
-        total_count = news_count + rss_count
-
+        hot_count = sum(len(s["titles"]) for s in selected_hotlist_stats)
+        rss_count = sum(len(s["titles"]) for s in selected_rss_stats)
         return PreparedNewsContent(
-            news_content=news_content,
-            rss_content=rss_content,
+            news_content="\n".join(news_lines),
+            rss_content="\n".join(rss_lines),
             hotlist_total=hotlist_total,
             rss_total=rss_total,
-            analyzed_count=total_count,
-            hotlist_analyzed=news_count,
+            analyzed_count=hot_count + rss_count,
+            hotlist_analyzed=hot_count,
             rss_analyzed=rss_count,
+            selected_hotlist_stats=selected_hotlist_stats,
+            selected_rss_stats=selected_rss_stats,
         )
 
     def _call_ai(self, user_prompt: str) -> str:
@@ -706,6 +757,22 @@ class AIAnalyzer:
                 if isinstance(level_summaries, dict)
                 else {}
             )
+            raw_company_summaries = data.get("company_summaries")
+            if isinstance(raw_company_summaries, list):
+                result.company_summaries = [
+                    {
+                        "company": item["company"].strip(),
+                        "summary": item["summary"].strip(),
+                        "titles": [title.strip() for title in item["titles"] if isinstance(title, str) and title.strip()],
+                    }
+                    for item in raw_company_summaries
+                    if isinstance(item, dict)
+                    and isinstance(item.get("company"), str)
+                    and isinstance(item.get("summary"), str)
+                    and isinstance(item.get("titles"), list)
+                    and item["company"].strip()
+                    and item["summary"].strip()
+                ]
             # CFO 轻量机会雷达：仅保留结构完整、评分有效的前 5 条，
             # 并在本地重新排序，避免依赖模型输出顺序。
             allowed_event_types = {

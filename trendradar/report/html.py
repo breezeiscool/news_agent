@@ -2893,6 +2893,78 @@ def render_html_content(
                 .cfo-score { width: 48px; }
                 .cfo-score strong { font-size: 16px; }
             }
+
+            /* 编辑台阅读密度：冷蓝系、统一基线、细分隔线。 */
+            body { background: #eef3f8; color: #1a3043; line-height: 1.5; }
+            body.wide-mode .container { max-width: 1280px; }
+            .header, .ai-section, .cfo-radar, .zone, .run-stats, .metric-card {
+                border-radius: 6px;
+                box-shadow: none;
+            }
+            .header {
+                border-top: 3px solid #153f65;
+                background: linear-gradient(115deg, #fff 0%, #f2f8fc 100%);
+                padding: 16px 20px;
+                margin-bottom: 12px;
+            }
+            .header-title { font-size: 19px; line-height: 1.35; }
+            .header-sub { line-height: 1.45; }
+            .ai-section, .zone, .run-stats { padding: 16px 20px; margin-bottom: 12px; }
+            .zone-industry { background: linear-gradient(180deg, #f2f8fc 0, #fff 76px); border-top: 3px solid #317390; }
+            .zone-company { background: linear-gradient(180deg, #f4f7fc 0, #fff 76px); border-top: 3px solid #315f8e; }
+            .zone-header { margin-bottom: 10px; padding-bottom: 8px; border-bottom-width: 1px; }
+            .zone-title { font-size: 16px; line-height: 1.4; }
+            .zone-meta { font-size: 11px; font-variant-numeric: tabular-nums; }
+            .word-group { margin-bottom: 16px; }
+            .word-header { margin-bottom: 4px; padding: 5px 0 7px; border-bottom-color: #dce6ef; }
+            .word-name { font-size: 14px; line-height: 1.4; color: #183a57; }
+            .word-count { font-size: 11px; font-variant-numeric: tabular-nums; }
+            .company-layout, body.wide-mode .company-layout { gap: 16px; }
+            .company-directory { border-radius: 4px; padding: 10px; }
+            .dir-item { border-radius: 3px; padding: 4px 7px; line-height: 1.4; font-size: 12px; }
+            .dir-note { line-height: 1.5; }
+            .news-item { align-items: flex-start; gap: 9px; padding: 7px 0; border-bottom-color: #e9eff4; }
+            .news-number { border-radius: 3px; width: 18px; height: 18px; min-width: 18px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+            .news-header { gap: 6px; margin-bottom: 2px; line-height: 1.35; }
+            .news-title, .news-link { font-size: 13px; line-height: 1.5; }
+            .news-link { color: #164f7b; }
+            .rss-summary, .ai-block-content, .cluster-sum, .level-sum,
+            .cfo-summary, .cfo-impact, .company-summary { line-height: 1.55; }
+            .rss-summary { margin-top: 3px; font-size: 12px; }
+            .cluster { padding: 8px 0; border-bottom-color: #dfe8f0; }
+            .cluster-hd { margin-bottom: 2px; line-height: 1.4; }
+            .cluster-sum { font-size: 12.5px; }
+            .level-sum { margin: 4px 0 8px; padding: 8px 11px; border-radius: 0 3px 3px 0; }
+            .cfo-signal { padding: 10px 18px; border-bottom-color: #e4ecf3; }
+            .cfo-radar-header { padding: 12px 18px 10px; }
+            .ind-tabbar { margin-bottom: 10px; }
+            .ind-tab { border-radius: 3px; padding: 5px 10px; line-height: 1.35; }
+            .company-summary {
+                display: block;
+                background: #edf4fa;
+                border-left: 3px solid #315f8e;
+                color: #24445f;
+                font-size: 12.5px;
+                padding: 8px 10px;
+                margin: 5px 0 3px;
+            }
+            .company-summary-label { color: #315f8e; font-size: 10px; font-weight: 700; letter-spacing: .05em; margin-right: 8px; white-space: nowrap; }
+            .company-summary .cites { margin-left: 6px; white-space: nowrap; }
+            .company-evidence { border-bottom: 1px solid #e9eff4; }
+            .company-evidence > summary { color: #55758f; cursor: pointer; font-size: 11px; line-height: 1.5; padding: 5px 0; user-select: none; }
+            .company-evidence > summary:hover { color: #164f7b; }
+            .word-group.collapsed > .company-summary,
+            .word-group.collapsed > .company-evidence { display: none; }
+            body.dark-mode .zone-industry { background: linear-gradient(180deg, #163042 0, #16202c 76px); border-top-color: #4b8ca8; }
+            body.dark-mode .zone-company { background: linear-gradient(180deg, #1b2d42 0, #16202c 76px); border-top-color: #5480aa; }
+            body.dark-mode .word-header, body.dark-mode .cluster, body.dark-mode .company-evidence { border-bottom-color: #294052; }
+            body.dark-mode .company-summary { background: #1b344b; color: #c9dce9; border-left-color: #6b9fc3; }
+            body.dark-mode .company-summary-label, body.dark-mode .company-evidence > summary { color: #9dc2db; }
+            @media (max-width: 600px) {
+                body { padding: 8px; }
+                .header, .ai-section, .zone, .run-stats { padding: 13px; }
+                .news-content, .news-item.new .news-content { padding-right: 25px; }
+            }
         </style>
     </head>
     <body>
@@ -3171,7 +3243,7 @@ def render_html_content(
                     </div>"""
         return item_html
 
-    def render_word_group(stat, extra_attr="", group_id=""):
+    def render_word_group(stat, extra_attr="", group_id="", company_summary=None):
         """渲染一个关键词组（组头 + 条目列表）"""
         count = stat["count"]
         if count >= 10:
@@ -3190,8 +3262,23 @@ def render_html_content(
                         </div>
                         <div class="word-index"><span class="collapse-icon">▼</span></div>
                     </div>"""
+        cited_items = []
+        if company_summary:
+            evidence_titles = set(company_summary.get("titles", []))
+            cited_items = [item for item in stat["titles"] if item.get("title") in evidence_titles]
+        if cited_items:
+            group_html += (
+                '<div class="company-summary">'
+                '<span class="company-summary-label">公司简报</span>'
+                f'<span>{html_escape(company_summary["summary"])}</span>'
+                f'<span class="cites">{build_cluster_cites(cited_items)}</span>'
+                '</div>'
+            )
+            group_html += f'<details class="company-evidence"><summary>查看原始资讯（{len(stat["titles"])} 条）</summary>'
         for j, title_data in enumerate(stat["titles"], 1):
             group_html += render_news_item(j, title_data)
+        if cited_items:
+            group_html += '</details>'
         group_html += """
                 </div>"""
         return group_html
@@ -3401,8 +3488,17 @@ def render_html_content(
                         </aside>
                         <div class="company-feed">"""
                     if cat_stats:
+                        company_summaries = {
+                            item.get("company"): item
+                            for item in (getattr(ai_analysis, "company_summaries", None) or [])
+                            if isinstance(item, dict)
+                        }
                         for k, s in enumerate(cat_stats):
-                            stats_html += render_word_group(s, group_id=f"company-grp-{zone_idx}-{k}")
+                            stats_html += render_word_group(
+                                s,
+                                group_id=f"company-grp-{zone_idx}-{k}",
+                                company_summary=company_summaries.get(s["word"]),
+                            )
                     else:
                         stats_html += """
                             <div class="zone-empty-feed">监控名单今日暂无资讯更新</div>"""
