@@ -3,7 +3,7 @@
 邮件专用 HTML 渲染模块（Outlook 安全极简版）
 
 设计目标（按用户要求）：
-1. 邮件正文只有三样东西：一句话研判 + 两段 AI 分区总结（行业动态 / 公司监控）
+1. 邮件正文只有三样东西：公司监控与行业交集两段 AI 总结 + 完整报告链接
    + 一个跳转完整网页报告的链接按钮；明细阅读全部发生在网页端。
 2. Outlook 桌面版使用 Word 渲染引擎，不支持 <style> 块 / flex / 渐变 /
    border-radius，且对特殊字符敏感——因此这里使用表格布局、全内联样式、
@@ -109,21 +109,21 @@ def render_email_html(
         + 'padding:22px 24px 18px 24px;">'
         '<div style="font-size:19px;font-weight:bold;color:#ffffff;">产业情报简报</div>'
         f'<div style="font-size:12px;color:#b7cbdc;padding-top:5px;">{mode_display} · {now.strftime("%Y-%m-%d %H:%M")} 生成'
-        f' · 行业动态 {industry_updates} 组 · 公司监控 {company_updates} 家 · 共 {total_picked} 条</div>'
+        f' · 公司监控 {company_updates} 家 · 行业交集 {industry_updates} 组 · 共 {total_picked} 条</div>'
         "</td></tr>"
     )
 
     if ai_ok and (core or company_sum):
         # 两段分区总结（各段第一行即本信息域的一句话研判，两域不混杂）
-        if core:
-            rows += (
-                f'<tr><td style="{_BLOCK_TITLE}">一、行业动态速览</td></tr>'
-                f'<tr><td style="{_BLOCK_TEXT}">{_fmt_ai(core)}</td></tr>'
-            )
         if company_sum:
             rows += (
-                f'<tr><td style="{_BLOCK_TITLE}">二、公司监控速览</td></tr>'
+                f'<tr><td style="{_BLOCK_TITLE}">一、重点公司动态</td></tr>'
                 f'<tr><td style="{_BLOCK_TEXT}">{_fmt_ai(company_sum)}</td></tr>'
+            )
+        if core:
+            rows += (
+                f'<tr><td style="{_BLOCK_TITLE}">二、AI 行业交集</td></tr>'
+                f'<tr><td style="{_BLOCK_TEXT}">{_fmt_ai(core)}</td></tr>'
             )
     else:
         # AI 未运行的降级：数字概览 + 前几条标题链接
@@ -133,6 +133,7 @@ def render_email_html(
             f"共有 {total_picked} 条更新，重点条目如下，完整内容请打开网页报告：</td></tr>"
         )
         ordered, _ = order_stats_by_category(active)
+        ordered.sort(key=lambda stat: not _is_company_cat(stat.get("category")))
         shown = 0
         list_html = ""
         for s in ordered:

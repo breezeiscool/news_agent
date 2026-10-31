@@ -102,13 +102,13 @@ def _render_ai_analysis_markdown_like(
 
     lines = ["**✨ AI 情报分析**", ""]
 
-    if result.core_trends:
-        lines.extend(["**今日核心研判**", _format_list_content(result.core_trends), ""])
-
     if result.sentiment_controversy:
         lines.extend(
             ["**客户与公司动态**", _format_list_content(result.sentiment_controversy), ""]
         )
+
+    if result.core_trends:
+        lines.extend(["**AI 行业交集**", _format_list_content(result.core_trends), ""])
 
     if result.signals:
         lines.extend(["**异动与弱信号**", _format_list_content(result.signals), ""])
@@ -159,11 +159,6 @@ def render_ai_analysis_dingtalk(result: AIAnalysisResult) -> str:
 
     lines = ["### ✨ AI 情报分析", ""]
 
-    if result.core_trends:
-        lines.extend(
-            ["#### 今日核心研判", _format_list_content(result.core_trends), ""]
-        )
-
     if result.sentiment_controversy:
         lines.extend(
             [
@@ -171,6 +166,11 @@ def render_ai_analysis_dingtalk(result: AIAnalysisResult) -> str:
                 _format_list_content(result.sentiment_controversy),
                 "",
             ]
+        )
+
+    if result.core_trends:
+        lines.extend(
+            ["#### AI 行业交集", _format_list_content(result.core_trends), ""]
         )
 
     if result.signals:
@@ -203,13 +203,13 @@ def render_ai_analysis_plain(result: AIAnalysisResult) -> str:
 
     lines = ["【✨ AI 情报分析】", ""]
 
-    if result.core_trends:
-        lines.extend(["[今日核心研判]", _format_list_content(result.core_trends), ""])
-
     if result.sentiment_controversy:
         lines.extend(
             ["[客户与公司动态]", _format_list_content(result.sentiment_controversy), ""]
         )
+
+    if result.core_trends:
+        lines.extend(["[AI 行业交集]", _format_list_content(result.core_trends), ""])
 
     if result.signals:
         lines.extend(["[异动与弱信号]", _format_list_content(result.signals), ""])
@@ -242,11 +242,11 @@ def render_ai_analysis_telegram(result: AIAnalysisResult) -> str:
 
     lines = ["<b>✨ AI 情报分析</b>", ""]
 
-    if result.core_trends:
-        lines.extend(["<b>今日核心研判</b>", _escape_html(_format_list_content(result.core_trends)), ""])
-
     if result.sentiment_controversy:
         lines.extend(["<b>客户与公司动态</b>", _escape_html(_format_list_content(result.sentiment_controversy)), ""])
+
+    if result.core_trends:
+        lines.extend(["<b>AI 行业交集</b>", _escape_html(_format_list_content(result.core_trends)), ""])
 
     if result.signals:
         lines.extend(["<b>异动与弱信号</b>", _escape_html(_format_list_content(result.signals)), ""])
@@ -306,12 +306,12 @@ def render_ai_analysis_html_rich(result: AIAnalysisResult) -> str:
                         <div class="ai-block-content">{content_html}</div>
                     </div>"""
 
-    # 主栏：核心研判（阅读主体）+ 客户与公司动态；侧栏：值得跟踪的线索（不打断主线阅读）
+    # 主栏：公司动态优先，AI 行业交集其次；侧栏：值得跟踪的线索。
     main_html = ""
-    if result.core_trends:
-        main_html += _block("今日核心研判", result.core_trends, " ai-block-core")
     if result.sentiment_controversy:
-        main_html += _block("客户与公司动态", result.sentiment_controversy)
+        main_html += _block("重点公司动态", result.sentiment_controversy, " ai-block-core")
+    if result.core_trends:
+        main_html += _block("AI 行业交集", result.core_trends)
     if result.signals:
         main_html += _block("异动与弱信号", result.signals)
     if result.rss_insights:

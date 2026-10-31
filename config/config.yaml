@@ -576,10 +576,12 @@ ai_analysis:
 ai_curation:
   enabled: true
   max_items: 60
-  max_events: 20
-  thresholds:
-    T1: 60
-    T2: 76
+  max_events: 16                  # 页首精选上限；完整新闻仍在下方
+  company_share: 0.75             # 候选与精选位置优先留给 22 组公司新闻
+  company_min_score: 55           # 仅公司名命中、但无实质事件的条目不占页首位置
+  industry_thresholds:            # AI 行业仅保留与客户/商业格局有交集的高价值资讯
+    T1: 70
+    T2: 80
 
 
 # ===============================================================

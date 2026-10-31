@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import yaml
 
-from trendradar.ai.curation import _canonical_url, curate_events
+from trendradar.ai.curation import _canonical_url, _collect, curate_events
 from trendradar.report.html import _render_curated_events, render_html_content
 
 
@@ -102,6 +102,36 @@ class CurationTests(unittest.TestCase):
                             _canonical_url("https://news.example/article?id=2"))
         self.assertEqual(_canonical_url("https://news.example/article?id=1&utm_source=x"),
                          _canonical_url("https://news.example/article?id=1"))
+
+    def test_candidate_budget_reserves_company_news(self):
+        company = [_item(f"腾讯公司人工智能采购项目正式启动 {n}", f"https://company.example/{n}", "公司", "official")
+                   for n in range(20)]
+        industry = [_item(f"AI industry technical update number {n}", f"https://industry.example/{n}", "媒体", "media")
+                    for n in range(20)]
+        picked = _collect([_stat("腾讯", "公司监控", company),
+                           _stat("大模型厂商", "行业动态", industry)], [], 8, 0.75)
+        self.assertEqual(sum(item["company_watch"] for item in picked), 6)
+        self.assertEqual(len(picked), 8)
+
+    def test_high_score_technical_news_does_not_displace_company_index(self):
+        company = [_item(f"腾讯公司算力项目新进展 {n}", f"https://company.example/{n}", "公司", "official")
+                   for n in range(4)]
+        industry = [_item(f"OpenAI model technical update number {n}", f"https://industry.example/{n}", "媒体", "media")
+                    for n in range(4)]
+        stats = [_stat("腾讯", "公司监控", company), _stat("大模型厂商", "行业动态", industry)]
+        def score(_client, items):
+            return {item["id"]: 60 if item["company_watch"] else 95 for item in items}
+        with patch("trendradar.ai.curation.AIClient") as client, \
+             patch("trendradar.ai.curation._score_once", side_effect=score), \
+             patch("trendradar.ai.curation._cluster_with_ai", side_effect=lambda _client, items: [[i["id"]] for i in items]):
+            client.return_value.api_key = "fake"
+            result = curate_events(stats, [], {}, {"MAX_ITEMS": 8, "MAX_EVENTS": 4,
+                                                   "COMPANY_SHARE": 0.75}, [])
+        self.assertEqual(sum(e["company_watch"] for e in result["events"]), 3)
+        self.assertEqual(sum(not e["company_watch"] for e in result["events"]), 1)
+        page = _render_curated_events(result)
+        self.assertLess(page.index("重点公司"), page.index("与公司业务有关的 AI 行业变化"))
+        self.assertIn('<details class="curated-industry">', page)
 
 
 if __name__ == "__main__":

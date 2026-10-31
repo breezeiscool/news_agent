@@ -2,6 +2,7 @@ import json
 import unittest
 
 from trendradar.ai.analyzer import AIAnalyzer, AIAnalysisResult
+from trendradar.report.email_html import render_email_html
 from trendradar.report.html import render_html_content
 
 
@@ -94,6 +95,18 @@ class NewsFocusTests(unittest.TestCase):
         self.assertIn('<details class="company-evidence">', html)
         self.assertIn('href="https://example.com/tender"', html)
         self.assertLess(html.index("启动算力采购"), html.index("查看原始资讯"))
+
+    def test_company_summary_precedes_industry_in_page_and_email(self):
+        analysis = AIAnalysisResult(
+            success=True,
+            sentiment_controversy="腾讯公布新一轮算力采购计划。",
+            core_trends="AI 芯片供应链有新增扩产信号。",
+        )
+        report = {"stats": [], "new_titles": [], "failed_ids": [], "total_new_count": 0}
+        page = render_html_content(report, 0, region_order=["ai_analysis"], ai_analysis=analysis)
+        email = render_email_html(report, 0, ai_analysis=analysis)
+        self.assertLess(page.index("腾讯公布新一轮算力采购计划"), page.index("AI 芯片供应链有新增扩产信号"))
+        self.assertLess(email.index("一、重点公司动态"), email.index("二、AI 行业交集"))
 
 
 if __name__ == "__main__":

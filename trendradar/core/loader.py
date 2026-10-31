@@ -598,8 +598,10 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     config["AI_CURATION"] = {
         "ENABLED": curation.get("enabled", False),
         "MAX_ITEMS": curation.get("max_items", 60),
-        "MAX_EVENTS": curation.get("max_events", 20),
-        "THRESHOLDS": curation.get("thresholds", {"T1": 60, "T2": 76}),
+        "MAX_EVENTS": curation.get("max_events", 16),
+        "COMPANY_SHARE": curation.get("company_share", 0.75),
+        "COMPANY_MIN_SCORE": curation.get("company_min_score", 55),
+        "INDUSTRY_THRESHOLDS": curation.get("industry_thresholds", {"T1": 70, "T2": 80}),
     }
 
     # AI 翻译配置

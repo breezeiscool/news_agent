@@ -26,8 +26,9 @@ def _render_curated_events(curation: Optional[Dict]) -> str:
         return ""
     events = curation["events"]
     scored = bool(curation.get("scored"))
-    status = "两次独立评分 · 同一事件合并" if scored else "评分暂不可用 · 原始资讯仍完整保留"
-    rows = []
+    status = "公司优先 · 两次评分 · 事件聚簇" if scored else "评分暂不可用 · 完整资讯仍在下方"
+    company_rows = []
+    industry_rows = []
     for n, event in enumerate(events, 1):
         sources = event.get("sources") or []
         if not sources:
@@ -47,7 +48,7 @@ def _render_curated_events(curation: Optional[Dict]) -> str:
             f'title="{html_escape(source.get("title", ""))}">{html_escape(source.get("name", "来源"))}</a>'
             for source in sources
         )
-        rows.append(
+        row = (
             '<article class="curated-event">'
             f'<span class="curated-number">{n:02d}</span>'
             '<div class="curated-body">'
@@ -58,15 +59,26 @@ def _render_curated_events(curation: Optional[Dict]) -> str:
             '</div>'
             f'{score_html}</article>'
         )
-    if not rows:
+        (company_rows if event.get("company_watch") else industry_rows).append(row)
+    if not company_rows and not industry_rows:
         return ""
+    company_content = "".join(company_rows) if company_rows else (
+        '<p class="curated-empty">本轮没有值得置顶的名单公司事件；完整监控记录见下方。</p>'
+    )
+    industry_content = (
+        '<details class="curated-industry">'
+        f'<summary>与公司业务有关的 AI 行业变化 <span>{len(industry_rows)} 个事件</span></summary>'
+        f'{"".join(industry_rows)}</details>'
+        if industry_rows else ""
+    )
     return (
         '<section class="curated-section" aria-label="今日精选事件">'
         '<div class="curated-heading"><div><div class="curated-kicker">READ FIRST</div>'
         '<h2>今日精选事件</h2></div>'
         f'<span class="curated-status">{status}</span></div>'
-        '<p class="curated-intro">一件事只占一个位置；先看脉络，再按需打开原文。完整的 22 组公司监控和行业动态仍在下方。</p>'
-        f'{"".join(rows)}</section>'
+        '<p class="curated-intro">先看 22 组重点公司发生了什么；AI 行业仅收录与客户采购或商业格局有关的变化。一件事只占一个位置，原文链接始终保留。</p>'
+        f'<div class="curated-subhead">重点公司 <span>{len(company_rows)} 个事件</span></div>'
+        f'{company_content}{industry_content}</section>'
     )
 
 
@@ -3016,6 +3028,12 @@ def render_html_content(
             .curated-heading h2 { margin: 3px 0 0; color: #173c5d; font-size: 20px; line-height: 1.3; }
             .curated-status { color: #658096; font-size: 11px; line-height: 1.5; white-space: nowrap; }
             .curated-intro { margin: 9px 0 3px; color: #64788b; font-size: 12px; line-height: 1.5; }
+            .curated-subhead { margin-top: 13px; padding: 6px 0; color: #1d5279; border-bottom: 1px solid #dce5ed; font-size: 11px; font-weight: 700; line-height: 1.5; }
+            .curated-subhead span { color: #7c96aa; font-weight: 500; margin-left: 5px; }
+            .curated-empty { color: #71899c; font-size: 12px; line-height: 1.5; margin: 12px 0; }
+            .curated-industry { margin-top: 12px; border-top: 1px solid #dce5ed; }
+            .curated-industry > summary { padding: 10px 0 3px; color: #416b8a; cursor: pointer; font-size: 12px; font-weight: 650; line-height: 1.5; }
+            .curated-industry > summary span { color: #8199ab; font-size: 11px; font-weight: 400; margin-left: 5px; }
             .curated-event { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 10px; padding: 11px 0; border-bottom: 1px solid #e8edf2; }
             .curated-event:last-child { border-bottom: 0; padding-bottom: 0; }
             .curated-number { color: #8aa4b9; font: 700 12px/1.5 ui-monospace, SFMono-Regular, monospace; padding-top: 1px; }
@@ -3035,6 +3053,7 @@ def render_html_content(
             body.dark-mode .curated-heading h2, body.dark-mode .curated-event h3 a { color: #d9e9f5; }
             body.dark-mode .curated-event { border-bottom-color: #294052; }
             body.dark-mode .curated-event p { color: #b4c9d9; }
+            body.dark-mode .curated-subhead, body.dark-mode .curated-industry { border-color: #294052; }
             @media (max-width: 600px) {
                 .curated-section { padding: 13px; }
                 .curated-heading { align-items: start; flex-direction: column; gap: 2px; }
@@ -3088,12 +3107,15 @@ def render_html_content(
 
             <div class="content">"""
 
-    # 一句话总研判（取 AI 行业研判的第一行，独立强调卡）
+    # 一句话总研判优先取重点公司，只有公司域无内容时才退到行业交集。
     headline = ""
     if ai_analysis is not None and getattr(ai_analysis, "success", False):
-        core_text = (getattr(ai_analysis, "core_trends", "") or "").strip()
-        if core_text:
-            headline = core_text.split("\n")[0].strip()
+        lead_text = (
+            (getattr(ai_analysis, "sentiment_controversy", "") or "").strip()
+            or (getattr(ai_analysis, "core_trends", "") or "").strip()
+        )
+        if lead_text:
+            headline = lead_text.split("\n")[0].strip()
             if len(headline) > 90:
                 headline = headline[:90] + "…"
     if headline:
@@ -3116,8 +3138,8 @@ def render_html_content(
     new_count = report_data.get("total_new_count", 0)
 
     metric_cards = [
-        ("行业动态", industry_updates, "组更新"),
         ("客户动态", company_updates, "家"),
+        ("行业交集", industry_updates, "组更新"),
         ("精选资讯", total_picked, "条"),
     ]
     if new_count:
