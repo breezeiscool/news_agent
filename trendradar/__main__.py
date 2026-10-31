@@ -773,6 +773,22 @@ class NewsAnalyzer:
         # 英文 RSS 摘要翻译为中文（标题保持原文；HTML 与推送共用同一份数据）
         rss_items = self._translate_rss_summaries(rss_items)
 
+        curated_events = None
+        curation_config = self.ctx.config.get("AI_CURATION", {})
+        if curation_config.get("ENABLED") and getattr(schedule, "analyze", True) and (stats or rss_items):
+            from trendradar.ai.curation import curate_events
+
+            try:
+                curated_events = curate_events(
+                    stats or [], rss_items or [], self.ctx.config.get("AI", {}),
+                    curation_config, self.ctx.config.get("RSS", {}).get("FEEDS", []),
+                )
+                print(f"[精选] {curated_events['candidate_count']} 条候选 → "
+                      f"{len(curated_events['events'])} 个事件；"
+                      f"双评分{'完成' if curated_events['scored'] else '未完成，展示回退'}")
+            except Exception as exc:
+                print(f"[精选] 索引生成失败，原有简报照常生成：{type(exc).__name__}: {exc}")
+
         # 计算 RSS 匹配条数（供 HTML 和推送共用）
         self._rss_matched_count = sum(stat.get("count", 0) for stat in rss_items) if rss_items else 0
 
@@ -796,6 +812,7 @@ class NewsAnalyzer:
                 standalone_data=html_standalone,
                 frequency_file=self.frequency_file,
                 report_metadata={
+                    "curated_events": curated_events,
                     "hotlist_total": total_titles,
                     "platform_total": len(self.ctx.platform_ids),
                     "rss_matched_count": self._rss_matched_count,

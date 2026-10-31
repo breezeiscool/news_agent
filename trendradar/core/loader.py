@@ -594,6 +594,13 @@ def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
 
     # AI 分析配置
     config["AI_ANALYSIS"] = _load_ai_analysis_config(config_data)
+    curation = config_data.get("ai_curation", {})
+    config["AI_CURATION"] = {
+        "ENABLED": curation.get("enabled", False),
+        "MAX_ITEMS": curation.get("max_items", 60),
+        "MAX_EVENTS": curation.get("max_events", 20),
+        "THRESHOLDS": curation.get("thresholds", {"T1": 60, "T2": 76}),
+    }
 
     # AI 翻译配置
     config["AI_TRANSLATION"] = _load_ai_translation_config(config_data)

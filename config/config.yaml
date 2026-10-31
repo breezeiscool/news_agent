@@ -118,18 +118,10 @@ rss:
   # - 正整数：覆盖全局设置，只推送此天数内的文章
   # - 0：禁用此频道的新鲜度过滤，推送所有文章
   feeds:
-    # ---- 中文产业源：优先保留近期有更新、可解析的源 ----
-    - id: "36kr"
-      name: "36氪"
-      url: "https://36kr.com/feed"
-
+    # 中文与财经补充源：AIHOT 示范源仅覆盖海外 AI，不足以覆盖 22 组客户。
     - id: "ithome"
       name: "IT之家"
       url: "https://www.ithome.com/rss/"
-
-    - id: "huxiu"
-      name: "虎嗅"
-      url: "https://www.huxiu.com/rss/0.xml"
 
     # 微信公众号镜像：非官方服务；已核验有近期更新，故障时不影响其他源。
     - id: "jiqizhixin"
@@ -145,68 +137,109 @@ rss:
     - id: "ruanyifeng"
       name: "阮一峰的网络日志"
       url: "http://www.ruanyifeng.com/blog/atom.xml"
-
-    # ---- 英文源 ----
-    - id: "hacker-news"
-      name: "Hacker News"
-      url: "https://hnrss.org/frontpage"
-
-    - id: "yahoo-finance"
-      name: "雅虎财经"
-      url: "https://finance.yahoo.com/news/rssindex"
-
-    - id: "techcrunch"
-      name: "TechCrunch"
-      url: "https://techcrunch.com/feed/"
-
-    - id: "the-verge"
-      name: "The Verge"
-      url: "http://www.theverge.com/rss/full.xml"
-
-    - id: "venturebeat"
-      name: "VentureBeat"
-      url: "http://venturebeat.com/feed/"
-
     - id: "infoq"
       name: "InfoQ"
       url: "https://feed.infoq.com"
 
+    # 社区与财经补充：热榜仍承担银行、电力、铁路等客户监控覆盖。
+    - id: "hacker-news"
+      name: "Hacker News"
+      url: "https://hnrss.org/frontpage"
     - id: "mit-news"
       name: "MIT News"
       url: "https://news.mit.edu/rss/topic/science-technology-and-society"
 
-    # The Register 的 atom 源存在非法字符导致解析失败，已移除
-
-    - id: "arstechnica"
-      name: "Ars Technica"
-      url: "https://feeds.arstechnica.com/arstechnica/index"
-      # 深度科技报道，覆盖芯片/AI/政策
-
-    # 公司/技术一手消息：与媒体报道交叉核对，仍受同一 24h 新鲜度规则约束。
+    # AIHOT 开源仓库 industry/sources.json 的 18 个公开示范 RSS：
+    # https://github.com/KKKKhazix/AIHOT/blob/main/industry/sources.json
+    # T1 官方一手，T2 媒体/研究者；完整线上信源名单并未开源。
     - id: "openai-news"
       name: "OpenAI News"
       url: "https://openai.com/news/rss.xml"
+      tier: "T1"
       max_items: 40
-
     - id: "google-deepmind"
       name: "Google DeepMind"
       url: "https://deepmind.google/blog/rss.xml"
+      tier: "T1"
       max_items: 40
-
+    - id: "google-research"
+      name: "Google Research"
+      url: "https://research.google/blog/rss/"
+      tier: "T1"
+    - id: "hugging-face"
+      name: "Hugging Face Blog"
+      url: "https://huggingface.co/blog/feed.xml"
+      tier: "T1"
+    - id: "microsoft-research"
+      name: "Microsoft Research"
+      url: "https://www.microsoft.com/en-us/research/feed/"
+      tier: "T1"
+    - id: "nvidia-blog"
+      name: "NVIDIA Blog"
+      url: "https://blogs.nvidia.com/feed/"
+      tier: "T1"
+      max_items: 40
+    # 原有 NVIDIA 技术博客保留作补充；与上面的 AIHOT 示范源不是同一 URL。
     - id: "nvidia-developer"
       name: "NVIDIA Developer"
       url: "https://developer.nvidia.com/blog/feed/"
+      tier: "T1"
       max_items: 40
-
     - id: "aws-machine-learning"
       name: "AWS Machine Learning"
       url: "https://aws.amazon.com/blogs/machine-learning/feed/"
+      tier: "T1"
       max_items: 40
+    - id: "github-ai"
+      name: "GitHub Blog · AI & ML"
+      url: "https://github.blog/ai-and-ml/feed/"
+      tier: "T1"
+    - id: "mistral-ai"
+      name: "Mistral AI"
+      url: "https://mistral.ai/news/rss"
+      tier: "T1"
+    - id: "berkeley-ai"
+      name: "Berkeley AI Research"
+      url: "https://bair.berkeley.edu/blog/feed.xml"
+      tier: "T1"
+    - id: "the-verge-ai"
+      name: "The Verge · AI"
+      url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+      tier: "T2"
+    - id: "techcrunch-ai"
+      name: "TechCrunch · AI"
+      url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+      tier: "T2"
+    - id: "arstechnica-ai"
+      name: "Ars Technica · AI"
+      url: "https://arstechnica.com/ai/feed/"
+      tier: "T2"
+    - id: "mit-tech-review-ai"
+      name: "MIT Technology Review · AI"
+      url: "https://www.technologyreview.com/topic/artificial-intelligence/feed"
+      tier: "T2"
+    - id: "the-decoder"
+      name: "The Decoder"
+      url: "https://the-decoder.com/feed/"
+      tier: "T2"
+    - id: "simon-willison"
+      name: "Simon Willison"
+      url: "https://simonwillison.net/atom/everything/"
+      tier: "T2"
+    - id: "import-ai"
+      name: "Import AI"
+      url: "https://importai.substack.com/feed"
+      tier: "T2"
+    - id: "latent-space"
+      name: "Latent Space"
+      url: "https://www.latent.space/feed"
+      tier: "T2"
 
     # Anthropic 暂无官方 RSS；此镜像由 Alan Turing Institute 的开源项目维护。
     - id: "anthropic-news"
       name: "Anthropic News（镜像）"
       url: "https://raw.githubusercontent.com/alan-turing-institute/ai-rss-feeds/main/feeds/anthropic-news.xml"
+      tier: "T2"
       max_items: 0                    # 镜像按旧到新排列；不能截取前 40 条
 
 
@@ -290,7 +323,7 @@ display:
     standalone: false # 独立展示区（完整热榜/RSS，不受关键词过滤）
   standalone:
     platforms: ["wallstreetcn-hot","cls-hot","thepaper","ifeng"] # 热榜平台 ID 列表（需与上方 platforms.sources 的 id 一致）
-    rss_feeds: ["36kr","ithome","huxiu","ruanyifeng","yahoo-finance","hacker-news","the-verge","venturebeat","techcrunch","infoq","mit-news"] # RSS 源 ID 列表（需与上方 rss.feeds 的 id 一致）
+    rss_feeds: ["ithome","jiqizhixin","qbitai","ruanyifeng","hacker-news","infoq","mit-news"] # RSS 源 ID 列表（需与上方 rss.feeds 的 id 一致）
     max_items: 20                     # 每个源最多展示条数（0=不限制）
 
 
@@ -533,6 +566,20 @@ ai_analysis:
                                     # 启用后 AI 能更精确分析热度趋势，但会额外增加 token 消耗（0.5 倍到 1 倍）
 
 
+
+
+# ===============================================================
+# 9.5 双评分与事件聚簇（AIHOT 思路的 GitHub Actions 适配版）
+# 不会改变 22 组公司监控名单的完整展示；仅生成页首的阅读优先级索引。
+# 两次独立评分 + 一次事件聚簇会增加约 3 次模型调用/推送。
+# ===============================================================
+ai_curation:
+  enabled: true
+  max_items: 60
+  max_events: 20
+  thresholds:
+    T1: 60
+    T2: 76
 
 
 # ===============================================================

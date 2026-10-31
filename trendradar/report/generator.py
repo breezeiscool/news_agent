@@ -225,7 +225,7 @@ def generate_html_report(
     if report_metadata:
         _METADATA_KEYS = {
             "hotlist_total", "platform_total", "rss_matched_count",
-            "rss_total_count", "rss_source_total", "rss_source_failed",
+            "rss_total_count", "rss_source_total", "rss_source_failed", "curated_events",
         }
         for key in _METADATA_KEYS:
             if key in report_metadata:

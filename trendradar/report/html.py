@@ -20,6 +20,56 @@ from trendradar.utils.time import convert_time_for_display
 from trendradar.ai.formatter import render_ai_analysis_html_rich
 
 
+def _render_curated_events(curation: Optional[Dict]) -> str:
+    """A one-event-one-slot reading index, with every source still clickable."""
+    if not curation or not curation.get("events"):
+        return ""
+    events = curation["events"]
+    scored = bool(curation.get("scored"))
+    status = "两次独立评分 · 同一事件合并" if scored else "评分暂不可用 · 原始资讯仍完整保留"
+    rows = []
+    for n, event in enumerate(events, 1):
+        sources = event.get("sources") or []
+        if not sources:
+            continue
+        first_url = html_escape(sources[0].get("url", ""))
+        title = html_escape(event.get("title", ""))
+        summary = html_escape(event.get("summary", "").strip())
+        scope = "客户监控" if event.get("company_watch") else "AI 行业"
+        score = event.get("score")
+        scores = event.get("scores") or []
+        score_html = (
+            f'<span class="curated-score" title="独立评分：{scores[0]} / {scores[1]}">{score}<small>/100</small></span>'
+            if scored and score is not None and len(scores) == 2 else ""
+        )
+        source_links = "".join(
+            f'<a href="{html_escape(source.get("url", ""))}" target="_blank" rel="noopener noreferrer" '
+            f'title="{html_escape(source.get("title", ""))}">{html_escape(source.get("name", "来源"))}</a>'
+            for source in sources
+        )
+        rows.append(
+            '<article class="curated-event">'
+            f'<span class="curated-number">{n:02d}</span>'
+            '<div class="curated-body">'
+            f'<div class="curated-meta">{scope} · {html_escape(event.get("group", ""))} · {len({s.get("name", "") for s in sources})} 个来源</div>'
+            f'<h3><a href="{first_url}" target="_blank" rel="noopener noreferrer">{title}</a></h3>'
+            f'{f"<p>{summary}</p>" if summary else ""}'
+            f'<div class="curated-sources">原文 {source_links}</div>'
+            '</div>'
+            f'{score_html}</article>'
+        )
+    if not rows:
+        return ""
+    return (
+        '<section class="curated-section" aria-label="今日精选事件">'
+        '<div class="curated-heading"><div><div class="curated-kicker">READ FIRST</div>'
+        '<h2>今日精选事件</h2></div>'
+        f'<span class="curated-status">{status}</span></div>'
+        '<p class="curated-intro">一件事只占一个位置；先看脉络，再按需打开原文。完整的 22 组公司监控和行业动态仍在下方。</p>'
+        f'{"".join(rows)}</section>'
+    )
+
+
 def _render_cfo_signal_radar(ai_analysis: Any, stats: List[Dict]) -> str:
     """渲染 CFO 商业信号 Top 5；旧报告没有该字段时静默降级。"""
     if not ai_analysis or not getattr(ai_analysis, "success", False):
@@ -2960,7 +3010,35 @@ def render_html_content(
             body.dark-mode .word-header, body.dark-mode .cluster, body.dark-mode .company-evidence { border-bottom-color: #294052; }
             body.dark-mode .company-summary { background: #1b344b; color: #c9dce9; border-left-color: #6b9fc3; }
             body.dark-mode .company-summary-label, body.dark-mode .company-evidence > summary { color: #9dc2db; }
+            .curated-section { background: #fff; border: 1px solid #d5e0ea; border-top: 3px solid #245b86; border-radius: 4px; padding: 18px 22px; margin: 0 0 14px; }
+            .curated-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; border-bottom: 1px solid #dce5ed; padding-bottom: 10px; }
+            .curated-kicker { color: #5f829f; font: 700 10px/1.4 ui-monospace, SFMono-Regular, monospace; letter-spacing: .14em; }
+            .curated-heading h2 { margin: 3px 0 0; color: #173c5d; font-size: 20px; line-height: 1.3; }
+            .curated-status { color: #658096; font-size: 11px; line-height: 1.5; white-space: nowrap; }
+            .curated-intro { margin: 9px 0 3px; color: #64788b; font-size: 12px; line-height: 1.5; }
+            .curated-event { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 10px; padding: 11px 0; border-bottom: 1px solid #e8edf2; }
+            .curated-event:last-child { border-bottom: 0; padding-bottom: 0; }
+            .curated-number { color: #8aa4b9; font: 700 12px/1.5 ui-monospace, SFMono-Regular, monospace; padding-top: 1px; }
+            .curated-body { min-width: 0; }
+            .curated-meta { color: #547b9a; font-size: 10px; font-weight: 700; line-height: 1.5; letter-spacing: .02em; }
+            .curated-event h3 { margin: 2px 0 0; font-size: 14px; font-weight: 650; line-height: 1.45; }
+            .curated-event h3 a { color: #173c5d; text-decoration: none; }
+            .curated-event h3 a:hover { color: #216d9d; text-decoration: underline; }
+            .curated-event p { margin: 4px 0 0; color: #42596b; font-size: 12px; line-height: 1.55; }
+            .curated-sources { display: flex; flex-wrap: wrap; gap: 4px 9px; margin-top: 5px; color: #8397a7; font-size: 10px; line-height: 1.5; }
+            .curated-sources a { color: #376f96; text-decoration: none; border-bottom: 1px solid #bdd4e4; }
+            .curated-sources a:hover { color: #164f7b; }
+            .curated-score { color: #245b86; font: 700 16px/1.4 ui-monospace, SFMono-Regular, monospace; white-space: nowrap; }
+            .curated-score small { color: #8ba3b4; font-size: 10px; font-weight: 500; }
+            body.dark-mode .curated-section { background: #16202c; border-color: #294052; border-top-color: #6b9fc3; }
+            body.dark-mode .curated-heading { border-bottom-color: #294052; }
+            body.dark-mode .curated-heading h2, body.dark-mode .curated-event h3 a { color: #d9e9f5; }
+            body.dark-mode .curated-event { border-bottom-color: #294052; }
+            body.dark-mode .curated-event p { color: #b4c9d9; }
             @media (max-width: 600px) {
+                .curated-section { padding: 13px; }
+                .curated-heading { align-items: start; flex-direction: column; gap: 2px; }
+                .curated-status { white-space: normal; }
                 body { padding: 8px; }
                 .header, .ai-section, .zone, .run-stats { padding: 13px; }
                 .news-content, .news-item.new .news-content { padding-right: 25px; }
@@ -3021,6 +3099,8 @@ def render_html_content(
     if headline:
         html += f"""
                 <div class="headline-card">「{html_escape(headline)}」</div>"""
+
+    html += _render_curated_events(report_data.get("curated_events"))
 
     # 大数字指标卡行（读者关心的数字）
     def _hdr_is_company(cat):
